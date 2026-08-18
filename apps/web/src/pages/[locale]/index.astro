@@ -1,0 +1,76 @@
+---
+import { SUPPORTED_LOCALES, type SupportedLocale } from '@edu-hub/config';
+import type { AppShellCopy } from '@edu-hub/domain';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  return SUPPORTED_LOCALES.map((locale) => ({
+    params: { locale: locale.toLowerCase() },
+    props: { locale },
+  }));
+}
+interface Props {
+  locale: SupportedLocale;
+}
+const { locale } = Astro.props;
+const copy: Record<SupportedLocale, AppShellCopy> = {
+  'en-EG': {
+    locale: 'en-EG',
+    title: 'Edu Hub foundation',
+    description:
+      'A temporary engineering foundation for a trusted education reference in Egypt.',
+  },
+  'ar-EG': {
+    locale: 'ar-EG',
+    title: 'الأساس التقني لمنصة إديو هَب',
+    description: 'أساس تقني مؤقت لمرجع تعليمي موثوق في مصر.',
+  },
+};
+const current = copy[locale];
+const isArabic = locale === 'ar-EG';
+---
+
+<BaseLayout
+  locale={locale}
+  title={current.title}
+  description={current.description}
+>
+  <header>
+    <nav
+      class="shell"
+      aria-label={isArabic ? 'التنقل الرئيسي' : 'Primary navigation'}
+    >
+      <strong>Edu Hub</strong><ul>
+        <li><a href="/en-eg/" lang="en">English</a></li><li>
+          <a href="/ar-eg/" lang="ar">العربية</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <main class="shell">
+    <p class="eyebrow">{isArabic ? 'أساس مؤقت' : 'Temporary foundation'}</p>
+    <h1>
+      {
+        isArabic
+          ? 'مرجع تعليمي موثوق يبدأ من أساس متين.'
+          : 'A trustworthy education reference starts with a sound foundation.'
+      }
+    </h1>
+    <p>{current.description}</p>
+    <aside
+      class="notice"
+      aria-label={isArabic ? 'حالة المشروع' : 'Project status'}
+    >
+      {
+        isArabic
+          ? 'هذه واجهة تأسيسية فقط. لا توجد بيانات مؤسسات أو وظائف دليل في هذه المرحلة.'
+          : 'This is a foundation shell only. No institution data or directory functionality exists in this milestone.'
+      }
+    </aside>
+  </main>
+  <footer>
+    <div class="shell">
+      {isArabic ? 'إديو هَب — مرحلة التأسيس' : 'Edu Hub — foundation milestone'}
+    </div>
+  </footer>
+</BaseLayout>

@@ -1,0 +1,141 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #222;
+  background: #f4f4f2;
+  line-height: 1.5;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+.shell {
+  width: min(100% - 2rem, 76rem);
+  margin-inline: auto;
+}
+header {
+  background: #222;
+  color: #fff;
+  padding-block: 1rem;
+}
+header .shell {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+header a {
+  color: inherit;
+}
+main {
+  padding-block: clamp(1.5rem, 5vw, 4rem);
+}
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin-block: 0.25rem 1.5rem;
+}
+.panel {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: clamp(1rem, 3vw, 2rem);
+}
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+.button,
+button {
+  display: inline-block;
+  background: #222;
+  color: #fff;
+  border: 1px solid #222;
+  padding: 0.65rem 1rem;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.button.secondary {
+  background: #fff;
+  color: #222;
+}
+.table-wrap {
+  overflow-x: auto;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 45rem;
+}
+th,
+td {
+  text-align: start;
+  padding: 0.75rem;
+  border-block-end: 1px solid #ddd;
+  vertical-align: top;
+}
+form.grid,
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+fieldset {
+  grid-column: 1/-1;
+  border: 1px solid #ccc;
+  padding: 1rem;
+}
+label {
+  display: grid;
+  gap: 0.3rem;
+  font-weight: 600;
+}
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.65rem;
+  border: 1px solid #888;
+  background: #fff;
+  color: #222;
+  font: inherit;
+}
+select[multiple] {
+  min-height: 8rem;
+}
+.full {
+  grid-column: 1/-1;
+}
+.muted {
+  color: #62625d;
+  font-size: 0.9rem;
+}
+.error {
+  border: 1px solid #a00;
+  background: #fff0f0;
+  color: #700;
+  padding: 1rem;
+}
+textarea[dir='rtl'],
+input[dir='rtl'] {
+  text-align: right;
+}
+@media (max-width: 44rem) {
+  header .shell {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  form.grid,
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .full {
+    grid-column: 1;
+  }
+  table {
+    min-width: 38rem;
+  }
+}

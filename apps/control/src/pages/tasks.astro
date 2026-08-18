@@ -1,0 +1,106 @@
+---
+import ControlLayout from '../layouts/ControlLayout.astro';
+import { getStaffContext } from '../lib/auth';
+export const prerender = false;
+const staff = await getStaffContext(Astro);
+if (!staff) return Astro.redirect('/login?error=session');
+const { data: tasks } = await staff.client
+  .from('research_tasks')
+  .select('*,institutions!research_tasks_entity_id_fkey(official_name)')
+  .order('created_at', { ascending: false });
+const { data: institutions } = await staff.client
+  .from('institutions')
+  .select('id,official_name')
+  .order('official_name');
+const { data: staffUsers } = await staff.client
+  .from('staff_users')
+  .select('user_id,display_name,role,status')
+  .eq('status', 'active');
+---
+
+<ControlLayout title="Research tasks"
+  ><h1>Research tasks</h1><section class="panel">
+    <h2>Create task</h2><form class="grid" method="post" action="/api/tasks">
+      <label
+        >Type<select name="task_type"
+          ><option value="initial_research">Initial research</option><option
+            value="source_verification">Source verification</option
+          ><option value="conflict_resolution">Conflict resolution</option
+          ><option value="translation">Translation</option><option
+            value="quality_review">Quality review</option
+          ></select
+        ></label
+      ><label
+        >Institution<select name="entity_id" required
+          >{
+            institutions?.map((i) => (
+              <option value={i.id}>{i.official_name}</option>
+            ))
+          }</select
+        ></label
+      ><label
+        >Priority<select name="priority"
+          ><option value="normal">Normal</option><option value="high"
+            >High</option
+          ><option value="critical">Critical</option></select
+        ></label
+      ><label class="full">Notes<textarea name="notes"></textarea></label
+      ><button type="submit">Create task</button>
+    </form>
+  </section><section class="panel table-wrap">
+    <table>
+      <thead
+        ><tr
+          ><th>Institution</th><th>Task</th><th>Priority</th><th>Status</th><th
+            >Assignment / transition</th
+          ></tr
+        ></thead
+      ><tbody
+        >{
+          tasks?.map((task) => (
+            <tr>
+              <>
+                <td>{task.institutions?.official_name}</td>
+                <td>{task.task_type}</td>
+                <td>{task.priority}</td>
+                <td>{task.status}</td>
+                <td>
+                  <form method="post" action={`/api/tasks/${task.id}`}>
+                    <>
+                      <select name="assigned_to" aria-label="Assignee">
+                        <option value="">Unassigned</option>
+                        {staffUsers?.map((s) => (
+                          <option
+                            value={s.user_id}
+                            selected={s.user_id === task.assigned_to}
+                          >
+                            {s.display_name ?? s.user_id} ({s.role})
+                          </option>
+                        ))}
+                      </select>
+                      <select name="status" aria-label="Status">
+                        <>
+                          <option value="assigned">Assigned</option>
+                          <option value="in_progress">In progress</option>
+                          <option value="in_review">In review</option>
+                          <option value="completed">Completed</option>
+                          <option value="cancelled">Cancelled</option>
+                        </>
+                      </select>
+                      <input
+                        name="outcome"
+                        aria-label="Outcome"
+                        placeholder="Outcome when complete"
+                      />
+                      <button>Update</button>
+                    </>
+                  </form>
+                </td>
+              </>
+            </tr>
+          ))
+        }</tbody
+      >
+    </table>
+  </section></ControlLayout
+>

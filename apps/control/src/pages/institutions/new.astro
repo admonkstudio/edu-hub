@@ -1,0 +1,199 @@
+---
+import ControlLayout from '../../layouts/ControlLayout.astro';
+import LocalizationFormValidation from '../../components/LocalizationFormValidation.astro';
+import { getStaffContext } from '../../lib/auth';
+export const prerender = false;
+const context = await getStaffContext(Astro);
+if (!context) return Astro.redirect('/login');
+const tables = [
+  'institution_types',
+  'ownership_types',
+  'education_models',
+  'education_levels',
+  'curricula',
+  'languages',
+  'certificates',
+] as const;
+const results = await Promise.all(
+  tables.map((table) =>
+    context.client
+      .from(table)
+      .select('id,label_en')
+      .eq('status', 'active')
+      .order('sort_order'),
+  ),
+);
+const options = results.map((result) => result.data ?? []);
+const institutionTypes = options[0] ?? [],
+  ownershipTypes = options[1] ?? [],
+  educationModels = options[2] ?? [],
+  educationLevels = options[3] ?? [],
+  curricula = options[4] ?? [],
+  languages = options[5] ?? [],
+  certificates = options[6] ?? [];
+const { data: providers } = await context.client
+  .from('providers')
+  .select('id,official_name')
+  .order('official_name');
+const { data: governorates } = await context.client
+  .from('locations')
+  .select('id,name_en')
+  .eq('location_type', 'governorate')
+  .order('name_en');
+---
+
+<ControlLayout title="Create institution"
+  ><p><a href="/">← Institutions</a></p><h1>Create institution</h1><form
+    data-localization-form
+    class="grid panel"
+    method="post"
+    action="/api/institutions"
+  >
+    <label>Official name<input name="official_name" required /></label><label
+      >Institution type<select name="institution_type_id" required
+        ><option value="">Select</option>{
+          institutionTypes.map((item) => (
+            <option value={item.id}>{item.label_en}</option>
+          ))
+        }</select
+      ></label
+    >
+    <label
+      >Provider<select name="provider_id"
+        ><option value="">Independent</option>{
+          providers?.map((item) => (
+            <option value={item.id}>{item.official_name}</option>
+          ))
+        }</select
+      ></label
+    ><label
+      >Ownership<select name="ownership_type_id"
+        ><option value="">Not set</option>{
+          ownershipTypes.map((item) => (
+            <option value={item.id}>{item.label_en}</option>
+          ))
+        }</select
+      ></label
+    >
+    <label
+      >Education model<select name="education_model_id"
+        ><option value="">Not set</option>{
+          educationModels.map((item) => (
+            <option value={item.id}>{item.label_en}</option>
+          ))
+        }</select
+      ></label
+    ><label
+      >Founded year<input
+        name="founded_year"
+        type="number"
+        min="900"
+        max={new Date().getFullYear()}
+      /></label
+    >
+    <label
+      >Official website<input name="official_website_url" type="url" /></label
+    ><label
+      >Publication status<select name="publication_status"
+        ><option>draft</option><option>public_noindex</option><option
+          >index_ready</option
+        ><option>published</option></select
+      ></label
+    >
+    <label
+      >Data status<select name="data_status"
+        ><option>candidate</option><option>researching</option><option
+          >sourced</option
+        ><option>reviewed</option><option>officially_sourced</option><option
+          >institution_confirmed</option
+        ><option>conflicting</option><option>stale</option><option
+          >disputed</option
+        ></select
+      ></label
+    >
+    <fieldset>
+      <legend>English localization</legend><p class="full">
+        Complete at least one localization. Missing launch locales remain
+        pending while the record is a draft.
+      </p><div class="grid">
+        <label>Name<input name="name_en" /></label><label
+          >Slug<input
+            name="slug_en"
+            pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
+          /></label
+        ><label class="full"
+          >Summary<textarea name="summary_en"></textarea></label
+        >
+      </div>
+    </fieldset>
+    <fieldset dir="rtl">
+      <legend>المحتوى العربي — Pending</legend><div class="grid">
+        <label>الاسم<input dir="rtl" name="name_ar" /></label><label
+          >الرابط المختصر<input dir="rtl" name="slug_ar" /></label
+        ><label class="full"
+          >الملخص<textarea dir="rtl" name="summary_ar"></textarea></label
+        >
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Main campus</legend><div class="grid">
+        <label>Campus name<input name="campus_name" required /></label><label
+          >Governorate<select name="location_id" required
+            ><option value="">Select</option>{
+              governorates?.map((item) => (
+                <option value={item.id}>{item.name_en}</option>
+              ))
+            }</select
+          ></label
+        ><label>English address<textarea name="address_en"></textarea></label
+        ><label dir="rtl"
+          >العنوان العربي<textarea dir="rtl" name="address_ar"
+          ></textarea></label
+        >
+      </div>
+    </fieldset>
+    <label
+      >Education levels<select multiple name="education_level_ids"
+        >{
+          educationLevels.map((item) => (
+            <option value={item.id}>{item.label_en}</option>
+          ))
+        }</select
+      ></label
+    ><label
+      >Curricula<select multiple name="curriculum_ids"
+        >{
+          curricula.map((item) => (
+            <option value={item.id}>{item.label_en}</option>
+          ))
+        }</select
+      ></label
+    ><label
+      >Languages<select multiple name="language_ids"
+        >{
+          languages.map((item) => (
+            <option value={item.id}>{item.label_en}</option>
+          ))
+        }</select
+      ></label
+    ><label
+      >Certificates<select multiple name="certificate_ids"
+        >{
+          certificates.map((item) => (
+            <option value={item.id}>{item.label_en}</option>
+          ))
+        }</select
+      ></label
+    >
+    <label class="full"
+      >Change reason<textarea name="change_reason" required minlength="3"
+        >Initial institution record</textarea
+      ></label
+    ><div class="full actions">
+      <button type="submit">Create institution</button><a
+        class="button secondary"
+        href="/">Cancel</a
+      >
+    </div>
+  </form><LocalizationFormValidation /></ControlLayout
+>

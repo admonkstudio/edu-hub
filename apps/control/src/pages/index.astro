@@ -1,0 +1,68 @@
+---
+import { listInstitutions } from '@edu-hub/database';
+import ControlLayout from '../layouts/ControlLayout.astro';
+import { getStaffContext } from '../lib/auth';
+export const prerender = false;
+const staffContext = await getStaffContext(Astro);
+if (!staffContext) return Astro.redirect('/login');
+const institutions = await listInstitutions(staffContext.client);
+---
+
+<ControlLayout title="Institutions">
+  <div class="actions">
+    <div><p class="muted">Milestone 1</p><h1>Institutions</h1></div><a
+      class="button"
+      href="/institutions/new">Create institution</a
+    >
+  </div>
+  <section class="panel table-wrap" aria-label="Institution records">
+    <table>
+      <thead
+        ><tr
+          ><th>Name</th><th>Type</th><th>Publication</th><th>Data</th><th
+            >Location</th
+          ><th>Locales</th></tr
+        ></thead
+      ><tbody>
+        {
+          institutions.map((institution) => (
+            <tr>
+              <>
+                <td>
+                  <a href={`/institutions/${institution.id}`}>
+                    {institution.official_name}
+                  </a>
+                </td>
+                <td>{institution.institution_types?.label_en}</td>
+                <td>{institution.publication_status}</td>
+                <td>{institution.data_status}</td>
+                <td>
+                  {institution.campuses.find((campus) => campus.is_main)
+                    ?.locations?.name_en ?? '—'}
+                </td>
+                <td>
+                  {(['en-EG', 'ar-EG'] as const)
+                    .map((locale) =>
+                      institution.institution_localizations.some(
+                        (item) => item.locale === locale,
+                      )
+                        ? locale
+                        : `${locale}: Pending`,
+                    )
+                    .join(', ')}
+                </td>
+              </>
+            </tr>
+          ))
+        }
+        {
+          institutions.length === 0 && (
+            <tr>
+              <td colspan="6">No institutions yet.</td>
+            </tr>
+          )
+        }
+      </tbody>
+    </table>
+  </section>
+</ControlLayout>

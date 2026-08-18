@@ -1,0 +1,74 @@
+---
+import ControlLayout from '../layouts/ControlLayout.astro';
+import { getStaffContext } from '../lib/auth';
+export const prerender = false;
+const staff = await getStaffContext(Astro);
+if (!staff) return Astro.redirect('/login?error=session');
+const { data: sources } = await staff.client
+  .from('sources')
+  .select('*')
+  .order('retrieved_at', { ascending: false });
+---
+
+<ControlLayout title="Sources"
+  ><h1>Sources</h1><section class="panel">
+    <h2>Add source</h2><form class="grid" method="post" action="/api/sources">
+      <label
+        >Type<select name="source_type"
+          ><option value="government">Government</option><option
+            value="regulator">Regulator</option
+          ><option value="institution_website">Institution website</option
+          ><option value="institution_social">Official social account</option
+          ><option value="official_document">Official document</option><option
+            value="authoritative_publication">Authoritative publication</option
+          ><option value="secondary">Secondary</option></select
+        ></label
+      ><label
+        >Authority level<input
+          name="authority_level"
+          type="number"
+          min="1"
+          max="6"
+          value="2"
+          required
+        /></label
+      ><label>Publisher<input name="publisher" required /></label><label
+        >Title<input name="title" required /></label
+      ><label class="full">URL<input name="url" type="url" required /></label
+      ><label
+        >Language<select name="language"
+          ><option value="en">English</option><option value="ar">Arabic</option
+          ><option value="mixed">Mixed</option></select
+        ></label
+      ><label class="full"
+        >Research notes<textarea name="notes"></textarea></label
+      ><button type="submit">Add source</button>
+    </form>
+  </section><section class="panel table-wrap">
+    <table>
+      <thead
+        ><tr
+          ><th>Source</th><th>Publisher</th><th>Authority</th><th>Status</th
+          ></tr
+        ></thead
+      ><tbody
+        >{
+          sources?.map((source) => (
+            <tr>
+              <>
+                <td>
+                  <a href={source.url} rel="noreferrer">
+                    {source.title}
+                  </a>
+                </td>
+                <td>{source.publisher}</td>
+                <td>{source.authority_level}</td>
+                <td>{source.status}</td>
+              </>
+            </tr>
+          ))
+        }</tbody
+      >
+    </table>
+  </section></ControlLayout
+>

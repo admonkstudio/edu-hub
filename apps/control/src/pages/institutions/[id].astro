@@ -1,0 +1,296 @@
+---
+import { getInstitution } from '@edu-hub/database';
+import ControlLayout from '../../layouts/ControlLayout.astro';
+import LocalizationFormValidation from '../../components/LocalizationFormValidation.astro';
+import { getStaffContext } from '../../lib/auth';
+export const prerender = false;
+const context = await getStaffContext(Astro);
+if (!context) return Astro.redirect('/login');
+const institution = await getInstitution(context.client, Astro.params.id!);
+const en = institution.institution_localizations.find(
+  (item) => item.locale === 'en-EG',
+);
+const ar = institution.institution_localizations.find(
+  (item) => item.locale === 'ar-EG',
+);
+const campus =
+  institution.campuses.find((item) => item.is_main) ?? institution.campuses[0];
+const tables = [
+  'institution_types',
+  'ownership_types',
+  'education_models',
+  'education_levels',
+  'curricula',
+  'languages',
+  'certificates',
+] as const;
+const results = await Promise.all(
+  tables.map((table) =>
+    context.client
+      .from(table)
+      .select('id,label_en')
+      .eq('status', 'active')
+      .order('sort_order'),
+  ),
+);
+const options = results.map((result) => result.data ?? []);
+const institutionTypes = options[0] ?? [],
+  ownershipTypes = options[1] ?? [],
+  educationModels = options[2] ?? [],
+  educationLevels = options[3] ?? [],
+  curricula = options[4] ?? [],
+  languages = options[5] ?? [],
+  certificates = options[6] ?? [];
+const selected = {
+  educationLevels: institution.institution_education_levels.map(
+    (x) => x.education_level_id,
+  ),
+  curricula: institution.institution_curricula.map((x) => x.curriculum_id),
+  languages: institution.institution_languages.map((x) => x.language_id),
+  certificates: institution.institution_certificates.map(
+    (x) => x.certificate_id,
+  ),
+};
+const { data: providers } = await context.client
+  .from('providers')
+  .select('id,official_name')
+  .order('official_name');
+const { data: governorates } = await context.client
+  .from('locations')
+  .select('id,name_en')
+  .eq('location_type', 'governorate')
+  .order('name_en');
+---
+
+<ControlLayout title={`Edit ${institution.official_name}`}
+  ><p>
+    <a href="/">← Institutions</a> · <a
+      href={`/institutions/${institution.id}/trust`}
+      >Trust, evidence & history</a
+    >
+  </p><h1>Edit institution</h1>{
+    Astro.url.searchParams.has('created') && (
+      <p class="panel">Institution created.</p>
+    )
+  }{
+    Astro.url.searchParams.has('saved') && <p class="panel">Changes saved.</p>
+  }<form
+    data-localization-form
+    class="grid panel"
+    method="post"
+    action={`/api/institutions/${institution.id}`}
+  >
+    <label
+      >Official name<input
+        name="official_name"
+        required
+        value={institution.official_name}
+      /></label
+    ><label
+      >Institution type<select name="institution_type_id" required
+        >{
+          institutionTypes.map((x) => (
+            <option
+              value={x.id}
+              selected={x.id === institution.institution_type_id}
+            >
+              {x.label_en}
+            </option>
+          ))
+        }</select
+      ></label
+    >
+    <label
+      >Provider<select name="provider_id"
+        ><option value="">Independent</option>{
+          providers?.map((x) => (
+            <option value={x.id} selected={x.id === institution.provider_id}>
+              {x.official_name}
+            </option>
+          ))
+        }</select
+      ></label
+    >
+    <label
+      >Ownership<select name="ownership_type_id"
+        ><option value="">Not set</option>{
+          ownershipTypes.map((x) => (
+            <option
+              value={x.id}
+              selected={x.id === institution.ownership_type_id}
+            >
+              {x.label_en}
+            </option>
+          ))
+        }</select
+      ></label
+    ><label
+      >Education model<select name="education_model_id"
+        ><option value="">Not set</option>{
+          educationModels.map((x) => (
+            <option
+              value={x.id}
+              selected={x.id === institution.education_model_id}
+            >
+              {x.label_en}
+            </option>
+          ))
+        }</select
+      ></label
+    >
+    <label
+      >Official website<input
+        name="official_website_url"
+        type="url"
+        value={institution.official_website_url ?? ''}
+      /></label
+    ><label
+      >Founded year<input
+        name="founded_year"
+        type="number"
+        value={institution.founded_year ?? ''}
+      /></label
+    >
+    <label
+      >Publication status<select name="publication_status"
+        >{
+          [
+            'draft',
+            'public_noindex',
+            'index_ready',
+            'published',
+            'archived',
+          ].map((x) => (
+            <option selected={x === institution.publication_status}>{x}</option>
+          ))
+        }</select
+      ></label
+    ><label
+      >Data status<select name="data_status"
+        >{
+          [
+            'candidate',
+            'researching',
+            'sourced',
+            'reviewed',
+            'officially_sourced',
+            'institution_confirmed',
+            'conflicting',
+            'stale',
+            'disputed',
+          ].map((x) => (
+            <option selected={x === institution.data_status}>{x}</option>
+          ))
+        }</select
+      ></label
+    >
+    <fieldset>
+      <legend>English {en ? '' : '— Pending'}</legend><div class="grid">
+        <label>Name<input name="name_en" value={en?.name} /></label><label
+          >Slug<input name="slug_en" value={en?.slug} /></label
+        ><label class="full"
+          >Summary<textarea name="summary_en">{en?.summary}</textarea></label
+        >
+      </div>
+    </fieldset>
+    <fieldset dir="rtl">
+      <legend>العربية {ar ? '' : '— Pending'}</legend><div class="grid">
+        <label>الاسم<input dir="rtl" name="name_ar" value={ar?.name} /></label
+        ><label>الرابط<input dir="rtl" name="slug_ar" value={ar?.slug} /></label
+        ><label class="full"
+          >الملخص<textarea dir="rtl" name="summary_ar">{ar?.summary}</textarea
+          ></label
+        >
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Main campus</legend><input
+        type="hidden"
+        name="campus_id"
+        value={campus?.id}
+      /><div class="grid">
+        <label
+          >Name<input name="campus_name" required value={campus?.name} /></label
+        ><label
+          >Governorate<select name="location_id" required
+            >{
+              governorates?.map((x) => (
+                <option value={x.id} selected={x.id === campus?.location_id}>
+                  {x.name_en}
+                </option>
+              ))
+            }</select
+          ></label
+        ><label
+          >English address<textarea name="address_en"
+            >{campus?.address_en}</textarea
+          ></label
+        ><label dir="rtl"
+          >العنوان العربي<textarea dir="rtl" name="address_ar"
+            >{campus?.address_ar}</textarea
+          ></label
+        >
+      </div>
+    </fieldset>
+    <label
+      >Education levels<select multiple name="education_level_ids"
+        >{
+          educationLevels.map((x) => (
+            <option
+              value={x.id}
+              selected={selected.educationLevels.includes(x.id)}
+            >
+              {x.label_en}
+            </option>
+          ))
+        }</select
+      ></label
+    ><label
+      >Curricula<select multiple name="curriculum_ids"
+        >{
+          curricula.map((x) => (
+            <option value={x.id} selected={selected.curricula.includes(x.id)}>
+              {x.label_en}
+            </option>
+          ))
+        }</select
+      ></label
+    ><label
+      >Languages<select multiple name="language_ids"
+        >{
+          languages.map((x) => (
+            <option value={x.id} selected={selected.languages.includes(x.id)}>
+              {x.label_en}
+            </option>
+          ))
+        }</select
+      ></label
+    ><label
+      >Certificates<select multiple name="certificate_ids"
+        >{
+          certificates.map((x) => (
+            <option
+              value={x.id}
+              selected={selected.certificates.includes(x.id)}
+            >
+              {x.label_en}
+            </option>
+          ))
+        }</select
+      ></label
+    >
+    <label class="full"
+      >Change reason<textarea
+        name="change_reason"
+        required
+        minlength="3"
+        placeholder="Explain why these canonical facts changed."
+      ></textarea></label
+    ><div class="full actions">
+      <button type="submit">Save changes</button><a
+        class="button secondary"
+        href="/">Cancel</a
+      >
+    </div>
+  </form><LocalizationFormValidation /></ControlLayout
+>

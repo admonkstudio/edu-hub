@@ -1,0 +1,22 @@
+{
+  "name": "@edu-hub/control",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --port 4322",
+    "build": "astro build",
+    "preview": "astro preview --port 4322",
+    "typecheck": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/vercel": "11.0.5",
+    "@edu-hub/config": "workspace:*",
+    "@edu-hub/database": "workspace:*",
+    "@supabase/supabase-js": "2.112.3",
+    "astro": "7.2.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.6"
+  }
+}

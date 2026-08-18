@@ -1,0 +1,22 @@
+{
+  "name": "@edu-hub/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --port 4321",
+    "build": "astro build",
+    "preview": "astro preview --port 4321",
+    "typecheck": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/vercel": "11.0.5",
+    "@edu-hub/config": "workspace:*",
+    "@edu-hub/domain": "workspace:*",
+    "@edu-hub/seo": "workspace:*",
+    "astro": "7.2.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.6"
+  }
+}

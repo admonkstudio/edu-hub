@@ -1,0 +1,36 @@
+---
+import ControlLayout from '../layouts/ControlLayout.astro';
+export const prerender = false;
+const error = Astro.url.searchParams.get('error');
+const messages: Record<string, string> = {
+  credentials: 'The email or password was not accepted.',
+  unauthorized: 'This account does not have an active staff role.',
+  session: 'Your session expired. Sign in again to continue.',
+};
+---
+
+<ControlLayout title="Sign in"
+  ><section class="panel" style="max-width:32rem">
+    <h1>Staff sign in</h1><p class="muted">
+      Supabase authentication plus an active internal staff role is required.
+    </p>{
+      error && <p class="error">{messages[error] ?? 'Sign-in failed.'}</p>
+    }<form class="grid" method="post" action="/api/session">
+      <label class="full"
+        >Email<input
+          name="email"
+          type="email"
+          required
+          autocomplete="email"
+        /></label
+      ><label class="full"
+        >Password<input
+          name="password"
+          type="password"
+          required
+          autocomplete="current-password"
+        /></label
+      ><button class="full" type="submit">Sign in</button>
+    </form>
+  </section></ControlLayout
+>

@@ -1,0 +1,42 @@
+---
+import '../styles/control.css';
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+const hasSession =
+  Astro.cookies.has('edu-hub-access-token') ||
+  Astro.cookies.has('edu-hub-refresh-token');
+---
+
+<!doctype html>
+<html lang="en-EG" dir="ltr">
+  <head
+    ><meta charset="UTF-8" /><meta
+      name="viewport"
+      content="width=device-width"
+    /><meta name="robots" content="noindex,nofollow" /><title>
+      {title} — Edu Hub Control
+    </title></head
+  ><body
+    ><header>
+      <div class="shell">
+        <a href="/"><strong>Edu Hub Control</strong></a><nav
+          aria-label="Control"
+        >
+          <a href="/">Institutions</a>
+          <a href="/sources">Sources</a>
+          <a href="/tasks">Research tasks</a>
+        </nav>{
+          hasSession && (
+            <form method="post" action="/api/logout">
+              <button type="submit" class="secondary">
+                Sign out
+              </button>
+            </form>
+          )
+        }
+      </div>
+    </header><main class="shell"><slot /></main></body
+  >
+</html>
