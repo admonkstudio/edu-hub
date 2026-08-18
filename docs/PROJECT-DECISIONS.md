@@ -141,3 +141,11 @@ Record durable decisions here. Do not use this file for temporary task notes.
 **Decision:** Keep the hosted workflow fixture as draft staging data for operational inspection. Real cohort records remain staging-only until Milestone 2 closes.
 
 **Risk:** Supabase's hosted advisor reports leaked-password protection disabled on the Free staging project. Generated QA passwords remain high entropy; enable the protection before production if plan support permits. Informational missing-FK-index findings will be evaluated against the cohort's actual query patterns instead of adding indexes blindly.
+
+## 2026-08-18 — Pending localization in the real-institution cohort
+
+**Decision:** Do not invent or transliterate a canonical Arabic institution name to satisfy Control validation. When an institution-owned Arabic form cannot be established, preserve that uncertainty explicitly and treat any required-localization block as a cohort workflow/readiness finding.
+
+**Evidence:** The Small Talk Nursery staging attempt used the researcher workflow with `draft` / `candidate`, supplied only the established English identity, and left Arabic identity pending. Control prevented submission at the required Arabic-name field, and a post-attempt database query confirmed that no institution record was created.
+
+**Consequence:** The first cohort record remains blocked rather than being created with unsupported data. The pilot must decide how pending localization is represented before N1 can proceed through sources, assertions, and research tasks.

@@ -69,7 +69,7 @@ Verified locally on 2026-08-18: clean migration reset; 36 pgTAP checks; database
 
 Hosted staging was verified on 2026-08-18. The linked Frankfurt Supabase project received all five migrations after a clean dry run. Separate Vercel projects deploy `apps/web` and `apps/control` with independently scoped variables and no service-role key. Hosted checks passed for anonymous denial, researcher/reviewer/admin access, suspended login denial, refresh, logout, live stale-role revocation, protected direct-write denial, atomic rollback, conflict resolution, task assignment/transitions, freshness, bilingual content entry, responsive widths (390/768/1024/1440), RTL/LTR direction, and console/network sanity. Vercel reported no runtime errors. Supabase reports one Auth warning (leaked-password protection disabled) and informational unindexed-foreign-key notices for workload review.
 
-Milestone 2 is not complete. The 20–30 real source-backed institution cohort and workflow/model/data-quality retrospective remain outstanding. Do not start Milestone 3 before those gates are complete.
+Milestone 2 is not complete. The 20–30 real source-backed institution cohort and workflow/model/data-quality retrospective remain outstanding. The first candidate, Small Talk Nursery, is currently blocked at Control creation because the form requires an Arabic name and slug while no institution-owned Arabic naming source has been established. The failed submission was verified to create no database record; no placeholder localization or direct-write workaround was used. Do not start Milestone 3 before those gates are complete.
 
 ## Immediate next actions
 
