@@ -1,0 +1,14 @@
+{
+  "name": "@edu-hub/database",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@edu-hub/config": "workspace:*",
+    "@supabase/supabase-js": "2.112.3"
+  }
+}

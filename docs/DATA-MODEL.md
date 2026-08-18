@@ -1,6 +1,10 @@
 # Edu Hub Data Model
 
-This document defines the approved conceptual data model for Milestone 1. Exact SQL can evolve during implementation only when the reason is recorded in `PROJECT-DECISIONS.md`.
+This document defines the approved conceptual data model for Milestone 1. The canonical identity, localization, campus, geography, taxonomy, relationship, lifecycle, staff-access, and RLS portions are implemented in `supabase/migrations/20260818022104_canonical_data_foundation.sql`.
+
+Milestone 1 intentionally does not implement fees, admission cycles, source/evidence records, research workflow, editorial content, institution claims, commercial plans, or the public directory. Those conceptual sections remain requirements for their separately approved milestones and must not be inferred from the current schema.
+
+Milestone 2 implementation is now in progress through `20260818110704_trust_provenance_research_foundation.sql`. It adds change sets/revisions, sources/snapshots, field assertions/conflicts, research tasks, freshness, completeness requirements, and atomic canonical institution commands. Fees, admissions, public directory, AI research, and mass ingestion remain outside this milestone.
 
 ## Core principles
 

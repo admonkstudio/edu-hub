@@ -64,9 +64,68 @@ Record durable decisions here. Do not use this file for temporary task notes.
 
 - final public brand name
 - final domain
-- final hosting provider/Astro adapter
 - final visual identity
 - final production design system/styling strategy
 - final map provider
 - final analytics/consent stack
 - exact first public institution/data cohort
+
+## 2026-08-18 — Milestone 0 workspace and tooling
+
+**Decision:** Use pnpm workspaces without Turborepo/Nx. The current dependency graph and quality gates do not justify a separate orchestration layer.
+
+**Decision:** Keep `apps/web` and `apps/control` as independent Astro applications and create only `database`, `domain`, `seo`, and `config` shared packages. `research` and `ui` wait for a concrete milestone responsibility.
+
+**Decision:** Pin Node.js 22.12+, pnpm 11.19.0, Astro 7.2.2, and TypeScript 6.0.3. TypeScript 7 was evaluated but rejected because the current Astro language-server check explicitly requires the TypeScript 6 programmatic API.
+
+**Decision:** Use Vitest for shared helper tests and Playwright for rendered shell smoke tests. CI installs Chromium and runs browser smoke tests after the build gates.
+
+## 2026-08-18 — Supabase foundation boundary
+
+**Decision:** Commit the current CLI-generated local Supabase configuration and an empty migration convention. Do not create a placeholder domain table or canonical directory schema in Milestone 0.
+
+**Decision:** Use local ports `55320`–`55329` for Edu Hub so its stack can coexist with another Supabase project using the CLI defaults.
+
+**Decision:** Provide only a server-side Supabase client boundary using a secret key and validated environment. No browser client exists until a real public-client use case and RLS policy are approved.
+
+## 2026-08-18 — Initial deployment direction
+
+**Decision:** Configure Astro's official Vercel adapter for both apps. Vercel is the initial hosting direction because it supports Astro on-demand rendering, pull-request previews, environment/secrets management, cache controls, and simple operations for two independently deployed monorepo apps.
+
+**Constraint:** Both Milestone 0 shells remain statically prerendered. On-demand routes are enabled only when later data-driven requirements justify them.
+
+**External dependency:** Two Vercel projects and one Supabase project still require account-level creation/linking and deployed verification. This repository does not claim those external steps are complete.
+
+## 2026-08-18 — Milestone 1 canonical data foundation
+
+**Decision:** Model providers, institutions, localized editorial records, campuses, hierarchical locations, and controlled education taxonomies relationally. Keep campuses separate from institutions and use explicit join tables for searchable many-to-many concepts.
+
+**Decision:** Use stable codes plus bilingual labels/slugs for controlled vocabularies. Seed Egypt and its 27 governorates using CAPMAS's official governorate set and ISO 3166-2 subdivision codes; do not treat local fixtures as factual institution data.
+
+**Decision:** Store geography with PostGIS `geography(Point, 4326)` and GiST indexes. Install extensions in the `extensions` schema rather than `public`.
+
+**Decision:** Separate editorial/data readiness from publication/indexability. Anonymous access is restricted to intentional public states; an active Supabase Auth user mapped through `staff_users` is required for canonical writes and draft visibility.
+
+**Decision:** Use explicit GRANTs in addition to RLS for Data API access, operation-specific staff policies, generated Supabase types, and named repository functions instead of scattering table access through the applications.
+
+**Decision:** Keep Milestone 1 control writes server-rendered with HttpOnly access-token cookies. A refresh-token/session-renewal workflow and atomic multi-table write RPC are deferred and recorded as risks before higher-volume operations.
+
+**Decision:** Maintain 12 clearly fictional representative institution fixtures outside deterministic seeds. They cover independent/group, single/multi-campus, nursery/school/university, curriculum, and ownership shapes without making unsupported real-world claims.
+
+## 2026-08-18 — Milestone 2 trust foundation
+
+**Decision:** Canonical multi-table institution writes use authenticated public invoker wrappers calling an explicitly granted private `SECURITY DEFINER` transaction function. The private function uses an empty search path, fully qualified objects, server-derived `auth.uid()`, active-role checks, and atomic audit writes.
+
+**Decision:** Audit history is append-only ordinary operational data, not event sourcing. Canonical tables remain the source of current truth.
+
+**Decision:** Evidence is field-level through reusable sources, restrained snapshots, assertions, and preserved conflicts. Source authority is priority context, never automatic truth.
+
+**Decision:** Staff sessions use access and rotating refresh tokens in HttpOnly strict-same-site cookies. Protected requests verify the Auth user and current active staff row; stale JWT role claims are not authorization inputs.
+
+**Decision:** Initial readiness evaluation separates record existence, public readiness, and index readiness. Open conflicts or missing accepted evidence prevent readiness.
+
+**Decision:** Revoke authenticated direct mutation grants for canonical institution records and reviewed workflow state. Audited command functions are the only supported mutation boundary for those operations; RLS remains necessary but is not treated as sufficient authorization or audit enforcement.
+
+**Decision:** Research work is governed by `docs/RESEARCH-PROTOCOL.md`. Official-source priority does not mean automatic acceptance; conflicts remain explicit, reviewer rationale is required, Arabic and English naming are independently reviewed, and AI cannot accept or publish factual assertions autonomously.
+
+**Decision:** Milestone 2 cannot close on local correctness alone. Hosted Supabase plus separate Vercel public/control staging, the deliberate 20–30 real-institution cohort, and a recorded workflow/model retrospective are exit criteria before Milestone 3.

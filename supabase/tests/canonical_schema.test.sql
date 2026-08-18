@@ -1,0 +1,17 @@
+begin;
+select plan(12);
+select has_extension('postgis','PostGIS is enabled');
+select has_table('public','institutions','institutions exists');
+select has_table('public','institution_localizations','localizations exist');
+select has_table('public','campuses','campuses exist');
+select has_index('public','campuses','campuses_coordinates_gist','campus geography has a GiST index');
+select is((select count(*)::integer from public.locations where location_type='governorate'),27,'all 27 governorates are seeded');
+select is((select count(*)::integer from public.locations where official_code='EG'),1,'Egypt is seeded once');
+select throws_ok($$insert into public.institutions(id,official_name,institution_type_id,publication_status,merged_into_id) select '10000000-0000-4000-8000-000000000001','Invalid',id,'redirected','10000000-0000-4000-8000-000000000001' from public.institution_types limit 1$$,'23514',null,'self merge is rejected');
+select throws_ok($$insert into public.institution_localizations(institution_id,locale,name,slug) values(gen_random_uuid(),'fr-FR','Nom','nom')$$,'23514',null,'unsupported locale is rejected');
+set local role anon;
+select is((select count(*)::integer from public.institutions),0,'anonymous users cannot read draft institutions');
+select is((select count(*)::integer from public.institution_types where status='active'),7,'anonymous users can read active taxonomies');
+select throws_ok($$insert into public.institutions(official_name,institution_type_id) select 'Blocked',id from public.institution_types limit 1$$,'42501',null,'anonymous users cannot create institutions');
+select * from finish();
+rollback;

@@ -12,8 +12,8 @@ Last updated: 2026-08-18
 04 Content + Structure   IN PROGRESS
 05 Creative Direction    NOT STARTED
 06 Design + Systemize    NOT STARTED
-07 Build + Connect       READY FOR MILESTONE 0
-08 Verify + Optimize     NOT STARTED
+07 Build + Connect       MILESTONE 2 IN PROGRESS
+08 Verify + Optimize     MILESTONE 2 PARTIALLY VERIFIED
 09 Review + Launch       NOT STARTED
 10 Handoff + Learn       NOT STARTED
 ```
@@ -57,23 +57,30 @@ Phase 2 commercial functionality is intentionally deferred.
 
 ## Current implementation milestone
 
-**Milestone 0 — Foundation**
+**Milestone 2 — Trust, Provenance & Research Foundation (in progress)**
 
-Milestone 0 should create the trustworthy engineering foundation only. It must not implement the canonical institution data model from Milestone 1 beyond minimal connectivity/schema tooling required to prove the stack.
+Milestone 1 added the canonical relational institution foundation without entering public directory/profile work or later editorial/commercial milestones.
 
-Milestone 1 begins only after Milestone 0 acceptance criteria pass.
+Implemented and verified: provider/institution/localization/campus models; controlled taxonomies and relationships; PostGIS locations; all 27 Egyptian governorates; publication/data lifecycle states; generated TypeScript types; explicit repository functions; RLS and grants; minimal staff roles; authenticated bilingual control CRUD; 12 fictional validation fixtures; pgTAP, unit, build, and browser coverage.
+
+The local Milestone 2 implementation now includes atomic audited institution commands; direct-write protection for canonical facts and reviewed workflow state; renewable HttpOnly sessions; active-role revalidation and sign-out; expanded staff roles; sources/snapshots; field assertions; conflict detection and reviewer resolution; task assignment/status transitions; freshness state; readiness evaluation; and complete Control screens for the implemented workflows. The research protocol is recorded in `docs/RESEARCH-PROTOCOL.md`.
+
+Verified locally on 2026-08-18: clean migration reset; 36 pgTAP checks; database advisory/lint review (only extension-owned PostGIS findings plus one harmless project variable warning); lint; typecheck; 5 unit tests; both production builds; and 7 Chromium browser tests. Browser coverage includes bilingual LTR/RTL shells, four representative widths, console/network sanity, bilingual institution CRUD, researcher evidence/conflict flow, reviewer resolution, task completion, suspended staff denial, invalid-access-token refresh, logout, anonymous API denial, and role-denial database checks.
+
+Milestone 2 is not complete. Hosted Supabase/Vercel staging, staging migrations and auth/RLS reruns, the 20–30 real source-backed cohort, and the workflow retrospective remain outstanding. A stale active session changed to suspended after login still needs a dedicated browser case; current-request staff status is revalidated in application code, and suspended-login behavior is verified.
 
 ## Immediate next actions
 
-1. Implement GitHub Issue #1 — Milestone 0 foundation.
-2. Verify lint, typecheck, tests/configuration, production builds and rendered app shells.
-3. Record actual deployment/runtime decisions in `docs/PLATFORM.md` and `docs/PROJECT-DECISIONS.md`.
-4. Then implement Issue #2 — canonical data foundation.
-5. Build a representative 20–30 institution test cohort after the core schema exists.
+1. Create/link hosted Supabase and two Vercel staging projects and migrate/configure them.
+2. Rerun the complete auth, RLS, rollback, workflow, responsive, RTL, console, and network matrix on staging, including a live stale-role/session transition.
+3. Only after staging trust gates pass, research the approved 20–30 real institution cohort under `docs/RESEARCH-PROTOCOL.md`.
+4. Record the retrospective and model/workflow changes before approving Milestone 3.
+
+The governing research procedure is now documented in `docs/RESEARCH-PROTOCOL.md` and must be used before any real cohort record is added.
 
 ## Blockers / unresolved decisions
 
-These do not block Milestone 0:
+These do not block the local Milestone 2 build, but hosted account access is required for its staging acceptance criteria:
 
 - final public brand name and domain
 - final hosting/adapter selection

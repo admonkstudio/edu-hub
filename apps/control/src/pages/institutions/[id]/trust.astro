@@ -1,0 +1,228 @@
+---
+import ControlLayout from '../../../layouts/ControlLayout.astro';
+import { getStaffContext } from '../../../lib/auth';
+export const prerender = false;
+const staff = await getStaffContext(Astro);
+if (!staff) return Astro.redirect('/login?error=session');
+const id = Astro.params.id!;
+const [
+  { data: institution },
+  { data: sources },
+  { data: assertions },
+  { data: conflicts },
+  { data: revisions },
+  { data: freshness },
+  { data: readiness },
+] = await Promise.all([
+  staff.client
+    .from('institutions')
+    .select('id,official_name')
+    .eq('id', id)
+    .single(),
+  staff.client
+    .from('sources')
+    .select('id,title,publisher')
+    .eq('status', 'active')
+    .order('authority_level'),
+  staff.client
+    .from('entity_assertions')
+    .select('*,sources(title,publisher)')
+    .eq('entity_type', 'institution')
+    .eq('entity_id', id)
+    .order('created_at', { ascending: false }),
+  staff.client
+    .from('assertion_conflicts')
+    .select(
+      '*,assertion_conflict_members(assertion_id,entity_assertions(value_jsonb,sources(title)))',
+    )
+    .eq('entity_type', 'institution')
+    .eq('entity_id', id)
+    .eq('status', 'open'),
+  staff.client
+    .from('entity_revisions')
+    .select('*,change_sets(reason,created_at)')
+    .eq('entity_type', 'institution')
+    .eq('entity_id', id)
+    .order('created_at', { ascending: false }),
+  staff.client
+    .from('field_freshness')
+    .select('*')
+    .eq('entity_type', 'institution')
+    .eq('entity_id', id),
+  staff.client.rpc('institution_readiness', { institution_id: id }),
+]);
+if (!institution) return Astro.redirect('/');
+const reviewer = ['super_admin', 'admin', 'reviewer'].includes(
+  staff.staff.role,
+);
+---
+
+<ControlLayout title={`Trust — ${institution.official_name}`}
+  ><p><a href={`/institutions/${id}`}>← Edit institution</a></p><h1>
+    {institution.official_name}: trust record
+  </h1><section class="panel">
+    <h2>Readiness</h2><pre>{JSON.stringify(readiness,null,2)}</pre>
+  </section><section class="panel">
+    <h2>Add field assertion</h2><form
+      class="grid"
+      method="post"
+      action="/api/assertions"
+    >
+      <input type="hidden" name="entity_id" value={id} /><label
+        >Field key<select name="field_key"
+          ><option value="official_website_url">Official website</option><option
+            value="founded_year">Founded year</option
+          ><option value="curricula">Curricula</option><option
+            value="education_levels">Education levels</option
+          ></select
+        ></label
+      ><label
+        >Locale<select name="locale"
+          ><option value="">Not localized</option><option value="en-EG"
+            >English</option
+          ><option value="ar-EG">Arabic</option></select
+        ></label
+      ><label class="full"
+        >Observed value (JSON)<textarea
+          name="value_jsonb"
+          required
+          placeholder='"https://example.edu.eg"'></textarea></label
+      ><label
+        >Source<select name="source_id" required
+          >{
+            sources?.map((s) => (
+              <option value={s.id}>
+                {s.publisher} — {s.title}
+              </option>
+            ))
+          }</select
+        ></label
+      ><label
+        >Observed at<input
+          type="datetime-local"
+          name="observed_at"
+          required
+        /></label
+      ><label
+        >Confidence<input
+          type="number"
+          name="confidence"
+          min="0"
+          max="100"
+          value="70"
+        /></label
+      ><button type="submit">Add unreviewed assertion</button>
+    </form>
+  </section><section class="panel table-wrap">
+    <h2>Assertions</h2><table>
+      <thead
+        ><tr
+          ><th>Field</th><th>Value</th><th>Source</th><th>Status</th><th
+            >Review</th
+          ></tr
+        ></thead
+      ><tbody
+        >{
+          assertions?.map((a) => (
+            <tr>
+              <>
+                <td>{a.field_key}</td>
+                <td>
+                  <code>{JSON.stringify(a.value_jsonb)}</code>
+                </td>
+                <td>{a.sources?.title}</td>
+                <td>{a.assertion_status}</td>
+                <td>
+                  {reviewer && a.assertion_status === 'unreviewed' && (
+                    <form
+                      method="post"
+                      action={`/api/assertions/${a.id}/review`}
+                    >
+                      <select name="decision">
+                        <option value="accepted">Accept</option>
+                        <option value="rejected">Reject</option>
+                        <option value="superseded">Supersede</option>
+                      </select>
+                      <input
+                        name="reason"
+                        required
+                        placeholder="Review rationale"
+                      />
+                      <button>Record</button>
+                    </form>
+                  )}
+                </td>
+              </>
+            </tr>
+          ))
+        }</tbody
+      >
+    </table>
+  </section><section class="panel">
+    <h2>Open conflicts</h2>{
+      conflicts?.length === 0 ? (
+        <p>No open conflicts.</p>
+      ) : (
+        conflicts?.map((c) => (
+          <article>
+            <h3>{c.field_key}</h3>
+            {c.assertion_conflict_members.map((m) => (
+              <form method="post" action={`/api/conflicts/${c.id}/resolve`}>
+                <input
+                  type="hidden"
+                  name="accepted_assertion_id"
+                  value={m.assertion_id}
+                />
+                <code>{JSON.stringify(m.entity_assertions?.value_jsonb)}</code>{' '}
+                — {m.entity_assertions?.sources?.title}
+                <input
+                  name="reason"
+                  required
+                  placeholder="Resolution rationale"
+                />
+                <button disabled={!reviewer}>Accept this assertion</button>
+              </form>
+            ))}
+          </article>
+        ))
+      )
+    }
+  </section><section class="panel table-wrap">
+    <h2>Freshness</h2><table>
+      <thead
+        ><tr
+          ><th>Field</th><th>Status</th><th>Last verified</th><th
+            >Next review</th
+          ></tr
+        ></thead
+      ><tbody
+        >{
+          freshness?.map((f) => (
+            <tr>
+              <>
+                <td>{f.field_key}</td>
+                <td>{f.status}</td>
+                <td>{f.last_verified_at}</td>
+                <td>{f.next_review_at}</td>
+              </>
+            </tr>
+          ))
+        }</tbody
+      >
+    </table>
+  </section><section class="panel">
+    <h2>Canonical audit history</h2>{
+      revisions?.map((r) => (
+        <article>
+          <>
+            <strong>
+              {r.operation}: {r.field_key}
+            </strong>
+            <p>{r.change_sets?.reason}</p>
+            <small>{r.created_at}</small>
+          </>
+        </article>
+      ))
+    }
+  </section></ControlLayout
+>

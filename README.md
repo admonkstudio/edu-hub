@@ -1,54 +1,73 @@
 # Edu Hub
 
-Edu Hub is an Admonk-owned, independent bilingual education discovery and knowledge platform.
+Edu Hub is an independent, bilingual education discovery and knowledge platform owned by Admonk. Egypt is the initial market. The repository implements Milestones 0 and 1 and the local engineering slice of Milestone 2. Milestone 2 remains in progress until hosted staging, a real 20–30 institution research cohort, and the workflow retrospective are complete. Public directory/profile functionality remains a later milestone.
 
-The first market is Egypt. Phase 1 combines a structured directory of education providers with an editorial knowledge platform designed for useful discovery, trustworthy research, strong organic search visibility, and AI-search discoverability.
+## Architecture
 
-## Core product thesis
+- `apps/web` — static-first Astro public shell with `/en-eg/` and `/ar-eg/` route proofs
+- `apps/control` — authenticated Astro staff application for bilingual institution CRUD, evidence review, conflict resolution, research tasks, freshness, and readiness
+- `packages/config` — Egypt/locale constants, direction helpers, and environment validation
+- `packages/domain` — foundation-only shell contracts
+- `packages/database` — generated Supabase types, authenticated/server clients, and explicit institution repository functions
+- `packages/seo` — tested canonical, locale-alternate, and path helpers
+- `supabase` — migrations, RLS policies, Egypt/taxonomy seeds, pgTAP tests, and fictional representative fixtures
+- `docs/RESEARCH-PROTOCOL.md` — binding source, conflict, review, localization, and readiness procedure for research work
 
-```text
-Useful structured information
-→ search visibility
-→ authority
-→ audience
-→ intent
-→ monetization
+The workspace uses pnpm without a separate monorepo orchestrator. The public app remains static-first; the control app uses Astro on-demand rendering and Supabase Auth/RLS.
+
+## Requirements
+
+- Node.js 22.12 or later
+- pnpm 11.19.0
+- Docker-compatible runtime only when running the local Supabase stack
+
+## Setup
+
+```bash
+pnpm install --frozen-lockfile
+cp .env.example .env
 ```
 
-Phase 1 is authority and traffic. Phase 2 may add claimed profiles, premium plans, advertising, leads, applications, consultants, and related commercial functions only after the core information product proves useful.
+Keep `SUPABASE_SECRET_KEY` server-side. Actual `.env` files are ignored.
 
-## Primary audience
+The control app requires `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Create a Supabase Auth user, then insert the user's UUID into `public.staff_users` with an active role (`admin`, `researcher`, `editor`, `reviewer`, or `seo_manager`) before signing in. Never place the secret/service-role key in browser-accessible variables. Canonical writes and reviewed workflow transitions must use the audited command functions; direct authenticated table writes are intentionally revoked for protected records.
 
-1. Parents
-2. Students
+## Applications
 
-Institutions, universities, advertisers, consultants, and other commercial participants are secondary audiences attracted by parent/student demand.
+```bash
+pnpm dev:web       # http://localhost:4321
+pnpm dev:control   # http://localhost:4322
+```
 
-## Initial platform direction
+## Quality gates
 
-- Astro + TypeScript
-- PostgreSQL as source of truth
-- Supabase as the initial database/auth/storage platform
-- Arabic and English from launch
-- country-aware locale routes (`ar-EG`, `en-EG`)
-- official-source-first research
-- source/evidence provenance for important facts
-- curated programmatic SEO, never unrestricted filter-index generation
+```bash
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build:web
+pnpm build:control
+pnpm test:browser
+```
 
-## Project control
+`pnpm build` builds both applications. CI runs all gates, installs Chromium, and runs the browser smoke suite.
 
-Read `AGENTS.md` before substantial work.
+## Supabase workflow
 
-Current project state: `docs/PROJECT-STATUS.md`
+```bash
+pnpm db:start
+pnpm supabase migration new <descriptive-name>
+pnpm db:reset
+pnpm db:types
+pnpm test:db
+pnpm db:fixtures
+pnpm db:stop
+```
 
-Core definition:
+The local stack requires Docker. `db:reset` creates the canonical schema and deterministic seed data; `db:fixtures` adds 12 clearly fictional institutions for local validation only. A hosted Supabase project must still be created, linked, migrated, and configured before remote use.
 
-- `docs/PROJECT-BRIEF.md`
-- `docs/PRODUCT-ARCHITECTURE.md`
-- `docs/DATA-MODEL.md`
-- `docs/SEO-ARCHITECTURE.md`
-- `docs/CONTENT-STRATEGY.md`
-- `docs/PLATFORM.md`
-- `docs/PROJECT-DECISIONS.md`
+## Deployment
 
-Reusable Admonk studio intelligence remains maintained in `admonkstudio/admonk`; do not copy the entire studio agent system into this repository.
+Vercel is the initial adapter/hosting direction. Create two Vercel projects from this monorepo, with root directories `apps/web` and `apps/control`, then configure each environment and its canonical origin. No deployment is claimed until those external projects exist and preview/production builds are verified.
+
+Read [AGENTS.md](./AGENTS.md) and [docs/PROJECT-STATUS.md](./docs/PROJECT-STATUS.md) before substantial work.
