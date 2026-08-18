@@ -13,7 +13,7 @@ Last updated: 2026-08-18
 05 Creative Direction    NOT STARTED
 06 Design + Systemize    NOT STARTED
 07 Build + Connect       MILESTONE 2 IN PROGRESS
-08 Verify + Optimize     MILESTONE 2 PARTIALLY VERIFIED
+08 Verify + Optimize     HOSTED STAGING VERIFIED; COHORT PENDING
 09 Review + Launch       NOT STARTED
 10 Handoff + Learn       NOT STARTED
 ```
@@ -67,23 +67,26 @@ The local Milestone 2 implementation now includes atomic audited institution com
 
 Verified locally on 2026-08-18: clean migration reset; 36 pgTAP checks; database advisory/lint review (only extension-owned PostGIS findings plus one harmless project variable warning); lint; typecheck; 5 unit tests; both production builds; and 7 Chromium browser tests. Browser coverage includes bilingual LTR/RTL shells, four representative widths, console/network sanity, bilingual institution CRUD, researcher evidence/conflict flow, reviewer resolution, task completion, suspended staff denial, invalid-access-token refresh, logout, anonymous API denial, and role-denial database checks.
 
-Milestone 2 is not complete. Hosted Supabase/Vercel staging, staging migrations and auth/RLS reruns, the 20–30 real source-backed cohort, and the workflow retrospective remain outstanding. A stale active session changed to suspended after login still needs a dedicated browser case; current-request staff status is revalidated in application code, and suspended-login behavior is verified.
+Hosted staging was verified on 2026-08-18. The linked Frankfurt Supabase project received all five migrations after a clean dry run. Separate Vercel projects deploy `apps/web` and `apps/control` with independently scoped variables and no service-role key. Hosted checks passed for anonymous denial, researcher/reviewer/admin access, suspended login denial, refresh, logout, live stale-role revocation, protected direct-write denial, atomic rollback, conflict resolution, task assignment/transitions, freshness, bilingual content entry, responsive widths (390/768/1024/1440), RTL/LTR direction, and console/network sanity. Vercel reported no runtime errors. Supabase reports one Auth warning (leaked-password protection disabled) and informational unindexed-foreign-key notices for workload review.
+
+Milestone 2 is not complete. The 20–30 real source-backed institution cohort and workflow/model/data-quality retrospective remain outstanding. Do not start Milestone 3 before those gates are complete.
 
 ## Immediate next actions
 
-1. Create/link hosted Supabase and two Vercel staging projects and migrate/configure them.
-2. Rerun the complete auth, RLS, rollback, workflow, responsive, RTL, console, and network matrix on staging, including a live stale-role/session transition.
-3. Only after staging trust gates pass, research the approved 20–30 real institution cohort under `docs/RESEARCH-PROTOCOL.md`.
-4. Record the retrospective and model/workflow changes before approving Milestone 3.
+1. Research the approved 20–30 real institution cohort in staging under `docs/RESEARCH-PROTOCOL.md`.
+2. Record every model, workflow, taxonomy, completeness, source-quality, and AI-boundary friction point.
+3. Classify each retrospective finding as a model, workflow, or data-quality problem and implement/retest approved corrections.
+4. Enable leaked-password protection before production if the Supabase plan supports it, and review FK-index advisor findings against cohort query patterns.
+5. Approve Milestone 3 only after the cohort retrospective closes Milestone 2.
 
 The governing research procedure is now documented in `docs/RESEARCH-PROTOCOL.md` and must be used before any real cohort record is added.
 
 ## Blockers / unresolved decisions
 
-These do not block the local Milestone 2 build, but hosted account access is required for its staging acceptance criteria:
+These do not block the remaining Milestone 2 cohort, but must be resolved before the relevant downstream milestone:
 
 - final public brand name and domain
-- final hosting/adapter selection
+- production hosting/environment promotion policy
 - final visual identity
 - final production design system
 - final map provider

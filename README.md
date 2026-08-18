@@ -1,6 +1,6 @@
 # Edu Hub
 
-Edu Hub is an independent, bilingual education discovery and knowledge platform owned by Admonk. Egypt is the initial market. The repository implements Milestones 0 and 1 and the local engineering slice of Milestone 2. Milestone 2 remains in progress until hosted staging, a real 20–30 institution research cohort, and the workflow retrospective are complete. Public directory/profile functionality remains a later milestone.
+Edu Hub is an independent, bilingual education discovery and knowledge platform owned by Admonk. Egypt is the initial market. The repository implements Milestones 0 and 1 plus the engineering and hosted-staging validation slices of Milestone 2. Milestone 2 remains in progress until the real 20–30 institution research cohort and workflow retrospective are complete. Public directory/profile functionality remains a later milestone.
 
 ## Architecture
 
@@ -64,10 +64,10 @@ pnpm db:fixtures
 pnpm db:stop
 ```
 
-The local stack requires Docker. `db:reset` creates the canonical schema and deterministic seed data; `db:fixtures` adds 12 clearly fictional institutions for local validation only. A hosted Supabase project must still be created, linked, migrated, and configured before remote use.
+The local stack requires Docker. `db:reset` creates the canonical schema and deterministic seed data; `db:fixtures` adds 12 clearly fictional institutions for local validation only. Hosted staging uses the linked `edu-hub-staging` Supabase project in Frankfurt. Apply repository-owned migrations with `supabase db push --dry-run` followed by `supabase db push`; do not use production data or create a production project during Milestone 2.
 
 ## Deployment
 
-Vercel is the initial adapter/hosting direction. Create two Vercel projects from this monorepo, with root directories `apps/web` and `apps/control`, then configure each environment and its canonical origin. No deployment is claimed until those external projects exist and preview/production builds are verified.
+Vercel hosts two staging projects from this monorepo: `edu-hub-web` rooted at `apps/web` and `edu-hub-control` rooted at `apps/control`. Their stable staging URLs are [edu-hub-web.vercel.app](https://edu-hub-web.vercel.app) and [edu-hub-control.vercel.app](https://edu-hub-control.vercel.app). Public and Control environment variables are scoped separately; no Supabase secret/service-role key is configured in Vercel.
 
 Read [AGENTS.md](./AGENTS.md) and [docs/PROJECT-STATUS.md](./docs/PROJECT-STATUS.md) before substantial work.

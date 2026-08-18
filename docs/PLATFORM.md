@@ -16,9 +16,9 @@ Edu Hub is a code-native Astro project backed by PostgreSQL/Supabase.
 - PostgreSQL search first
 - server-side/background jobs only where justified
 
-The initial deployment direction is Vercel with Astro's official `@astrojs/vercel` adapter. The public app is statically prerendered; the authenticated control app uses server rendering. Vercel server dependencies are bundled to keep pnpm-based output portable across hosts.
+Staging uses Vercel with Astro's official `@astrojs/vercel` adapter. The public app is statically prerendered; the authenticated control app uses server rendering. Vercel server dependencies are bundled to keep pnpm-based output portable across hosts.
 
-External setup remains: create two Vercel projects rooted at `apps/web` and `apps/control`, configure canonical origins/secrets, and verify preview and production deployments. No hosted deployment has been claimed.
+Two projects point to the same GitHub repository: `edu-hub-web` uses root `apps/web`, and `edu-hub-control` uses root `apps/control`. Environment variables are scoped independently. Control receives only the hosted Supabase URL and publishable key; no service-role/secret key is deployed. Stable staging aliases are `https://edu-hub-web.vercel.app` and `https://edu-hub-control.vercel.app`.
 
 ## Repository architecture
 
@@ -157,9 +157,9 @@ Zod schemas validate public origins and Supabase configuration. Astro's server e
 
 ## Supabase development workflow
 
-The repository contains CLI configuration, immutable migrations, deterministic foundation seeds, pgTAP tests, generated types, and optional fictional fixtures. Local development uses `pnpm db:start`, `pnpm db:reset`, `pnpm db:types`, `pnpm test:db`, and `pnpm db:fixtures`. Docker and a hosted project are external dependencies.
+The repository contains CLI configuration, immutable migrations, deterministic foundation seeds, pgTAP tests, generated types, and optional fictional fixtures. Local development uses `pnpm db:start`, `pnpm db:reset`, `pnpm db:types`, `pnpm test:db`, and `pnpm db:fixtures`. Docker remains a local dependency.
 
-Edu Hub uses local ports `55320`–`55329` to coexist with other Supabase projects using the defaults. Clean migration reset, seeds, generated types, RLS tests, fixtures, and database advisors were verified on 2026-08-18.
+Edu Hub uses local ports `55320`–`55329` to coexist with other Supabase projects using the defaults. Hosted staging is `edu-hub-staging` in `eu-central-1` (Frankfurt). The CLI is linked to that project; `db push --dry-run` and `db push` applied the five repository migrations. Auth redirect configuration includes localhost, the stable Control staging origin, and the Admonk Vercel preview wildcard.
 
 ## Milestone 2 trust operations
 
@@ -169,8 +169,10 @@ The trust schema includes sources, restrained snapshots, field assertions, asser
 
 Control authentication stores access and refresh tokens only in HttpOnly cookies, refreshes expired access tokens server-side, revalidates active staff roles per protected request, and supports explicit sign-out.
 
-Local verification covers clean reset, 36 pgTAP tests, protected direct-write denial, role denial, rollback, suspended login, invalid-access-token refresh, logout, anonymous API denial, and the complete researcher-to-reviewer workflow. Hosted behavior is not yet verified.
+Local verification covers clean reset, 36 pgTAP tests, protected direct-write denial, role denial, rollback, suspended login, invalid-access-token refresh, logout, anonymous API denial, and the complete researcher-to-reviewer workflow.
+
+Hosted verification covers active admin/researcher/reviewer sessions, suspended login rejection, refresh and logout, live stale-role revocation on the next privileged request, anonymous visibility/write denial, authenticated direct-write denial, deliberate late-failure rollback, researcher evidence/conflict entry, reviewer resolution, task assignment/status transitions, freshness updates, bilingual institution entry, four responsive widths, RTL/LTR rendering, and console/network/runtime error review. Supabase's security advisor currently warns that leaked-password protection is disabled; performance advisors report informational unindexed foreign keys to evaluate with cohort workloads.
 
 ## Deployment decision resolved in Milestone 0
 
-Vercel + the official Astro adapter is configured as the initial direction. External account/project creation and deployed-preview verification remain outstanding.
+Vercel + the official Astro adapter is configured and verified for Milestone 2 staging. Production projects, domains, staff, and database remain intentionally uncreated.

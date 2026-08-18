@@ -94,7 +94,7 @@ Record durable decisions here. Do not use this file for temporary task notes.
 
 **Constraint:** Both Milestone 0 shells remain statically prerendered. On-demand routes are enabled only when later data-driven requirements justify them.
 
-**External dependency:** Two Vercel projects and one Supabase project still require account-level creation/linking and deployed verification. This repository does not claim those external steps are complete.
+**Resolution:** Milestone 2 staging now uses one Frankfurt Supabase project plus two Vercel projects rooted at `apps/web` and `apps/control`. Production infrastructure remains intentionally uncreated.
 
 ## 2026-08-18 — Milestone 1 canonical data foundation
 
@@ -129,3 +129,15 @@ Record durable decisions here. Do not use this file for temporary task notes.
 **Decision:** Research work is governed by `docs/RESEARCH-PROTOCOL.md`. Official-source priority does not mean automatic acceptance; conflicts remain explicit, reviewer rationale is required, Arabic and English naming are independently reviewed, and AI cannot accept or publish factual assertions autonomously.
 
 **Decision:** Milestone 2 cannot close on local correctness alone. Hosted Supabase plus separate Vercel public/control staging, the deliberate 20–30 real-institution cohort, and a recorded workflow/model retrospective are exit criteria before Milestone 3.
+
+## 2026-08-18 — Hosted Milestone 2 staging
+
+**Decision:** Use one Free-plan Supabase staging project, `edu-hub-staging`, in `eu-central-1` (Frankfurt), and do not create a production project before the real cohort and retrospective are complete.
+
+**Decision:** Use two Vercel projects from the same repository, with `apps/web` and `apps/control` as independent roots. Scope public and Control variables separately and deploy no Supabase secret/service-role credential.
+
+**Decision:** Treat server-side staff-row revalidation as the authority boundary. Hosted testing proved that suspending an already-authenticated researcher invalidates the next privileged request without waiting for access-token expiry.
+
+**Decision:** Keep the hosted workflow fixture as draft staging data for operational inspection. Real cohort records remain staging-only until Milestone 2 closes.
+
+**Risk:** Supabase's hosted advisor reports leaked-password protection disabled on the Free staging project. Generated QA passwords remain high entropy; enable the protection before production if plan support permits. Informational missing-FK-index findings will be evaluated against the cohort's actual query patterns instead of adding indexes blindly.
