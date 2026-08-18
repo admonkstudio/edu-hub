@@ -41,10 +41,15 @@ const institutions = await listInstitutions(staffContext.client);
                     ?.locations?.name_en ?? '—'}
                 </td>
                 <td>
-                  {institution.institution_localizations
-                    .map((item) => item.locale)
-                    .sort()
-                    .join(', ') || 'Missing'}
+                  {(['en-EG', 'ar-EG'] as const)
+                    .map((locale) =>
+                      institution.institution_localizations.some(
+                        (item) => item.locale === locale,
+                      )
+                        ? locale
+                        : `${locale}: Pending`,
+                    )
+                    .join(', ')}
                 </td>
               </>
             </tr>

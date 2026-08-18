@@ -1,0 +1,38 @@
+<script>
+  document
+    .querySelectorAll<HTMLFormElement>('[data-localization-form]')
+    .forEach((form) => {
+      form.addEventListener('submit', (event) => {
+        const data = new FormData(form);
+        const locales = ['en', 'ar'].map((locale) => ({
+          name: String(data.get(`name_${locale}`) ?? '').trim(),
+          slug: String(data.get(`slug_${locale}`) ?? '').trim(),
+        }));
+        const complete = locales.filter(({ name, slug }) => name && slug);
+        const partial = locales.find(
+          ({ name, slug }) => Boolean(name) !== Boolean(slug),
+        );
+        const publication = String(data.get('publication_status') ?? 'draft');
+        const message = partial
+          ? 'Each localization needs both a name and slug.'
+          : complete.length === 0
+            ? 'Complete at least one localization.'
+            : ['public_noindex', 'index_ready', 'published'].includes(
+                  publication,
+                ) && complete.length < 2
+              ? 'Both launch localizations are required for publication.'
+              : '';
+        const anchor = form.querySelector<HTMLInputElement>('[name="name_en"]');
+        anchor?.setCustomValidity(message);
+        if (message) {
+          event.preventDefault();
+          anchor?.reportValidity();
+        }
+      });
+      form.addEventListener('input', () => {
+        form
+          .querySelector<HTMLInputElement>('[name="name_en"]')
+          ?.setCustomValidity('');
+      });
+    });
+</script>

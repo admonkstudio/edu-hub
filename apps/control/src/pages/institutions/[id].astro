@@ -1,6 +1,7 @@
 ---
 import { getInstitution } from '@edu-hub/database';
 import ControlLayout from '../../layouts/ControlLayout.astro';
+import LocalizationFormValidation from '../../components/LocalizationFormValidation.astro';
 import { getStaffContext } from '../../lib/auth';
 export const prerender = false;
 const context = await getStaffContext(Astro);
@@ -74,6 +75,7 @@ const { data: governorates } = await context.client
   }{
     Astro.url.searchParams.has('saved') && <p class="panel">Changes saved.</p>
   }<form
+    data-localization-form
     class="grid panel"
     method="post"
     action={`/api/institutions/${institution.id}`}
@@ -183,30 +185,18 @@ const { data: governorates } = await context.client
       ></label
     >
     <fieldset>
-      <legend>English</legend><div class="grid">
-        <label>Name<input name="name_en" required value={en?.name} /></label
-        ><label>Slug<input name="slug_en" required value={en?.slug} /></label
+      <legend>English {en ? '' : '— Pending'}</legend><div class="grid">
+        <label>Name<input name="name_en" value={en?.name} /></label><label
+          >Slug<input name="slug_en" value={en?.slug} /></label
         ><label class="full"
           >Summary<textarea name="summary_en">{en?.summary}</textarea></label
         >
       </div>
     </fieldset>
     <fieldset dir="rtl">
-      <legend>العربية</legend><div class="grid">
-        <label
-          >الاسم<input
-            dir="rtl"
-            name="name_ar"
-            required
-            value={ar?.name}
-          /></label
-        ><label
-          >الرابط<input
-            dir="rtl"
-            name="slug_ar"
-            required
-            value={ar?.slug}
-          /></label
+      <legend>العربية {ar ? '' : '— Pending'}</legend><div class="grid">
+        <label>الاسم<input dir="rtl" name="name_ar" value={ar?.name} /></label
+        ><label>الرابط<input dir="rtl" name="slug_ar" value={ar?.slug} /></label
         ><label class="full"
           >الملخص<textarea dir="rtl" name="summary_ar">{ar?.summary}</textarea
           ></label
@@ -302,5 +292,5 @@ const { data: governorates } = await context.client
         href="/">Cancel</a
       >
     </div>
-  </form></ControlLayout
+  </form><LocalizationFormValidation /></ControlLayout
 >

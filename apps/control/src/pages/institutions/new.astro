@@ -1,5 +1,6 @@
 ---
 import ControlLayout from '../../layouts/ControlLayout.astro';
+import LocalizationFormValidation from '../../components/LocalizationFormValidation.astro';
 import { getStaffContext } from '../../lib/auth';
 export const prerender = false;
 const context = await getStaffContext(Astro);
@@ -43,6 +44,7 @@ const { data: governorates } = await context.client
 
 <ControlLayout title="Create institution"
   ><p><a href="/">← Institutions</a></p><h1>Create institution</h1><form
+    data-localization-form
     class="grid panel"
     method="post"
     action="/api/institutions"
@@ -110,11 +112,13 @@ const { data: governorates } = await context.client
       ></label
     >
     <fieldset>
-      <legend>English localization</legend><div class="grid">
-        <label>Name<input name="name_en" required /></label><label
+      <legend>English localization</legend><p class="full">
+        Complete at least one localization. Missing launch locales remain
+        pending while the record is a draft.
+      </p><div class="grid">
+        <label>Name<input name="name_en" /></label><label
           >Slug<input
             name="slug_en"
-            required
             pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
           /></label
         ><label class="full"
@@ -123,9 +127,9 @@ const { data: governorates } = await context.client
       </div>
     </fieldset>
     <fieldset dir="rtl">
-      <legend>المحتوى العربي</legend><div class="grid">
-        <label>الاسم<input dir="rtl" name="name_ar" required /></label><label
-          >الرابط المختصر<input dir="rtl" name="slug_ar" required /></label
+      <legend>المحتوى العربي — Pending</legend><div class="grid">
+        <label>الاسم<input dir="rtl" name="name_ar" /></label><label
+          >الرابط المختصر<input dir="rtl" name="slug_ar" /></label
         ><label class="full"
           >الملخص<textarea dir="rtl" name="summary_ar"></textarea></label
         >
@@ -191,5 +195,5 @@ const { data: governorates } = await context.client
         href="/">Cancel</a
       >
     </div>
-  </form></ControlLayout
+  </form><LocalizationFormValidation /></ControlLayout
 >

@@ -6,6 +6,26 @@ const nullable = (form: FormData, key: string) =>
 export function institutionCommandFromForm(
   form: FormData,
 ): InstitutionCommandPayload {
+  const publicationStatus = String(form.get('publication_status') ?? 'draft');
+  const localizations = [
+    localizationFromForm(form, 'en-EG', 'en'),
+    localizationFromForm(form, 'ar-EG', 'ar'),
+  ].filter((localization) => localization !== null);
+
+  if (localizations.length === 0) {
+    throw new Error('At least one complete localization is required.');
+  }
+  if (
+    ['public_noindex', 'index_ready', 'published'].includes(
+      publicationStatus,
+    ) &&
+    !['en-EG', 'ar-EG'].every((locale) =>
+      localizations.some((localization) => localization.locale === locale),
+    )
+  ) {
+    throw new Error('Both launch localizations are required for publication.');
+  }
+
   return {
     core: {
       official_name: String(form.get('official_name') ?? '').trim(),
@@ -17,23 +37,10 @@ export function institutionCommandFromForm(
       founded_year: nullable(form, 'founded_year')
         ? Number(form.get('founded_year'))
         : null,
-      publication_status: String(form.get('publication_status') ?? 'draft'),
+      publication_status: publicationStatus,
       data_status: String(form.get('data_status') ?? 'candidate'),
     },
-    localizations: [
-      {
-        locale: 'en-EG',
-        name: String(form.get('name_en') ?? '').trim(),
-        slug: String(form.get('slug_en') ?? '').trim(),
-        summary: nullable(form, 'summary_en'),
-      },
-      {
-        locale: 'ar-EG',
-        name: String(form.get('name_ar') ?? '').trim(),
-        slug: String(form.get('slug_ar') ?? '').trim(),
-        summary: nullable(form, 'summary_ar'),
-      },
-    ],
+    localizations,
     campus: {
       id: nullable(form, 'campus_id'),
       name: String(form.get('campus_name') ?? '').trim(),
@@ -50,4 +57,22 @@ export function institutionCommandFromForm(
     },
     source_id: nullable(form, 'source_id'),
   };
+}
+
+function localizationFromForm(
+  form: FormData,
+  locale: 'en-EG' | 'ar-EG',
+  suffix: 'en' | 'ar',
+) {
+  const name = String(form.get(`name_${suffix}`) ?? '').trim();
+  const slug = String(form.get(`slug_${suffix}`) ?? '').trim();
+  const summary = nullable(form, `summary_${suffix}`);
+  const hasAnyValue = Boolean(name || slug || summary);
+
+  if (!hasAnyValue) return null;
+  if (!name || !slug) {
+    throw new Error(`${locale} requires both a name and slug.`);
+  }
+
+  return { locale, name, slug, summary };
 }
