@@ -15,7 +15,7 @@ permissions:
 jobs:
   acquire:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 120
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,6 +38,20 @@ jobs:
       - name: Acquire current SCU higher-education lists
         run: python tools/data-acquisition/scrape_scu.py
 
+      - name: Acquire public school and Al-Azhar directory snapshots
+        run: |
+          mkdir -p artifacts
+          python tools/data-acquisition/scrape_masrschools.py --output artifacts/masrschools_snapshot.jsonl --max-pages 500 --delay 0.30 &
+          MASR_PID=$!
+          python tools/data-acquisition/scrape_egyptschools.py --output artifacts/egyptschools_snapshot.jsonl --max-pages 200 --delay 0.30 &
+          EGYPT_PID=$!
+          python tools/data-acquisition/scrape_azhar.py --output artifacts/azhar_snapshot.jsonl --delay 0.30 &
+          AZHAR_PID=$!
+          wait $MASR_PID
+          wait $EGYPT_PID
+          wait $AZHAR_PID
+          wc -l artifacts/masrschools_snapshot.jsonl artifacts/egyptschools_snapshot.jsonl artifacts/azhar_snapshot.jsonl
+
       - name: Download current Egypt OpenStreetMap extract
         run: |
           mkdir -p /tmp/eduhub-osm
@@ -59,12 +73,17 @@ jobs:
 
       - name: Build raw acquisition database
         run: |
-          rm -rf artifacts
-          mkdir -p artifacts
+          rm -f artifacts/edu_hub_egypt_raw.sqlite artifacts/source_counts.csv artifacts/field_inventory.csv artifacts/coverage.csv artifacts/acquisition_summary.json
           python tools/data-acquisition/collect_egypt.py \
             --db artifacts/edu_hub_egypt_raw.sqlite \
             --outdir artifacts \
             --osm /tmp/eduhub-osm/education.geojsonseq
+          python tools/data-acquisition/ingest_web_snapshots.py \
+            --db artifacts/edu_hub_egypt_raw.sqlite \
+            --outdir artifacts \
+            --masrschools artifacts/masrschools_snapshot.jsonl \
+            --egyptschools artifacts/egyptschools_snapshot.jsonl \
+            --azhar artifacts/azhar_snapshot.jsonl
 
       - name: Inspect acquisition summary
         run: |
@@ -81,6 +100,9 @@ jobs:
             artifacts/field_inventory.csv
             artifacts/coverage.csv
             artifacts/acquisition_summary.json
+            artifacts/masrschools_snapshot.jsonl
+            artifacts/egyptschools_snapshot.jsonl
+            artifacts/azhar_snapshot.jsonl
             tools/data-acquisition/seeds/scu_higher_ed_snapshot.csv
             tools/data-acquisition/seeds/scu_higher_ed_snapshot.csv.report.json
           if-no-files-found: error
