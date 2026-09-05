@@ -1,0 +1,84 @@
+name: Egypt raw education data acquisition
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt
+    paths:
+      - "tools/data-acquisition/**"
+      - ".github/workflows/egypt-data-acquisition.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/data-acquisition/requirements.txt
+
+      - name: Install Python dependencies
+        run: pip install -r tools/data-acquisition/requirements.txt
+
+      - name: Install osmium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends osmium-tool
+
+      - name: Acquire current SCU higher-education lists
+        run: python tools/data-acquisition/scrape_scu.py
+
+      - name: Download current Egypt OpenStreetMap extract
+        run: |
+          mkdir -p /tmp/eduhub-osm
+          curl --fail --location --retry 4 https://download.geofabrik.de/africa/egypt-latest.osm.pbf -o /tmp/eduhub-osm/egypt-latest.osm.pbf
+
+      - name: Extract education features
+        run: |
+          osmium tags-filter /tmp/eduhub-osm/egypt-latest.osm.pbf \
+            nwr/amenity=school \
+            nwr/amenity=kindergarten \
+            nwr/amenity=college \
+            nwr/amenity=university \
+            -o /tmp/eduhub-osm/education.osm.pbf --overwrite
+          osmium export /tmp/eduhub-osm/education.osm.pbf --output-format=geojsonseq -o /tmp/eduhub-osm/education.geojsonseq --overwrite
+          wc -l /tmp/eduhub-osm/education.geojsonseq
+
+      - name: Build raw acquisition database
+        run: |
+          rm -rf artifacts
+          mkdir -p artifacts
+          python tools/data-acquisition/collect_egypt.py \
+            --db artifacts/edu_hub_egypt_raw.sqlite \
+            --outdir artifacts \
+            --osm /tmp/eduhub-osm/education.geojsonseq
+
+      - name: Inspect acquisition summary
+        run: |
+          cat artifacts/acquisition_summary.json
+          du -h artifacts/edu_hub_egypt_raw.sqlite
+
+      - name: Upload raw database and field census
+        uses: actions/upload-artifact@v4
+        with:
+          name: edu-hub-egypt-raw-database
+          path: |
+            artifacts/edu_hub_egypt_raw.sqlite
+            artifacts/source_counts.csv
+            artifacts/field_inventory.csv
+            artifacts/coverage.csv
+            artifacts/acquisition_summary.json
+            tools/data-acquisition/seeds/scu_higher_ed_snapshot.csv
+            tools/data-acquisition/seeds/scu_higher_ed_snapshot.csv.report.json
+          if-no-files-found: error
+          retention-days: 30
