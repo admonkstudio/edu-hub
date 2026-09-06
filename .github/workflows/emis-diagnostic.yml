@@ -1,0 +1,52 @@
+name: EMIS school directory diagnostic
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt
+    paths:
+      - ".github/workflows/emis-diagnostic.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Inspect public EMIS directory pages
+        run: |
+          python - <<'PY'
+          import requests, re
+          from bs4 import BeautifulSoup
+          S=requests.Session(); S.headers['User-Agent']='EduHubResearchBot/0.3 (+https://github.com/admonkstudio/edu-hub; public-source-diagnostic)'
+          urls=['https://search.emis.gov.eg/','https://search.emis.gov.eg/search_schpriv.aspx']
+          for u in urls:
+              print('\n===',u,'===')
+              try:
+                  r=S.get(u,timeout=60,allow_redirects=True); print('STATUS',r.status_code,'FINAL',r.url,'LEN',len(r.text)); r.raise_for_status()
+              except Exception as e:
+                  print('ERROR',repr(e)); continue
+              soup=BeautifulSoup(r.text,'html.parser')
+              print('TITLE',soup.title.get_text(' ',strip=True) if soup.title else None)
+              for a in soup.find_all('a',href=True):
+                  href=a.get('href',''); txt=' '.join(a.get_text(' ',strip=True).split())
+                  if txt or 'search' in href.lower(): print('A',href,'TEXT',txt[:160])
+              f=soup.find('form')
+              if f:
+                  print('FORM',f.get('method'),f.get('action'),f.get('id'),f.get('name'))
+                  for x in f.find_all(['input','select','button']):
+                      attrs={k:x.get(k) for k in ('type','name','id','value','onclick') if x.get(k) is not None}
+                      txt=' '.join(x.get_text(' ',strip=True).split())
+                      if x.name=='select':
+                          opts=[((o.get('value') or ''),' '.join(o.get_text(' ',strip=True).split())) for o in x.find_all('option')][:30]
+                          print('SELECT',attrs,'OPTS',opts)
+                      else: print(x.name.upper(),attrs,'TEXT',txt[:120])
+              for script in soup.find_all('script'):
+                  txt=script.string or script.get_text() or ''
+                  if any(k in txt.lower() for k in ['ajax','webmethod','search','gridview','postback']): print('SCRIPT',txt[:5000])
+          PY
