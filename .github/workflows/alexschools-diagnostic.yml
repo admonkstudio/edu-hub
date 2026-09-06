@@ -1,0 +1,52 @@
+name: AlexSchools public directory diagnostic
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/alexschools-diagnostic.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Inspect public WordPress/listing endpoints
+        run: |
+          python - <<'PY'
+          import json,re,requests
+          from bs4 import BeautifulSoup
+          from urllib.parse import urljoin
+          s=requests.Session(); s.headers['User-Agent']='EduHubResearchBot/1.4 (+https://github.com/admonkstudio/edu-hub; public-source-diagnostic)'
+          seeds=['https://alexschools.info/','https://alexschools.info/listings/','https://alexschools.info/wp-json/wp/v2/types']
+          for u in seeds:
+              print('\n===',u,'===',flush=True)
+              try:
+                  r=s.get(u,timeout=45,allow_redirects=True); print('STATUS',r.status_code,'FINAL',r.url,'LEN',len(r.text),'TYPE',r.headers.get('content-type'),flush=True)
+                  if r.status_code>=400: continue
+              except Exception as e:
+                  print('ERROR',repr(e),flush=True); continue
+              if 'json' in (r.headers.get('content-type') or '').lower():
+                  print('JSON',r.text[:20000],flush=True); continue
+              soup=BeautifulSoup(r.text,'html.parser')
+              for a in soup.find_all('a',href=True):
+                  href=urljoin(r.url,a.get('href','')); txt=' '.join(a.get_text(' ',strip=True).split())
+                  if '/listing/' in href or '/listings/' in href or 'page/' in href:
+                      print('LINK',json.dumps({'text':txt[:160],'href':href},ensure_ascii=False),flush=True)
+              for link in soup.find_all('link',href=True):
+                  href=urljoin(r.url,link.get('href',''))
+                  if 'wp-json' in href: print('API_LINK',href,flush=True)
+          # Try public WP API discovery/search without authentication.
+          for u in ('https://alexschools.info/wp-json/','https://alexschools.info/wp-json/wp/v2/search?per_page=1','https://alexschools.info/wp-json/wp/v2/posts?per_page=1'):
+              print('\n=== API',u,'===',flush=True)
+              try:
+                  r=s.get(u,timeout=45); print('STATUS',r.status_code,'TOTAL',r.headers.get('X-WP-Total'),'PAGES',r.headers.get('X-WP-TotalPages'),'LEN',len(r.text),flush=True); print(r.text[:12000],flush=True)
+              except Exception as e: print('ERROR',repr(e),flush=True)
+          PY
