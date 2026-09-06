@@ -1,0 +1,271 @@
+name: Egypt raw education data acquisition v3
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/egypt-data-acquisition-v3.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  base-acquisition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/data-acquisition/requirements.txt
+
+      - name: Install Python dependencies
+        run: pip install -r tools/data-acquisition/requirements.txt
+
+      - name: Install osmium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends osmium-tool
+
+      - name: Acquire current SCU higher-education lists
+        run: python tools/data-acquisition/scrape_scu.py
+
+      - name: Acquire MasrSchools, EgyptSchools and official Al-Azhar snapshots
+        run: |
+          mkdir -p artifacts
+          python tools/data-acquisition/scrape_masrschools.py \
+            --output artifacts/masrschools_snapshot.jsonl \
+            --max-pages 500 --delay 0.25 &
+          MASR_PID=$!
+
+          python tools/data-acquisition/scrape_egyptschools.py \
+            --output artifacts/egyptschools_snapshot.jsonl \
+            --max-pages 200 --delay 0.25 &
+          EGYPT_PID=$!
+
+          python tools/data-acquisition/scrape_azhar.py \
+            --output artifacts/azhar_snapshot.raw.jsonl \
+            --delay 0.15 &
+          AZHAR_PID=$!
+
+          wait $MASR_PID
+          wait $EGYPT_PID
+          wait $AZHAR_PID
+
+          python tools/data-acquisition/promote_azhar_raw_fields.py \
+            --input artifacts/azhar_snapshot.raw.jsonl \
+            --output artifacts/azhar_snapshot.jsonl
+
+          wc -l \
+            artifacts/masrschools_snapshot.jsonl \
+            artifacts/egyptschools_snapshot.jsonl \
+            artifacts/azhar_snapshot.jsonl
+
+      - name: Download current Egypt OpenStreetMap extract
+        run: |
+          mkdir -p /tmp/eduhub-osm
+          curl --fail --location --retry 4 \
+            https://download.geofabrik.de/africa/egypt-latest.osm.pbf \
+            -o /tmp/eduhub-osm/egypt-latest.osm.pbf
+
+      - name: Extract education features
+        run: |
+          osmium tags-filter /tmp/eduhub-osm/egypt-latest.osm.pbf \
+            nwr/amenity=school \
+            nwr/amenity=kindergarten \
+            nwr/amenity=college \
+            nwr/amenity=university \
+            -o /tmp/eduhub-osm/education.osm.pbf --overwrite
+          osmium export /tmp/eduhub-osm/education.osm.pbf \
+            --output-format=geojsonseq \
+            -o /tmp/eduhub-osm/education.geojsonseq --overwrite
+          perl -pi -e 's/^\x1e//' /tmp/eduhub-osm/education.geojsonseq
+          wc -l /tmp/eduhub-osm/education.geojsonseq
+
+      - name: Build base raw acquisition database
+        run: |
+          rm -f \
+            artifacts/edu_hub_egypt_raw.sqlite \
+            artifacts/source_counts.csv \
+            artifacts/field_inventory.csv \
+            artifacts/coverage.csv \
+            artifacts/acquisition_summary.json
+
+          python tools/data-acquisition/collect_egypt.py \
+            --db artifacts/edu_hub_egypt_raw.sqlite \
+            --outdir artifacts \
+            --osm /tmp/eduhub-osm/education.geojsonseq
+
+          python tools/data-acquisition/ingest_web_snapshots.py \
+            --db artifacts/edu_hub_egypt_raw.sqlite \
+            --outdir artifacts \
+            --masrschools artifacts/masrschools_snapshot.jsonl \
+            --egyptschools artifacts/egyptschools_snapshot.jsonl \
+            --madaresegypt artifacts/not-yet-merged-madaresegypt.jsonl \
+            --azhar artifacts/azhar_snapshot.jsonl
+
+          cat artifacts/acquisition_summary.json
+          du -h artifacts/edu_hub_egypt_raw.sqlite
+
+      - name: Upload base database
+        uses: actions/upload-artifact@v4
+        with:
+          name: edu-hub-egypt-base-v3
+          path: |
+            artifacts/edu_hub_egypt_raw.sqlite
+            artifacts/source_counts.csv
+            artifacts/field_inventory.csv
+            artifacts/coverage.csv
+            artifacts/acquisition_summary.json
+            artifacts/masrschools_snapshot.jsonl
+            artifacts/egyptschools_snapshot.jsonl
+            artifacts/azhar_snapshot.jsonl
+            tools/data-acquisition/seeds/scu_higher_ed_snapshot.csv
+            tools/data-acquisition/seeds/scu_higher_ed_snapshot.csv.report.json
+          if-no-files-found: error
+          retention-days: 30
+
+  madaresegypt-listings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include:
+          - name: schools-01
+            category: school
+            start_page: 1
+            end_page: 500
+          - name: schools-02
+            category: school
+            start_page: 501
+            end_page: 1000
+          - name: schools-03
+            category: school
+            start_page: 1001
+            end_page: 1500
+          - name: schools-04
+            category: school
+            start_page: 1501
+            end_page: 2000
+          - name: schools-05
+            category: school
+            start_page: 2001
+            end_page: 2500
+          - name: schools-06
+            category: school
+            start_page: 2501
+            end_page: 3000
+          - name: nurseries-01
+            category: nursery
+            start_page: 1
+            end_page: 400
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install acquisition dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Acquire listing shard
+        run: |
+          mkdir -p artifacts/madaresegypt
+          python tools/data-acquisition/scrape_madaresegypt.py \
+            --output artifacts/madaresegypt/${{ matrix.name }}.jsonl \
+            --category "${{ matrix.category }}" \
+            --start-page ${{ matrix.start_page }} \
+            --end-page ${{ matrix.end_page }} \
+            --listing-only \
+            --delay 0.20
+          wc -l artifacts/madaresegypt/${{ matrix.name }}.jsonl
+
+      - name: Upload listing shard
+        uses: actions/upload-artifact@v4
+        with:
+          name: madaresegypt-${{ matrix.name }}
+          path: artifacts/madaresegypt/${{ matrix.name }}.jsonl
+          if-no-files-found: error
+          retention-days: 30
+
+  merge-final:
+    needs:
+      - base-acquisition
+      - madaresegypt-listings
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download base database
+        uses: actions/download-artifact@v4
+        with:
+          name: edu-hub-egypt-base-v3
+          path: base
+
+      - name: Download all MadaresEgypt shards
+        uses: actions/download-artifact@v4
+        with:
+          pattern: madaresegypt-*
+          path: shards
+          merge-multiple: true
+
+      - name: Merge raw discovery shards
+        run: |
+          mkdir -p artifacts
+          cp base/edu_hub_egypt_raw.sqlite artifacts/edu_hub_egypt_raw.sqlite
+          cp base/coverage.csv artifacts/coverage.csv
+
+          python tools/data-acquisition/merge_madaresegypt_shards.py \
+            --input 'shards/*.jsonl' \
+            --output artifacts/madaresegypt_snapshot.jsonl
+
+          python tools/data-acquisition/ingest_web_snapshots.py \
+            --db artifacts/edu_hub_egypt_raw.sqlite \
+            --outdir artifacts \
+            --masrschools artifacts/not-present-masrschools.jsonl \
+            --egyptschools artifacts/not-present-egyptschools.jsonl \
+            --madaresegypt artifacts/madaresegypt_snapshot.jsonl \
+            --azhar artifacts/not-present-azhar.jsonl
+
+          cat artifacts/acquisition_summary.json
+          du -h artifacts/edu_hub_egypt_raw.sqlite
+          wc -l artifacts/madaresegypt_snapshot.jsonl
+
+      - name: Upload final v3 raw database
+        uses: actions/upload-artifact@v4
+        with:
+          name: edu-hub-egypt-raw-database-v3
+          path: |
+            artifacts/edu_hub_egypt_raw.sqlite
+            artifacts/source_counts.csv
+            artifacts/field_inventory.csv
+            artifacts/coverage.csv
+            artifacts/acquisition_summary.json
+            artifacts/madaresegypt_snapshot.jsonl
+            base/masrschools_snapshot.jsonl
+            base/egyptschools_snapshot.jsonl
+            base/azhar_snapshot.jsonl
+            base/scu_higher_ed_snapshot.csv
+            base/scu_higher_ed_snapshot.csv.report.json
+          if-no-files-found: error
+          retention-days: 30
