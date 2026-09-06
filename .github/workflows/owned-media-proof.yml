@@ -1,0 +1,98 @@
+name: Owned media archive proof
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/owned-media-proof.yml"
+      - "tools/data-acquisition/init_owned_archive.py"
+      - "tools/data-acquisition/discover_media.py"
+      - "tools/data-acquisition/archive_media.py"
+
+permissions:
+  contents: read
+
+jobs:
+  alexschools-owned-archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 pillow
+
+      - name: Acquire accepted Alexandria records
+        run: |
+          mkdir -p artifacts/owned
+          python tools/data-acquisition/scrape_alexschools.py \
+            --output artifacts/owned/alexschools.jsonl \
+            --max-pages 20 \
+            --delay 0.35
+          cat artifacts/owned/alexschools.report.json
+
+      - name: Initialize owned raw archive and ingest records
+        run: |
+          python tools/data-acquisition/init_owned_archive.py \
+            --db artifacts/owned/edu_hub_owned_archive.sqlite
+          python tools/data-acquisition/ingest_web_snapshots.py \
+            --db artifacts/owned/edu_hub_owned_archive.sqlite \
+            --outdir artifacts/owned/reports \
+            --alexschools artifacts/owned/alexschools.jsonl \
+            --masrschools artifacts/owned/missing-masr.jsonl \
+            --egyptschools artifacts/owned/missing-egypt.jsonl \
+            --madaresegypt artifacts/owned/missing-madares.jsonl \
+            --azhar artifacts/owned/missing-azhar.jsonl
+
+      - name: Discover public media candidates
+        run: |
+          python tools/data-acquisition/discover_media.py \
+            --input artifacts/owned/alexschools.jsonl \
+            --output artifacts/owned/alexschools-media-candidates.jsonl \
+            --source-id alexschools_public_directory \
+            --delay 0.35
+          cat artifacts/owned/alexschools-media-candidates.report.json
+
+      - name: Mirror media into Edu Hub-owned archive
+        run: |
+          python tools/data-acquisition/archive_media.py \
+            --input artifacts/owned/alexschools-media-candidates.jsonl \
+            --db artifacts/owned/edu_hub_owned_archive.sqlite \
+            --media-root artifacts/owned/media \
+            --coverage artifacts/owned/reports/media_coverage.csv
+          cat artifacts/owned/reports/media_coverage.summary.json
+
+      - name: Build portable archive and checksums
+        run: |
+          sqlite3 artifacts/owned/edu_hub_owned_archive.sqlite "PRAGMA wal_checkpoint(FULL);"
+          find artifacts/owned/media -type f -print0 | sort -z | xargs -0 sha256sum > artifacts/owned/reports/media-files.sha256 || true
+          sha256sum artifacts/owned/edu_hub_owned_archive.sqlite > artifacts/owned/reports/database.sha256
+          tar -C artifacts/owned -czf artifacts/edu-hub-owned-alexschools-proof.tar.gz \
+            edu_hub_owned_archive.sqlite \
+            alexschools.jsonl \
+            alexschools.report.json \
+            alexschools-media-candidates.jsonl \
+            alexschools-media-candidates.report.json \
+            media \
+            reports
+          sha256sum artifacts/edu-hub-owned-alexschools-proof.tar.gz > artifacts/edu-hub-owned-alexschools-proof.tar.gz.sha256
+          du -sh artifacts/owned/media artifacts/edu-hub-owned-alexschools-proof.tar.gz
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-hub-owned-alexschools-proof
+          path: |
+            artifacts/edu-hub-owned-alexschools-proof.tar.gz
+            artifacts/edu-hub-owned-alexschools-proof.tar.gz.sha256
+            artifacts/owned/reports/media_coverage.csv
+            artifacts/owned/reports/media_coverage.summary.json
+            artifacts/owned/reports/source_counts.csv
+            artifacts/owned/reports/field_inventory.csv
+          if-no-files-found: error
+          retention-days: 30
