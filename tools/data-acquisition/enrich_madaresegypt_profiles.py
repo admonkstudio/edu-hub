@@ -55,7 +55,12 @@ def main() -> None:
             try:
                 response = session.get(url, timeout=60, allow_redirects=True)
                 response.raise_for_status()
+                if "/Home/ErrorNotFount" in response.url or "الصفحه المطلوبة غير موجودة" in response.text:
+                    raise ValueError(f"soft unavailable profile: {response.url}")
                 enriched = adapter.parse_profile(sid, discovered, response.text, response.url)
+                evidence = enriched.get("payload") or {}
+                if not enriched.get("name_raw") and not evidence.get("sections") and not evidence.get("contacts"):
+                    raise ValueError(f"profile contains no usable factual evidence: {response.url}")
                 dst.write(json.dumps(enriched, ensure_ascii=False) + "\n")
                 written += 1
             except Exception as exc:
