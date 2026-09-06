@@ -1,0 +1,40 @@
+name: Al-Azhar directory diagnostic
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt
+    paths:
+      - ".github/workflows/azhar-diagnostic.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Inspect public search form
+        run: |
+          python - <<'PY'
+          import requests
+          from bs4 import BeautifulSoup
+          u='https://azhar.gov.eg/IDSC/InstGuide/Guide_Search.aspx'
+          r=requests.get(u,headers={'User-Agent':'Mozilla/5.0'},timeout=60); r.raise_for_status()
+          s=BeautifulSoup(r.text,'html.parser'); f=s.find('form')
+          print('FORM', f.get('method'), f.get('action'), f.get('id'), f.get('name'))
+          for x in f.find_all(['input','button','select','a']):
+              attrs={k:x.get(k) for k in ('tag','type','name','id','value','href','onclick') if x.get(k) is not None}
+              attrs['tag']=x.name
+              txt=' '.join(x.get_text(' ',strip=True).split())
+              if x.name!='a' or any(t in (txt+' '+str(attrs)).lower() for t in ['بحث','search','postback','btn']):
+                  print(attrs,'TEXT=',txt[:200])
+          print('--- scripts containing btn/search/result/postback ---')
+          for sc in s.find_all('script'):
+              txt=sc.string or sc.get_text() or ''
+              if any(k.lower() in txt.lower() for k in ['btn','search','resault','postback']): print(txt[:5000])
+          PY
