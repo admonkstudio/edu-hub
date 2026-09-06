@@ -1,0 +1,88 @@
+name: MOHESR technical colleges and institutes
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/mohesr-technical-institutes.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Acquire official 8-college 44-institute list
+        run: |
+          mkdir -p artifacts
+          python - <<'PY'
+          import hashlib,json,re,requests
+          from bs4 import BeautifulSoup
+          from pathlib import Path
+
+          URL='https://mohesr.gov.eg/index.php?id=190&option=com_sppagebuilder&view=page'
+          s=requests.Session(); s.headers['User-Agent']='EduHubResearchBot/1.0 (+https://github.com/admonkstudio/edu-hub; public-source-acquisition)'
+          r=s.get(URL,timeout=60,allow_redirects=True); r.raise_for_status()
+          soup=BeautifulSoup(r.text,'html.parser')
+          main=soup.find('main') or soup
+          lines=[' '.join(x.split()) for x in main.stripped_strings]
+          Path('artifacts/mohesr_technical_page.txt').write_text('\n'.join(lines),encoding='utf-8')
+
+          college=None
+          rows=[]
+          college_re=re.compile(r'^([1-8])\s*[-–]\s*(الكلية التكنولوجية.+)$')
+          for line in lines:
+              m=college_re.match(line)
+              if m:
+                  college=m.group(2).strip()
+                  continue
+              if not college:
+                  continue
+              value=line.strip(' •\t')
+              if value.startswith(('المعهد الفني','المعهد الصناعي','المعهد المتوسط')) and len(value)>8:
+                  rows.append({'technical_college_raw':college,'name_raw':value})
+
+          # DOM/theme duplication can repeat the article; keep exact source pair once.
+          seen=set(); clean=[]
+          for row in rows:
+              key=(row['technical_college_raw'],row['name_raw'])
+              if key not in seen:
+                  seen.add(key); clean.append(row)
+
+          out=Path('artifacts/mohesr_technical_institutes.jsonl')
+          with out.open('w',encoding='utf-8') as f:
+              for row in clean:
+                  seed=(row['technical_college_raw']+'|'+row['name_raw']).encode()
+                  payload={
+                    'source_record_id':'mohesr-tech-'+hashlib.sha256(seed).hexdigest()[:16],
+                    'source_url':r.url,
+                    'name_raw':row['name_raw'],
+                    'entity_type_raw':'technical_institute',
+                    'location_raw':None,
+                    'payload':row,
+                  }
+                  f.write(json.dumps(payload,ensure_ascii=False)+'\n')
+          by_college={}
+          for row in clean:
+              by_college[row['technical_college_raw']]=by_college.get(row['technical_college_raw'],0)+1
+          report={'ok':len(clean)==44,'source_url':r.url,'claimed_colleges':8,'claimed_institutes':44,'acquired':len(clean),'by_college':by_college}
+          Path('artifacts/mohesr_technical_institutes_report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(report,ensure_ascii=False))
+          if len(clean)!=44:
+              raise SystemExit(f'Expected 44 technical institutes; parsed {len(clean)}')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mohesr-technical-institutes-v3
+          path: |
+            artifacts/mohesr_technical_institutes.jsonl
+            artifacts/mohesr_technical_institutes_report.json
+            artifacts/mohesr_technical_page.txt
+          if-no-files-found: error
+          retention-days: 30
