@@ -20,23 +20,47 @@ jobs:
         uses: actions/checkout@v4
       - name: Install diagnostic dependencies
         run: pip install requests beautifulsoup4
-      - name: Inspect public search form
+      - name: Inspect public search response
         run: |
           python - <<'PY'
-          import requests
+          import re, requests
           from bs4 import BeautifulSoup
-          u='https://azhar.gov.eg/IDSC/InstGuide/Guide_Search.aspx'
-          r=requests.get(u,headers={'User-Agent':'Mozilla/5.0'},timeout=60); r.raise_for_status()
-          s=BeautifulSoup(r.text,'html.parser'); f=s.find('form')
-          print('FORM', f.get('method'), f.get('action'), f.get('id'), f.get('name'))
-          for x in f.find_all(['input','button','select','a']):
-              attrs={k:x.get(k) for k in ('type','name','id','value','href','onclick') if x.get(k) is not None}
-              attrs['tag']=x.name
-              txt=' '.join(x.get_text(' ',strip=True).split())
-              if x.name!='a' or any(t in (txt+' '+str(attrs)).lower() for t in ['بحث','search','postback','btn']):
-                  print(attrs,'TEXT=',txt[:200])
-          print('--- scripts containing btn/search/result/postback ---')
-          for sc in s.find_all('script'):
-              txt=sc.string or sc.get_text() or ''
-              if any(k.lower() in txt.lower() for k in ['btn','search','resault','postback']): print(txt[:5000])
+          from urllib.parse import urljoin
+          U='https://azhar.gov.eg/IDSC/InstGuide/Guide_Search.aspx'
+          S=requests.Session(); S.headers['User-Agent']='EduHubResearchBot/0.2 diagnostic'
+          def payload(form):
+              d={}
+              for x in form.find_all('input',attrs={'name':True}):
+                  t=(x.get('type') or 'text').lower()
+                  if t in ('submit','button','image','file'): continue
+                  d[x['name']]=x.get('value','')
+              for x in form.find_all('select',attrs={'name':True}):
+                  o=x.find('option',selected=True) or x.find('option'); d[x['name']]=o.get('value','') if o else ''
+              return d
+          r=S.get(U,timeout=60); r.raise_for_status(); soup=BeautifulSoup(r.text,'html.parser'); f=soup.find('form'); sels=f.find_all('select')
+          gov=sels[0].find_all('option')[0]; gv=gov.get('value',''); print('GOV',gv,gov.get_text(' ',strip=True))
+          d=payload(f); d[sels[0]['name']]=gv; d['__EVENTTARGET']=sels[0]['name']; d['__EVENTARGUMENT']=''
+          r=S.post(urljoin(U,f.get('action') or U),data=d,timeout=60); r.raise_for_status(); print('POSTBACK',r.url,len(r.text))
+          soup=BeautifulSoup(r.text,'html.parser'); f=soup.find('form'); sels=f.find_all('select');
+          admins=[o for o in sels[1].find_all('option') if o.get('value','').strip()]
+          for o in admins[:3]: print('ADMIN OPTION',repr(o.get('value')),o.get_text(' ',strip=True))
+          admin=admins[0]
+          d=payload(f); d[sels[0]['name']]=gv; d[sels[1]['name']]=admin.get('value',''); d['ctl00$MainContent$btnSearch']='بحث'; d['__EVENTTARGET']=''; d['__EVENTARGUMENT']=''
+          r=S.post(urljoin(U,f.get('action') or U),data=d,timeout=60,allow_redirects=True); print('SEARCH',r.status_code,r.url,len(r.text)); r.raise_for_status()
+          print('Guide_Resault matches',re.findall(r'Guide_Resault\\.aspx[^\"\'<> ]*',r.text,re.I)[:30])
+          print('ID patterns',sorted(set(re.findall(r'(?:id|InstID|instid)[=:\"\']+([0-9]{4,})',r.text,re.I)))[:50])
+          s2=BeautifulSoup(r.text,'html.parser')
+          for a in s2.find_all('a',href=True):
+              href=a.get('href',''); txt=' '.join(a.get_text(' ',strip=True).split())
+              if 'guide' in href.lower() or 'result' in href.lower() or 'resault' in href.lower(): print('A',href,'TEXT',txt[:200])
+          print('TABLES',len(s2.find_all('table')))
+          for ti,t in enumerate(s2.find_all('table')[-5:]):
+              rows=[]
+              for tr in t.find_all('tr')[:10]:
+                  rows.append([' '.join(c.get_text(' ',strip=True).split()) for c in tr.find_all(['th','td'])])
+              print('TABLE',ti,rows)
+          # print controls whose value/text looks like results/search/navigation
+          for x in s2.find_all(['input','a','button']):
+              blob=' '.join([str(x.get(k,'')) for k in ('name','id','value','href','onclick')])+' '+x.get_text(' ',strip=True)
+              if any(k in blob.lower() for k in ['بحث','search','result','resault','details','تفاصيل','معهد']): print('CTRL',x.name,{k:x.get(k) for k in ('type','name','id','value','href','onclick')},x.get_text(' ',strip=True)[:200])
           PY
