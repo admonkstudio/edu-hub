@@ -1,0 +1,64 @@
+name: MadaresEgypt targeted repair
+
+on:
+  workflow_dispatch:
+    inputs:
+      category:
+        description: "Source category"
+        required: true
+        type: choice
+        options:
+          - school
+          - nursery
+      start_page:
+        description: "First page to reacquire"
+        required: true
+        type: number
+      end_page:
+        description: "Last page to reacquire"
+        required: true
+        type: number
+      repair_name:
+        description: "Short artifact label, e.g. school-01-repair"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Reacquire requested range
+        run: |
+          mkdir -p artifacts/madaresegypt-repair
+          START="${{ inputs.start_page }}"
+          END="${{ inputs.end_page }}"
+          SPAN=$((END - START + 1))
+          # A targeted repair must scan the requested range even if the source is
+          # temporarily unavailable at the beginning. The final report, not the
+          # GitHub job status, determines whether the range is accepted.
+          python tools/data-acquisition/scrape_madaresegypt_listings_v2.py \
+            --category "${{ inputs.category }}" \
+            --start-page "$START" \
+            --end-page "$END" \
+            --output "artifacts/madaresegypt-repair/${{ inputs.repair_name }}.jsonl" \
+            --delay 0.75 \
+            --max-consecutive-failures "$SPAN"
+          cat "artifacts/madaresegypt-repair/${{ inputs.repair_name }}.report.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: madaresegypt-repair-${{ inputs.repair_name }}
+          path: |
+            artifacts/madaresegypt-repair/${{ inputs.repair_name }}.jsonl
+            artifacts/madaresegypt-repair/${{ inputs.repair_name }}.report.json
+          if-no-files-found: error
+          retention-days: 30
