@@ -1,0 +1,67 @@
+name: MadaresEgypt owned media pilot
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/madaresegypt-media-pilot.yml"
+      - "tools/data-acquisition/manifests/madaresegypt-media-pilot-001.txt"
+      - "tools/data-acquisition/discover_media.py"
+      - "tools/data-acquisition/archive_media.py"
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-owned-media:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 pillow
+      - name: Build deterministic profile batch
+        run: |
+          mkdir -p artifacts/madares-media/reports
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          ids = [x.strip() for x in Path("tools/data-acquisition/manifests/madaresegypt-media-pilot-001.txt").read_text().splitlines() if x.strip()]
+          out = Path("artifacts/madares-media/input.jsonl")
+          with out.open("w", encoding="utf-8") as f:
+              for sid in ids:
+                  f.write(json.dumps({"source_record_id": sid, "source_url": f"https://madaresegypt.com/ar/Item/{sid}"}) + "\\n")
+          print(json.dumps({"records": len(ids), "output": str(out)}))
+          PY
+      - name: Discover profile media candidates
+        run: |
+          python tools/data-acquisition/discover_media.py \
+            --input artifacts/madares-media/input.jsonl \
+            --output artifacts/madares-media/candidates.jsonl \
+            --source-id madaresegypt_public_directory \
+            --delay 0.75
+          cat artifacts/madares-media/candidates.report.json
+      - name: Mirror candidates into owned storage
+        run: |
+          python tools/data-acquisition/archive_media.py \
+            --input artifacts/madares-media/candidates.jsonl \
+            --db artifacts/madares-media/owned-media.sqlite \
+            --media-root artifacts/madares-media/media \
+            --coverage artifacts/madares-media/reports/media_coverage.csv
+          cat artifacts/madares-media/reports/media_coverage.summary.json
+      - name: Build verification manifests
+        run: |
+          sqlite3 artifacts/madares-media/owned-media.sqlite "PRAGMA wal_checkpoint(FULL); PRAGMA integrity_check;"
+          find artifacts/madares-media/media -type f -print0 | sort -z | xargs -0 sha256sum > artifacts/madares-media/reports/media-files.sha256
+          sha256sum artifacts/madares-media/owned-media.sqlite > artifacts/madares-media/reports/database.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-hub-owned-media-madaresegypt-pilot-001
+          path: artifacts/madares-media/
+          if-no-files-found: error
+          retention-days: 30
