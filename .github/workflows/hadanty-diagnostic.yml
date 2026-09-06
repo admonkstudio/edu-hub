@@ -1,0 +1,65 @@
+name: Hadanty public nursery directory diagnostic
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/hadanty-diagnostic.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Inspect public site assets and API references
+        run: |
+          python - <<'PY'
+          import json,re,requests
+          from bs4 import BeautifulSoup
+          from urllib.parse import urljoin
+          s=requests.Session(); s.headers['User-Agent']='EduHubResearchBot/1.4 (+https://github.com/admonkstudio/edu-hub; public-source-diagnostic)'
+          js=[]
+          for u in ('https://portal.hadanty.com/','https://web.hadanty.com/'):
+              print('\n=== PAGE',u,'===',flush=True)
+              try:
+                  r=s.get(u,timeout=45,allow_redirects=True); print('STATUS',r.status_code,'FINAL',r.url,'LEN',len(r.text),'TYPE',r.headers.get('content-type'),flush=True)
+                  if r.status_code>=400: continue
+              except Exception as e: print('ERROR',repr(e),flush=True); continue
+              soup=BeautifulSoup(r.text,'html.parser')
+              for a in soup.find_all('a',href=True):
+                  href=urljoin(r.url,a.get('href','')); txt=' '.join(a.get_text(' ',strip=True).split())
+                  if any(k in (txt+' '+href).lower() for k in ('حضان','nurser','govern','محافظ')):
+                      print('LINK',json.dumps({'text':txt[:180],'href':href},ensure_ascii=False),flush=True)
+              for tag in soup.find_all('script',src=True):
+                  src=urljoin(r.url,tag.get('src'))
+                  if src not in js: js.append(src)
+                  print('SCRIPT_SRC',src,flush=True)
+              for script in soup.find_all('script'):
+                  txt=script.string or script.get_text() or ''
+                  if any(k in txt.lower() for k in ('api','nurser','حضان','governorate')):
+                      print('INLINE',' '.join(txt.split())[:12000],flush=True)
+          print('JS_COUNT',len(js),flush=True)
+          for u in js[:100]:
+              try:
+                  r=s.get(u,timeout=35); txt=r.text
+                  if r.status_code>=400 or len(txt)>10_000_000: continue
+              except Exception as e: print('JS_ERROR',u,repr(e),flush=True); continue
+              low=txt.lower()
+              if not any(k in low for k in ('nurser','حضان','governorate','api/','/api','graphql')): continue
+              print('\n=== JS_MATCH',u,'LEN',len(txt),'===',flush=True)
+              refs=set()
+              for m in re.findall(r"https?://[^'\"\s)]+",txt):
+                  if any(k in m.lower() for k in ('api','hadanty','nurser')): refs.add(m.rstrip(';,}'))
+              for m in re.findall(r"['\"](/[^'\"]*(?:api|nurser|govern|city|search)[^'\"]*)['\"]",txt,re.I): refs.add(urljoin(u,m))
+              for ref in sorted(refs)[:150]: print('ENDPOINT_REF',ref,flush=True)
+              for token in ('nursery','nurseries','حضانة','حضانات','governorate'):
+                  p=low.find(token.lower())
+                  if p>=0: print('CONTEXT',txt[max(0,p-700):p+3000].replace('\n',' ')[:4000],flush=True)
+          PY
