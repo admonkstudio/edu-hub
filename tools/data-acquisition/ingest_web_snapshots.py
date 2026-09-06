@@ -26,6 +26,13 @@ SOURCES = {
         "authority": "secondary",
         "notes": "Public directory focused mainly on Cairo/Giza. Reviews, user comments and media are intentionally excluded.",
     },
+    "madaresegypt_public_directory": {
+        "name": "MadaresEgypt public schools and nurseries directory snapshot",
+        "url": "https://madaresegypt.com/ar/Results/مدارس",
+        "source_type": "secondary_directory_snapshot",
+        "authority": "secondary",
+        "notes": "Public directory used for school/nursery discovery and field census. Media, comments/reviews and authenticated content are intentionally excluded.",
+    },
     "azhar_official_institute_guide": {
         "name": "Al-Azhar official institute guide",
         "url": "https://azhar.gov.eg/IDSC/InstGuide/Guide_Search.aspx",
@@ -207,6 +214,7 @@ def main() -> None:
     ap.add_argument("--outdir", default="artifacts")
     ap.add_argument("--masrschools", default="artifacts/masrschools_snapshot.jsonl")
     ap.add_argument("--egyptschools", default="artifacts/egyptschools_snapshot.jsonl")
+    ap.add_argument("--madaresegypt", default="artifacts/madaresegypt_snapshot.jsonl")
     ap.add_argument("--azhar", default="artifacts/azhar_snapshot.jsonl")
     args = ap.parse_args()
 
@@ -216,6 +224,7 @@ def main() -> None:
     for sid, path in (
         ("masrschools_public_directory", Path(args.masrschools)),
         ("egyptschools_public_directory", Path(args.egyptschools)),
+        ("madaresegypt_public_directory", Path(args.madaresegypt)),
         ("azhar_official_institute_guide", Path(args.azhar)),
     ):
         seen, added = ingest_file(db, sid, path)
