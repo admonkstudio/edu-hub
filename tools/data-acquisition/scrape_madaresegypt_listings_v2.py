@@ -151,11 +151,26 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--category", required=True, choices=("school", "nursery"))
     ap.add_argument("--start-page", required=True, type=int)
-    ap.add_argument("--end-page", required=True, type=int)
+    ap.add_argument("--end-page", type=int)
+    ap.add_argument("--pages", help="Comma-separated exact page numbers; overrides start/end range")
     ap.add_argument("--output", required=True)
     ap.add_argument("--delay", type=float, default=0.75)
     ap.add_argument("--max-consecutive-failures", type=int, default=8)
     args = ap.parse_args()
+
+    if args.pages:
+        try:
+            page_numbers = sorted({int(value.strip()) for value in args.pages.split(",") if value.strip()})
+        except ValueError as exc:
+            raise SystemExit(f"Invalid --pages value: {exc}") from exc
+        if not page_numbers or page_numbers[0] < 1:
+            raise SystemExit("--pages must contain positive page numbers")
+    else:
+        if args.start_page is None or args.end_page is None:
+            raise SystemExit("Provide either --pages or both --start-page and --end-page")
+        if args.start_page < 1 or args.end_page < args.start_page:
+            raise SystemExit("Invalid start/end page range")
+        page_numbers = list(range(args.start_page, args.end_page + 1))
 
     out = Path(args.output)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -171,7 +186,7 @@ def main() -> None:
     repeated_count = 0
     stopped_early_reason = None
 
-    for page in range(args.start_page, args.end_page + 1):
+    for page in page_numbers:
         url = base if page == 1 else f"{base}?page={page}"
         try:
             html = fetch_page(session, url)
@@ -231,8 +246,10 @@ def main() -> None:
     report = {
         "ok": len(unresolved) == 0 and not (stopped_early_reason and stopped_early_reason.get("reason") == "max_consecutive_failures"),
         "category": args.category,
-        "start_page": args.start_page,
-        "end_page": args.end_page,
+        "start_page": min(page_numbers),
+        "end_page": max(page_numbers),
+        "requested_pages": page_numbers,
+        "pages_requested": len(page_numbers),
         "pages_ok": pages_ok,
         "initial_failed_pages": failed_pages,
         "unresolved_failed_pages": unresolved,
