@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Acquire public school and nursery facts from MadaresEgypt.
+"""Acquire public school and nursery discovery facts from MadaresEgypt.
 
-This adapter is discovery-only/raw-first. It reads public listing/profile pages,
-keeps source IDs/URLs and visible factual fields, and intentionally excludes media
-assets, comments/reviews and any authenticated/private content.
+MadaresEgypt is treated as a secondary discovery source, not an authority source.
+The adapter can crawl category listing pages only (preferred for broad coverage) or
+optionally enrich a bounded subset from public profile pages. Media, reviews,
+comments and authenticated/private content are intentionally excluded.
 """
 from __future__ import annotations
 
@@ -25,7 +26,7 @@ CATEGORIES = {
     "school": f"{BASE}/ar/Results/{quote('مدارس')}",
     "nursery": f"{BASE}/ar/Results/{quote('حضانات')}",
 }
-USER_AGENT = "EduHubResearchBot/0.4 (+https://github.com/admonkstudio/edu-hub; public-source-acquisition)"
+USER_AGENT = "EduHubResearchBot/0.5 (+https://github.com/admonkstudio/edu-hub; public-source-acquisition)"
 
 
 def session() -> requests.Session:
@@ -61,12 +62,37 @@ def canonical_item_url(href: str, source_id: str) -> str:
     return f"{p.scheme or 'https'}://{p.netloc or 'madaresegypt.com'}{path}"
 
 
-def discover_items(s: requests.Session, max_pages: int, delay: float) -> dict[str, dict]:
+def listing_context(a) -> str | None:
+    """Return a bounded nearby card/listing text block for discovery fields."""
+    candidates: list[str] = []
+    node = a
+    for _ in range(6):
+        node = node.parent
+        if node is None:
+            break
+        txt = clean(node.get_text(" ", strip=True)) if hasattr(node, "get_text") else None
+        if txt and 15 <= len(txt) <= 1600:
+            candidates.append(txt)
+    if not candidates:
+        return None
+    # Prefer the smallest nearby useful block; larger ancestors often include
+    # unrelated filters/footer content.
+    return min(candidates, key=len)
+
+
+def discover_items(
+    s: requests.Session,
+    categories: list[str],
+    start_page: int,
+    end_page: int,
+    delay: float,
+) -> dict[str, dict]:
     items: dict[str, dict] = {}
-    for category, base_url in CATEGORIES.items():
+    for category in categories:
+        base_url = CATEGORIES[category]
         empty_streak = 0
         previous_page_ids: tuple[str, ...] | None = None
-        for page in range(1, max_pages + 1):
+        for page in range(start_page, end_page + 1):
             url = base_url if page == 1 else f"{base_url}?page={page}"
             r = s.get(url, timeout=60)
             if r.status_code == 404:
@@ -82,6 +108,7 @@ def discover_items(s: requests.Session, max_pages: int, delay: float) -> dict[st
                     continue
                 page_ids.append(sid)
                 label = clean(a.get_text(" ", strip=True))
+                context = listing_context(a)
                 row = items.setdefault(
                     sid,
                     {
@@ -90,12 +117,15 @@ def discover_items(s: requests.Session, max_pages: int, delay: float) -> dict[st
                         "categories": set(),
                         "listing_names": set(),
                         "listing_urls": set(),
+                        "listing_contexts": set(),
                     },
                 )
                 row["categories"].add(category)
                 row["listing_urls"].add(url)
                 if label:
                     row["listing_names"].add(label)
+                if context:
+                    row["listing_contexts"].add(context)
             unique_page = tuple(sorted(set(page_ids)))
             new_count = len(items) - before
             print(json.dumps({
@@ -105,7 +135,7 @@ def discover_items(s: requests.Session, max_pages: int, delay: float) -> dict[st
                 "page_items": len(unique_page),
                 "new": new_count,
                 "total": len(items),
-            }, ensure_ascii=False))
+            }, ensure_ascii=False), flush=True)
             if not unique_page or unique_page == previous_page_ids or new_count == 0:
                 empty_streak += 1
             else:
@@ -113,8 +143,28 @@ def discover_items(s: requests.Session, max_pages: int, delay: float) -> dict[st
             previous_page_ids = unique_page
             if empty_streak >= 3:
                 break
-            time.sleep(delay)
+            if delay:
+                time.sleep(delay)
     return items
+
+
+def listing_row(source_id: str, discovered: dict) -> dict:
+    names = sorted(discovered["listing_names"])
+    contexts = sorted(discovered["listing_contexts"])
+    return {
+        "source_record_id": source_id,
+        "source_url": discovered["source_url"],
+        "name_raw": names[0] if names else None,
+        "entity_type_raw": "+".join(sorted(discovered["categories"])),
+        "location_raw": None,
+        "payload": {
+            "acquisition_level": "listing",
+            "categories": sorted(discovered["categories"]),
+            "listing_names": names,
+            "listing_urls": sorted(discovered["listing_urls"]),
+            "listing_contexts": contexts[:20],
+        },
+    }
 
 
 def strip_non_factual(soup: BeautifulSoup) -> None:
@@ -170,7 +220,6 @@ def parse_profile(source_id: str, discovered: dict, html: str, final_url: str) -
     meta = soup.find("meta", attrs={"name": "description"})
     meta_description = clean(meta.get("content") if meta else None)
 
-    # Capture contacts/maps before stripping non-factual UI blocks.
     contacts = defaultdict(list)
     for a in soup.find_all("a", href=True):
         href = a.get("href", "").strip()
@@ -222,18 +271,21 @@ def parse_profile(source_id: str, discovered: dict, html: str, final_url: str) -
                 break
 
     all_text = clean(soup.get_text(" ", strip=True)) or ""
+    names = sorted(discovered["listing_names"])
     return {
         "source_record_id": source_id,
         "source_url": final_url,
-        "name_raw": name or (sorted(discovered["listing_names"])[0] if discovered["listing_names"] else None),
+        "name_raw": name or (names[0] if names else None),
         "entity_type_raw": "+".join(sorted(discovered["categories"])),
         "location_raw": None,
         "latitude": lat,
         "longitude": lon,
         "payload": {
+            "acquisition_level": "profile",
             "categories": sorted(discovered["categories"]),
-            "listing_names": sorted(discovered["listing_names"]),
+            "listing_names": names,
             "listing_urls": sorted(discovered["listing_urls"]),
+            "listing_contexts": sorted(discovered["listing_contexts"])[:20],
             "title": name,
             "meta_description": meta_description,
             "breadcrumb": breadcrumb,
@@ -248,23 +300,49 @@ def parse_profile(source_id: str, discovered: dict, html: str, final_url: str) -
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--output", default="artifacts/madaresegypt_snapshot.jsonl")
-    ap.add_argument("--max-pages", type=int, default=1000)
+    ap.add_argument("--category", choices=("all", "school", "nursery"), default="all")
+    ap.add_argument("--start-page", type=int, default=1)
+    ap.add_argument("--end-page", type=int, default=0)
+    ap.add_argument("--max-pages", type=int, default=1000, help="Compatibility/default page span when --end-page is omitted")
     ap.add_argument("--max-profiles", type=int, default=0)
+    ap.add_argument("--listing-only", action="store_true")
     ap.add_argument("--delay", type=float, default=0.20)
     args = ap.parse_args()
 
+    categories = list(CATEGORIES) if args.category == "all" else [args.category]
+    start_page = max(1, args.start_page)
+    end_page = args.end_page if args.end_page > 0 else start_page + max(1, args.max_pages) - 1
+
     s = session()
-    discovered = discover_items(s, args.max_pages, args.delay)
+    discovered = discover_items(s, categories, start_page, end_page, args.delay)
     ordered = sorted(discovered.items(), key=lambda kv: int(kv[0]))
-    if args.max_profiles > 0:
-        ordered = ordered[: args.max_profiles]
 
     out = Path(args.output)
     out.parent.mkdir(parents=True, exist_ok=True)
     written = 0
     errors = 0
+
+    if args.listing_only:
+        with out.open("w", encoding="utf-8") as f:
+            for source_id, item in ordered:
+                f.write(json.dumps(listing_row(source_id, item), ensure_ascii=False) + "\n")
+                written += 1
+        print(json.dumps({
+            "ok": True,
+            "mode": "listing_only",
+            "category": args.category,
+            "start_page": start_page,
+            "end_page": end_page,
+            "discovered": len(discovered),
+            "written": written,
+            "errors": 0,
+            "output": str(out),
+        }, ensure_ascii=False), flush=True)
+        return
+
+    profile_items = ordered[: args.max_profiles] if args.max_profiles > 0 else ordered
     with out.open("w", encoding="utf-8") as f:
-        for index, (source_id, item) in enumerate(ordered, start=1):
+        for index, (source_id, item) in enumerate(profile_items, start=1):
             url = item["source_url"]
             try:
                 r = s.get(url, timeout=60, allow_redirects=True)
@@ -273,12 +351,13 @@ def main() -> None:
                 written += 1
             except Exception as exc:
                 errors += 1
-                print(json.dumps({"stage": "profile_error", "id": source_id, "url": url, "error": repr(exc)}, ensure_ascii=False))
+                print(json.dumps({"stage": "profile_error", "id": source_id, "url": url, "error": repr(exc)}, ensure_ascii=False), flush=True)
             if index % 100 == 0:
-                print(json.dumps({"stage": "profiles", "processed": index, "written": written, "errors": errors, "total": len(ordered)}, ensure_ascii=False))
-            time.sleep(args.delay)
+                print(json.dumps({"stage": "profiles", "processed": index, "written": written, "errors": errors, "total": len(profile_items)}, ensure_ascii=False), flush=True)
+            if args.delay:
+                time.sleep(args.delay)
 
-    print(json.dumps({"ok": True, "discovered": len(discovered), "written": written, "errors": errors, "output": str(out)}, ensure_ascii=False))
+    print(json.dumps({"ok": True, "mode": "profile", "discovered": len(discovered), "written": written, "errors": errors, "output": str(out)}, ensure_ascii=False), flush=True)
 
 
 if __name__ == "__main__":
