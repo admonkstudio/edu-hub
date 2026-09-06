@@ -10,6 +10,7 @@ on:
       - "tools/data-acquisition/manifests/madaresegypt-media-pilot-001.txt"
       - "tools/data-acquisition/discover_media.py"
       - "tools/data-acquisition/archive_media.py"
+      - "tools/data-acquisition/enrich_madaresegypt_profiles.py"
 
 permissions:
   contents: read
@@ -38,6 +39,13 @@ jobs:
                   f.write(json.dumps({"source_record_id": sid, "source_url": f"https://madaresegypt.com/ar/Item/{sid}"}) + "\n")
           print(json.dumps({"records": len(ids), "output": str(out)}))
           PY
+      - name: Acquire factual profile evidence
+        run: |
+          python tools/data-acquisition/enrich_madaresegypt_profiles.py \
+            --input artifacts/madares-media/input.jsonl \
+            --output artifacts/madares-media/enriched-profiles.jsonl \
+            --delay 0.75
+          cat artifacts/madares-media/enriched-profiles.report.json
       - name: Discover profile media candidates
         run: |
           python tools/data-acquisition/discover_media.py \
@@ -57,6 +65,7 @@ jobs:
       - name: Build verification manifests
         run: |
           sqlite3 artifacts/madares-media/owned-media.sqlite "PRAGMA wal_checkpoint(FULL); PRAGMA integrity_check;"
+          mkdir -p artifacts/madares-media/media
           find artifacts/madares-media/media -type f -print0 | sort -z | xargs -0 sha256sum > artifacts/madares-media/reports/media-files.sha256
           sha256sum artifacts/madares-media/owned-media.sqlite > artifacts/madares-media/reports/database.sha256
       - uses: actions/upload-artifact@v4
