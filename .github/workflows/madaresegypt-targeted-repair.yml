@@ -22,12 +22,65 @@ on:
         description: "Short artifact label, e.g. school-01-repair"
         required: true
         type: string
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/madaresegypt-targeted-repair.yml"
 
 permissions:
   contents: read
 
 jobs:
+  bootstrap-known-repairs:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        include:
+          - repair_name: school-01-repair
+            category: school
+            start_page: 1
+            end_page: 50
+          - repair_name: school-02-repair
+            category: school
+            start_page: 51
+            end_page: 100
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Reacquire known incomplete range
+        run: |
+          mkdir -p artifacts/madaresegypt-repair
+          START="${{ matrix.start_page }}"
+          END="${{ matrix.end_page }}"
+          SPAN=$((END - START + 1))
+          python tools/data-acquisition/scrape_madaresegypt_listings_v2.py \
+            --category "${{ matrix.category }}" \
+            --start-page "$START" \
+            --end-page "$END" \
+            --output "artifacts/madaresegypt-repair/${{ matrix.repair_name }}.jsonl" \
+            --delay 0.75 \
+            --max-consecutive-failures "$SPAN"
+          cat "artifacts/madaresegypt-repair/${{ matrix.repair_name }}.report.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: madaresegypt-repair-${{ matrix.repair_name }}
+          path: |
+            artifacts/madaresegypt-repair/${{ matrix.repair_name }}.jsonl
+            artifacts/madaresegypt-repair/${{ matrix.repair_name }}.report.json
+          if-no-files-found: error
+          retention-days: 30
+
   repair:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
