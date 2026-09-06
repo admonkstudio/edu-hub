@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Acquire public Alexandria school directory records from alexschools.info.
 
-Secondary discovery source only. The crawler retains factual public profile text and
-basic contact/taxonomy metadata, while excluding reviews/comments, share controls and
-media bodies. Values remain source-specific raw evidence; nothing here is canonical.
+Secondary discovery source only. The crawler retains factual public profile text,
+contact/location evidence and source-labelled metadata while excluding reviews,
+comments, share controls and media bodies. Values remain source-specific raw evidence;
+nothing here is canonical and generic external links are not called official websites.
 """
 from __future__ import annotations
 
@@ -16,20 +17,17 @@ from pathlib import Path
 from urllib.parse import parse_qs, urljoin, urlparse
 
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString, Tag
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 BASE = "https://alexschools.info"
 ARCHIVE = BASE + "/listings/"
-UA = "EduHubResearchBot/1.6 (+https://github.com/admonkstudio/edu-hub; public-source-acquisition)"
+UA = "EduHubResearchBot/1.7 (+https://github.com/admonkstudio/edu-hub; public-source-acquisition)"
 
 SOURCE_HOSTS = {
-    "alexschools.info",
-    "www.alexschools.info",
-    "egyptschools.info",
-    "www.egyptschools.info",
-    "shop.egyptschools.info",
+    "alexschools.info", "www.alexschools.info",
+    "egyptschools.info", "www.egyptschools.info", "shop.egyptschools.info",
     "alexschools.b-cdn.net",
 }
 EXCLUDED_EXTERNAL_HOSTS = {
@@ -45,9 +43,23 @@ EXCLUDED_EXTERNAL_HOSTS = {
     "reddit.com", "www.reddit.com",
     "vk.com", "www.vk.com",
     "nagdy.net", "www.nagdy.net",
+    "google.com", "www.google.com", "google.com.eg", "www.google.com.eg",
 }
 MEDIA_EXTENSIONS = (".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".ico", ".pdf", ".mp4", ".webm")
-EMAIL_RE = re.compile(r"^[^\s@?]+@[^\s@?]+\.[^\s@?]+$")
+EMAIL_RE = re.compile(r"(?<![\w.+-])([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})(?![\w.-])", re.I)
+HEADING_RE = re.compile(r"^h[2-6]$")
+RAW_FIELD_HEADINGS = {
+    "نوع": "type",
+    "لغات": "languages",
+    "اللغة الثانية الإضافية في": "second_language",
+    "الشهادة الممنوحة من": "certificates",
+    "مراحل": "stages",
+    "جهات اعتماد": "accreditations",
+    "تلاميذ": "gender",
+    "مصروفات": "fees",
+    "معلومات إضافية عن": "additional_information",
+    "وسائل اتصال": "contact_information",
+}
 
 
 def session() -> requests.Session:
@@ -120,7 +132,7 @@ def strip_non_factual(soup: BeautifulSoup) -> None:
             node.decompose()
 
 
-def is_external_website_candidate(href: str) -> bool:
+def is_external_link_candidate(href: str) -> bool:
     try:
         p = urlparse(href)
     except ValueError:
@@ -172,11 +184,9 @@ def extract_address(text: str, name: str) -> str | None:
     raw = clean(text[addr_pos + len("عنوان "):map_pos])
     if not raw:
         return None
-    # The source usually renders "عنوان <school name> <address>".
     if raw.startswith(name):
         raw = clean(raw[len(name):])
     else:
-        # Normalize dash variants only for prefix removal; retain the source address text itself.
         raw_norm = raw.replace("–", "-").replace("—", "-")
         name_norm = name.replace("–", "-").replace("—", "-")
         if raw_norm.startswith(name_norm):
@@ -184,79 +194,122 @@ def extract_address(text: str, name: str) -> str | None:
     return raw
 
 
-def extract_profile_taxonomy_text(text: str, name: str) -> dict[str, str]:
-    """Preserve label-delimited profile metadata as raw source text.
+def text_between_headings(heading: Tag, stop_levels: set[str] | None = None) -> str | None:
+    """Return source text after heading until the next qualifying heading.
 
-    We deliberately do not split these values into canonical terms here; that belongs
-    to the later taxonomy/matching layer.
+    Traversing text nodes avoids guessing the source theme's wrapper structure and
+    preserves the source wording without forcing it into canonical taxonomy values.
     """
-    start_candidates = [f"عن {name}", f"عن {name.replace(' - ', ' – ')}"]
-    start = -1
-    for marker in start_candidates:
-        start = text.find(marker)
-        if start >= 0:
-            start += len(marker)
-            break
-    end_candidates = [f"معلومات عن {name}", "معلومات عن"]
-    end = -1
-    if start >= 0:
-        for marker in end_candidates:
-            end = text.find(marker, start)
-            if end >= 0:
+    pieces: list[str] = []
+    for node in heading.next_elements:
+        if isinstance(node, Tag) and node is not heading and HEADING_RE.match(node.name or ""):
+            if stop_levels is None or node.name in stop_levels:
                 break
-    block = text[start:end] if start >= 0 and end > start else ""
-    if not block:
-        return {}
+        if isinstance(node, NavigableString):
+            if heading in node.parents:
+                continue
+            parent = node.parent
+            if parent and parent.name in {"script", "style", "noscript"}:
+                continue
+            value = clean(str(node))
+            if value and (not pieces or pieces[-1] != value):
+                pieces.append(value)
+    return clean(" | ".join(pieces))
 
-    labels = [
-        ("نوع", "type"),
-        ("لغات", "languages"),
-        ("اللغة الثانية الإضافية في", "second_language"),
-        ("الشهادة الممنوحة من", "certificates"),
-        ("مراحل", "stages"),
-        ("جهات اعتماد", "accreditations"),
-        ("تلاميذ", "gender"),
-    ]
-    positions = []
-    for label, key in labels:
-        pos = block.find(label)
-        if pos >= 0:
-            positions.append((pos, label, key))
-    positions.sort()
-    out: dict[str, str] = {}
-    for i, (pos, label, key) in enumerate(positions):
-        value_start = pos + len(label)
-        value_end = positions[i + 1][0] if i + 1 < len(positions) else len(block)
-        value = clean(block[value_start:value_end])
+
+def extract_heading_evidence(soup: BeautifulSoup) -> tuple[list[dict], dict[str, list[str]], str | None]:
+    """Extract heading-labelled evidence using exact source headings.
+
+    `heading_groups_raw` preserves the source label/value pairs in document order.
+    `profile_fields_raw` only maps exact recognized headings to stable raw keys; these
+    values are still source evidence, not canonical classifications.
+    """
+    groups: list[dict] = []
+    fields: dict[str, list[str]] = {}
+    about_raw = None
+
+    for h in soup.find_all(HEADING_RE):
+        label = clean(h.get_text(" ", strip=True))
+        if not label:
+            continue
+        value = text_between_headings(h)
         if value:
-            out[key] = value
-    return out
+            groups.append({"heading": label, "value": value})
+
+        normalized = label.rstrip(":：").strip()
+        key = RAW_FIELD_HEADINGS.get(normalized)
+        if key and value:
+            fields.setdefault(key, [])
+            if value not in fields[key]:
+                fields[key].append(value)
+
+        if h.name == "h2" and normalized.startswith("عن ") and about_raw is None:
+            about_raw = text_between_headings(h, {"h2"})
+
+    return groups[:80], fields, about_raw
+
+
+def extract_contacts_and_links(soup: BeautifulSoup, visible_text: str) -> dict:
+    phones: list[str] = []
+    emails: list[str] = []
+    maps: list[str] = []
+    external_links: list[dict] = []
+    website_candidates: list[dict] = []
+
+    for a in soup.find_all("a", href=True):
+        href = a.get("href", "").strip()
+        low = href.lower()
+        label = clean(a.get_text(" ", strip=True))
+        if low.startswith("tel:"):
+            value = clean(href[4:])
+            if value:
+                phones.append(value)
+        elif low.startswith("mailto:"):
+            value = href[7:].split("?", 1)[0].strip()
+            if value and EMAIL_RE.fullmatch(value):
+                emails.append(value)
+        elif any(x in low for x in ("google.com/maps", "maps.google.", "maps.app.goo.gl", "goo.gl/maps")):
+            maps.append(href)
+        elif is_external_link_candidate(href):
+            item = {"url": href, "label": label}
+            external_links.append(item)
+            label_low = (label or "").lower()
+            if any(token in label_low for token in ("website", "web site", "الموقع الرسمي", "الموقع الإلكتروني", "الموقع الالكتروني")):
+                website_candidates.append(item)
+
+    # Many profiles render the email as plain visible text rather than a mailto link.
+    emails.extend(m.group(1) for m in EMAIL_RE.finditer(visible_text))
+
+    def dedupe_strings(values: list[str]) -> list[str]:
+        return list(dict.fromkeys(v.strip() for v in values if v and v.strip()))[:30]
+
+    def dedupe_links(values: list[dict]) -> list[dict]:
+        out = []
+        seen = set()
+        for item in values:
+            url = item.get("url")
+            if not url or url in seen:
+                continue
+            seen.add(url)
+            out.append(item)
+        return out[:30]
+
+    return {
+        "phones": dedupe_strings(phones),
+        "emails": dedupe_strings(emails),
+        "maps": dedupe_strings(maps),
+        "external_links": dedupe_links(external_links),
+        "website_candidates": dedupe_links(website_candidates),
+    }
 
 
 def parse_profile(url: str, discovered: dict, html: str, final_url: str) -> dict:
     soup = BeautifulSoup(html, "html.parser")
     h1 = soup.find("h1")
     name = clean(h1.get_text(" ", strip=True) if h1 else None) or sorted(discovered["listing_names"])[0]
-
-    contacts = {"phones": [], "emails": [], "websites": [], "maps": []}
-    for a in soup.find_all("a", href=True):
-        href = a.get("href", "").strip()
-        low = href.lower()
-        if low.startswith("tel:"):
-            value = clean(href[4:])
-            if value:
-                contacts["phones"].append(value)
-        elif low.startswith("mailto:"):
-            value = href[7:].split("?", 1)[0].strip()
-            if EMAIL_RE.match(value):
-                contacts["emails"].append(value)
-        elif any(x in low for x in ("google.com/maps", "maps.google.", "maps.app.goo.gl", "goo.gl/maps")):
-            contacts["maps"].append(href)
-        elif is_external_website_candidate(href):
-            contacts["websites"].append(href)
-    contacts = {k: list(dict.fromkeys(v))[:30] for k, v in contacts.items()}
-
     text_before = " ".join(soup.get_text(" ", strip=True).split())
+
+    contacts = extract_contacts_and_links(soup, text_before)
 
     fee = None
     m = re.search(r"تبدأ\s+المصاريف\s+من\s*(?:LE|جنيه)?\s*([0-9٠-٩][0-9٠-٩,\.٬،\s]*)", text_before, re.I)
@@ -272,31 +325,7 @@ def parse_profile(url: str, discovered: dict, html: str, final_url: str) -> dict
             break
 
     address = extract_address(text_before, name)
-    profile_taxonomy_text = extract_profile_taxonomy_text(text_before, name)
-
-    # Retain DOM-derived blocks too when the theme exposes true headings.
-    taxonomy_blocks = {}
-    heading_keys = {
-        "لغات": "languages", "مراحل": "stages", "جهات اعتماد": "accreditations", "تلاميذ": "gender",
-        "نوع": "type", "معلومات إضافية": "features", "وسائل اتصال": "contacts_block",
-    }
-    for h in soup.find_all(re.compile(r"^h[2-6]$")):
-        ht = clean(h.get_text(" ", strip=True)) or ""
-        key = next((v for k, v in heading_keys.items() if k in ht), None)
-        if not key:
-            continue
-        vals = []
-        node = h
-        for _ in range(8):
-            node = node.find_next_sibling()
-            if node is None or (getattr(node, "name", "") and re.match(r"^h[2-6]$", node.name)):
-                break
-            if hasattr(node, "get_text"):
-                t = clean(node.get_text(" | ", strip=True))
-                if t and t not in vals:
-                    vals.append(t)
-        if vals:
-            taxonomy_blocks[key] = vals[:30]
+    heading_groups, profile_fields, profile_metadata_raw = extract_heading_evidence(soup)
 
     strip_non_factual(soup)
     factual_text = clean(soup.get_text(" ", strip=True)) or ""
@@ -313,8 +342,9 @@ def parse_profile(url: str, discovered: dict, html: str, final_url: str) -> dict
             "archive_names": sorted(discovered["listing_names"]),
             "archive_pages": sorted(discovered["listing_pages"]),
             "starting_fee_raw": fee,
-            "profile_taxonomy_text": profile_taxonomy_text,
-            "taxonomy_blocks": taxonomy_blocks,
+            "profile_metadata_raw": profile_metadata_raw,
+            "heading_groups_raw": heading_groups,
+            "profile_fields_raw": profile_fields,
             "contacts": contacts,
             "factual_text_excerpt": factual_text[:40000],
         },
@@ -336,7 +366,8 @@ def main() -> None:
     errors = []
     field_counts = {
         "named": 0, "location": 0, "coordinates": 0, "starting_fee": 0,
-        "phones": 0, "emails": 0, "websites": 0, "maps": 0, "profile_taxonomy_text": 0,
+        "phones": 0, "emails": 0, "maps": 0, "external_links": 0,
+        "website_candidates": 0, "profile_metadata_raw": 0, "profile_fields_raw": 0,
     }
 
     with out.open("w", encoding="utf-8") as f:
@@ -352,9 +383,11 @@ def main() -> None:
                 field_counts["coordinates"] += bool(record.get("latitude") is not None and record.get("longitude") is not None)
                 payload = record["payload"]
                 field_counts["starting_fee"] += bool(payload.get("starting_fee_raw"))
-                field_counts["profile_taxonomy_text"] += bool(payload.get("profile_taxonomy_text"))
-                for k in ("phones", "emails", "websites", "maps"):
-                    field_counts[k] += bool(payload["contacts"].get(k))
+                field_counts["profile_metadata_raw"] += bool(payload.get("profile_metadata_raw"))
+                field_counts["profile_fields_raw"] += bool(payload.get("profile_fields_raw"))
+                contacts = payload["contacts"]
+                for k in ("phones", "emails", "maps", "external_links", "website_candidates"):
+                    field_counts[k] += bool(contacts.get(k))
             except Exception as e:
                 errors.append({"url": u, "error": repr(e)})
             if i % 25 == 0:
