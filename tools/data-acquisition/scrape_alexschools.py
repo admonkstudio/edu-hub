@@ -23,7 +23,7 @@ from urllib3.util.retry import Retry
 
 BASE = "https://alexschools.info"
 ARCHIVE = BASE + "/listings/"
-UA = "EduHubResearchBot/1.7 (+https://github.com/admonkstudio/edu-hub; public-source-acquisition)"
+UA = "EduHubResearchBot/1.8 (+https://github.com/admonkstudio/edu-hub; public-source-acquisition)"
 
 SOURCE_HOSTS = {
     "alexschools.info", "www.alexschools.info",
@@ -64,13 +64,7 @@ RAW_FIELD_HEADINGS = {
 
 def session() -> requests.Session:
     s = requests.Session()
-    retry = Retry(
-        total=4,
-        backoff_factor=1.0,
-        status_forcelist=(429, 500, 502, 503, 504),
-        allowed_methods=("GET",),
-        respect_retry_after_header=True,
-    )
+    retry = Retry(total=4, backoff_factor=1.0, status_forcelist=(429, 500, 502, 503, 504), allowed_methods=("GET",), respect_retry_after_header=True)
     s.mount("https://", HTTPAdapter(max_retries=retry))
     s.headers.update({"User-Agent": UA, "Accept-Language": "ar,en;q=0.8"})
     return s
@@ -100,9 +94,7 @@ def discover(s: requests.Session, max_pages: int, delay: float) -> dict[str, dic
         page_urls = []
         for a in soup.find_all("a", href=True):
             href = urljoin(r.url, a.get("href", ""))
-            if urlparse(href).netloc not in {"alexschools.info", "www.alexschools.info"}:
-                continue
-            if "/school/" not in urlparse(href).path:
+            if urlparse(href).netloc not in {"alexschools.info", "www.alexschools.info"} or "/school/" not in urlparse(href).path:
                 continue
             label = clean(a.get_text(" ", strip=True))
             if not label:
@@ -140,14 +132,10 @@ def is_external_link_candidate(href: str) -> bool:
     if p.scheme not in {"http", "https"}:
         return False
     host = p.netloc.lower().split(":", 1)[0]
-    if host in SOURCE_HOSTS or host in EXCLUDED_EXTERNAL_HOSTS:
-        return False
-    if any(host.endswith("." + h) for h in EXCLUDED_EXTERNAL_HOSTS):
+    if host in SOURCE_HOSTS or host in EXCLUDED_EXTERNAL_HOSTS or any(host.endswith("." + h) for h in EXCLUDED_EXTERNAL_HOSTS):
         return False
     path = p.path.lower()
-    if path.endswith(MEDIA_EXTENSIONS):
-        return False
-    if any(token in path for token in ("/share", "/sharer", "/submit")):
+    if path.endswith(MEDIA_EXTENSIONS) or any(token in path for token in ("/share", "/sharer", "/submit")):
         return False
     return True
 
@@ -163,9 +151,7 @@ def coords_from_map_url(href: str) -> dict[str, float] | None:
         values.extend(qs.get(key, []))
     values.append(href)
     for value in values:
-        m = re.search(r"(-?\d{1,2}\.\d+)\s*[,\s]%?2C?\s*(-?\d{1,3}\.\d+)", value, re.I)
-        if not m:
-            m = re.search(r"(-?\d{1,2}\.\d+)%2C(-?\d{1,3}\.\d+)", value, re.I)
+        m = re.search(r"(-?\d{1,2}\.\d+)\s*[,\s]%?2C?\s*(-?\d{1,3}\.\d+)", value, re.I) or re.search(r"(-?\d{1,2}\.\d+)%2C(-?\d{1,3}\.\d+)", value, re.I)
         if m:
             lat, lon = float(m.group(1)), float(m.group(2))
             if -90 <= lat <= 90 and -180 <= lon <= 180:
@@ -195,11 +181,6 @@ def extract_address(text: str, name: str) -> str | None:
 
 
 def text_between_headings(heading: Tag, stop_levels: set[str] | None = None) -> str | None:
-    """Return source text after heading until the next qualifying heading.
-
-    Traversing text nodes avoids guessing the source theme's wrapper structure and
-    preserves the source wording without forcing it into canonical taxonomy values.
-    """
     pieces: list[str] = []
     for node in heading.next_elements:
         if isinstance(node, Tag) and node is not heading and HEADING_RE.match(node.name or ""):
@@ -218,16 +199,9 @@ def text_between_headings(heading: Tag, stop_levels: set[str] | None = None) -> 
 
 
 def extract_heading_evidence(soup: BeautifulSoup) -> tuple[list[dict], dict[str, list[str]], str | None]:
-    """Extract heading-labelled evidence using exact source headings.
-
-    `heading_groups_raw` preserves the source label/value pairs in document order.
-    `profile_fields_raw` only maps exact recognized headings to stable raw keys; these
-    values are still source evidence, not canonical classifications.
-    """
     groups: list[dict] = []
     fields: dict[str, list[str]] = {}
     about_raw = None
-
     for h in soup.find_all(HEADING_RE):
         label = clean(h.get_text(" ", strip=True))
         if not label:
@@ -235,21 +209,18 @@ def extract_heading_evidence(soup: BeautifulSoup) -> tuple[list[dict], dict[str,
         value = text_between_headings(h)
         if value:
             groups.append({"heading": label, "value": value})
-
         normalized = label.rstrip(":：").strip()
         key = RAW_FIELD_HEADINGS.get(normalized)
         if key and value:
             fields.setdefault(key, [])
             if value not in fields[key]:
                 fields[key].append(value)
-
         if h.name == "h2" and normalized.startswith("عن ") and about_raw is None:
             about_raw = text_between_headings(h, {"h2"})
-
     return groups[:80], fields, about_raw
 
 
-def extract_contacts_and_links(soup: BeautifulSoup, visible_text: str) -> dict:
+def extract_contacts_and_links(soup: BeautifulSoup, contact_evidence: str | None) -> dict:
     phones: list[str] = []
     emails: list[str] = []
     maps: list[str] = []
@@ -277,15 +248,17 @@ def extract_contacts_and_links(soup: BeautifulSoup, visible_text: str) -> dict:
             if any(token in label_low for token in ("website", "web site", "الموقع الرسمي", "الموقع الإلكتروني", "الموقع الالكتروني")):
                 website_candidates.append(item)
 
-    # Many profiles render the email as plain visible text rather than a mailto link.
-    emails.extend(m.group(1) for m in EMAIL_RE.finditer(visible_text))
+    # The site often renders the institution email as plain text. Restrict regex
+    # extraction to the source-labelled contact block so page-author/share emails
+    # cannot leak into institution contact evidence.
+    if contact_evidence:
+        emails.extend(m.group(1) for m in EMAIL_RE.finditer(contact_evidence))
 
     def dedupe_strings(values: list[str]) -> list[str]:
         return list(dict.fromkeys(v.strip() for v in values if v and v.strip()))[:30]
 
     def dedupe_links(values: list[dict]) -> list[dict]:
-        out = []
-        seen = set()
+        out, seen = [], set()
         for item in values:
             url = item.get("url")
             if not url or url in seen:
@@ -309,7 +282,9 @@ def parse_profile(url: str, discovered: dict, html: str, final_url: str) -> dict
     name = clean(h1.get_text(" ", strip=True) if h1 else None) or sorted(discovered["listing_names"])[0]
     text_before = " ".join(soup.get_text(" ", strip=True).split())
 
-    contacts = extract_contacts_and_links(soup, text_before)
+    heading_groups, profile_fields, profile_metadata_raw = extract_heading_evidence(soup)
+    contact_evidence = " | ".join(profile_fields.get("contact_information", [])) or None
+    contacts = extract_contacts_and_links(soup, contact_evidence)
 
     fee = None
     m = re.search(r"تبدأ\s+المصاريف\s+من\s*(?:LE|جنيه)?\s*([0-9٠-٩][0-9٠-٩,\.٬،\s]*)", text_before, re.I)
@@ -325,8 +300,6 @@ def parse_profile(url: str, discovered: dict, html: str, final_url: str) -> dict
             break
 
     address = extract_address(text_before, name)
-    heading_groups, profile_fields, profile_metadata_raw = extract_heading_evidence(soup)
-
     strip_non_factual(soup)
     factual_text = clean(soup.get_text(" ", strip=True)) or ""
     return {
@@ -357,13 +330,11 @@ def main() -> None:
     ap.add_argument("--max-pages", type=int, default=20)
     ap.add_argument("--delay", type=float, default=.35)
     args = ap.parse_args()
-
     s = session()
     discovered = discover(s, args.max_pages, args.delay)
     out = Path(args.output)
     out.parent.mkdir(parents=True, exist_ok=True)
-    written = 0
-    errors = []
+    written, errors = 0, []
     field_counts = {
         "named": 0, "location": 0, "coordinates": 0, "starting_fee": 0,
         "phones": 0, "emails": 0, "maps": 0, "external_links": 0,
@@ -395,14 +366,7 @@ def main() -> None:
             if args.delay:
                 time.sleep(args.delay)
 
-    report = {
-        "ok": not errors,
-        "discovered": len(discovered),
-        "written": written,
-        "errors": errors,
-        "field_counts": field_counts,
-        "output": str(out),
-    }
+    report = {"ok": not errors, "discovered": len(discovered), "written": written, "errors": errors, "field_counts": field_counts, "output": str(out)}
     Path(out.with_suffix(".report.json")).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(report, ensure_ascii=False), flush=True)
 
