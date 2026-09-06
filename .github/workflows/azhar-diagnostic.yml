@@ -20,29 +20,25 @@ jobs:
         uses: actions/checkout@v4
       - name: Install diagnostic dependencies
         run: pip install requests beautifulsoup4
-      - name: Test governorate-wide full-filter search
+      - name: Inspect one public institute detail page
         run: |
           python - <<'PY'
-          import re, requests
+          import requests
           from bs4 import BeautifulSoup
-          from urllib.parse import urljoin
-          U='https://azhar.gov.eg/IDSC/InstGuide/Guide_Search.aspx'
-          S=requests.Session(); S.headers['User-Agent']='EduHubResearchBot/0.2 diagnostic'
-          def base(f):
-              d={}
-              for x in f.find_all('input',attrs={'name':True}):
-                  if (x.get('type') or 'text').lower() not in ('submit','button','image','file'): d[x['name']]=x.get('value','')
-              for x in f.find_all('select',attrs={'name':True}):
-                  o=x.find('option',selected=True) or x.find('option'); d[x['name']]=o.get('value','') if o else ''
-              return d
-          r=S.get(U,timeout=60); r.raise_for_status(); s=BeautifulSoup(r.text,'html.parser'); f=s.find('form'); sels=f.find_all('select')
-          gv='101'; d=base(f); d[sels[0]['name']]=gv; d['__EVENTTARGET']=sels[0]['name']; d['__EVENTARGUMENT']=''; r=S.post(urljoin(U,f.get('action') or U),data=d,timeout=60); r.raise_for_status()
-          s=BeautifulSoup(r.text,'html.parser'); f=s.find('form'); sels=f.find_all('select'); d=base(f)
-          vals=['101','0','1','1','1']
-          for sel,val in zip(sels,vals): d[sel['name']]=val
-          d['ctl00$MainContent$btnSearch']='بحث'; d['__EVENTTARGET']=''; d['__EVENTARGUMENT']=''
-          rr=S.post(urljoin(U,f.get('action') or U),data=d,timeout=60); rr.raise_for_status()
-          ids=sorted(set(re.findall(r'Guide_Resault\.aspx\?id=([0-9]+)',rr.text,re.I)))
-          print('SEARCH',len(rr.text),'ids',len(ids),ids[:50])
-          print('TEXT',' '.join(BeautifulSoup(rr.text,'html.parser').get_text(' ',strip=True).split())[-2500:])
+          u='https://azhar.gov.eg/IDSC/InstGuide/Guide_Resault.aspx?id=10119101'
+          r=requests.get(u,headers={'User-Agent':'EduHubResearchBot/0.3 diagnostic'},timeout=60); r.raise_for_status()
+          s=BeautifulSoup(r.text,'html.parser')
+          print('TITLE',s.title.get_text(' ',strip=True) if s.title else None)
+          for x in s.find_all('input'):
+              typ=(x.get('type') or 'text').lower()
+              if typ=='hidden': continue
+              par=x.find_parent(['tr','div','td'])
+              ptxt=' '.join(par.get_text(' ',strip=True).split()) if par else ''
+              print('INPUT',{'type':typ,'name':x.get('name'),'id':x.get('id'),'value':x.get('value')},'PARENT=',ptxt[:500])
+          for a in s.find_all('a',href=True):
+              if 'map' in a.get('href','').lower() or 'google' in a.get('href','').lower(): print('MAP',a.get('href'))
+          for ti,t in enumerate(s.find_all('table')):
+              rows=[]
+              for tr in t.find_all('tr')[:20]: rows.append([' '.join(c.get_text(' ',strip=True).split()) for c in tr.find_all(['th','td'])])
+              print('TABLE',ti,rows[:20])
           PY
