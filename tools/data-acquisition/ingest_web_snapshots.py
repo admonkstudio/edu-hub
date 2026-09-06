@@ -66,7 +66,21 @@ def setup_sources(db: sqlite3.Connection) -> None:
 def add_record(db: sqlite3.Connection, sid: str, row: dict) -> bool:
     payload = row.get("payload") or {}
     raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, default=str)
-    h = hashlib.sha256((sid + "\n" + raw).encode()).hexdigest()
+    snapshot_identity = {
+        "source_id": sid,
+        "source_record_id": row.get("source_record_id"),
+        "entity_type_raw": row.get("entity_type_raw"),
+        "name_raw": row.get("name_raw"),
+        "name_ar_raw": row.get("name_ar_raw"),
+        "name_en_raw": row.get("name_en_raw"),
+        "location_raw": row.get("location_raw"),
+        "latitude": row.get("latitude"),
+        "longitude": row.get("longitude"),
+        "source_url": row.get("source_url"),
+        "payload": payload,
+    }
+    snapshot_raw = json.dumps(snapshot_identity, ensure_ascii=False, sort_keys=True, default=str)
+    h = hashlib.sha256(snapshot_raw.encode("utf-8")).hexdigest()
     try:
         db.execute(
             """INSERT INTO raw_records(
