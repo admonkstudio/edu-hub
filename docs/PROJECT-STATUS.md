@@ -66,8 +66,8 @@ Milestone 1 begins only after Milestone 0 acceptance criteria pass.
 ## Data acquisition status — 2026-09-06
 
 - Egypt raw acquisition remains active; canonical modelling, cross-source deduplication and public projections remain gated by acquisition audits.
-- MadaresEgypt bounded school/nursery acquisition and targeted school-page repairs completed successfully; their workflow artifacts are the current resume inputs.
-- The owned Alexandria proof completed successfully with 125 raw institution records and 2,101 mirrored media references covering all 125 records.
+- MadaresEgypt bounded acquisition repair is complete: all 180 remaining page gaps were recovered and the source-level merge now holds 11,339 named source records with zero unresolved crawl pages.
+- The V6 owned archive contains 11,464 raw records: 11,339 MadaresEgypt records plus 125 Alexandria records. Alexandria media includes 2,101 mirrored references covering all 125 records.
 - Content-addressed media deduplication produced 453 independently stored binary files; all file hashes and the SQLite database checksum were verified.
 - Media publication remains disabled by default: rights status is unknown and public-use eligibility is false until reviewed.
 - Successful proof artifact: [edu-hub-owned-alexschools-proof](https://github.com/admonkstudio/edu-hub/actions/runs/34054413762/artifacts/9995593260).
