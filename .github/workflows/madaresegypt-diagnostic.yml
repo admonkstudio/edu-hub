@@ -1,0 +1,56 @@
+name: MadaresEgypt acquisition diagnostic
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/madaresegypt-diagnostic.yml"
+      - "tools/data-acquisition/scrape_madaresegypt.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Acquire small MadaresEgypt sample
+        run: |
+          mkdir -p artifacts
+          python tools/data-acquisition/scrape_madaresegypt.py \
+            --output artifacts/madaresegypt_sample.jsonl \
+            --max-pages 3 \
+            --max-profiles 8 \
+            --delay 0.10
+          wc -l artifacts/madaresegypt_sample.jsonl
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('artifacts/madaresegypt_sample.jsonl')
+          rows=[json.loads(x) for x in p.read_text(encoding='utf-8').splitlines() if x.strip()]
+          print('ROWS',len(rows))
+          for r in rows[:8]:
+              print(json.dumps({
+                  'id': r.get('source_record_id'),
+                  'name': r.get('name_raw'),
+                  'type': r.get('entity_type_raw'),
+                  'url': r.get('source_url'),
+                  'maps': (r.get('payload') or {}).get('contacts',{}).get('maps',[])[:1],
+                  'sections': list(((r.get('payload') or {}).get('sections') or {}).keys())[:8],
+              }, ensure_ascii=False))
+          if not rows:
+              raise SystemExit('No MadaresEgypt rows acquired')
+          if not any(r.get('name_raw') for r in rows):
+              raise SystemExit('No named MadaresEgypt rows acquired')
+          PY
