@@ -93,3 +93,15 @@ They must be resolved before the relevant downstream milestone.
 - Do not allow AI to silently overwrite verified factual data.
 - Do not commit secrets.
 - Keep Arabic/RTL and performance requirements active from the beginning.
+
+## 2026-09-06 — Active raw acquisition workstream
+
+A separate evidence-gathering workstream is active before canonical bulk ingestion:
+
+- DA1 raw Egypt acquisition: active
+- DA1-M media acquisition: storage foundation implemented; crawler integration pending
+- latest preserved research checkpoint: V4 with 13,452 raw records across 12 sources
+- V5 owned-storage layer: implemented and tested without modifying V4 records
+- MadaresEgypt live crawler source: not present in this repository and remains the immediate integration dependency
+
+Canonical matching, field selection, bulk production import and public publication remain gated on acquisition completeness, field/media census and review.
