@@ -1,0 +1,71 @@
+name: Edu Hub owned media acquisition pilot
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/media-acquisition-pilot.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  alexschools-owned-media:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install acquisition dependencies
+        run: pip install requests beautifulsoup4 pillow
+
+      - name: Acquire Alexandria source records
+        run: |
+          mkdir -p artifacts
+          python tools/data-acquisition/scrape_alexschools.py \
+            --output artifacts/alexschools.jsonl \
+            --max-pages 20 \
+            --delay 0.45
+
+      - name: Discover media candidates
+        run: |
+          python tools/data-acquisition/discover_media.py \
+            --input artifacts/alexschools.jsonl \
+            --output artifacts/alexschools-media-candidates.jsonl \
+            --source-id alexschools_public_directory \
+            --delay 0.55
+          cat artifacts/alexschools-media-candidates.report.json
+
+      - name: Mirror media into Edu Hub-owned archive
+        run: |
+          python tools/data-acquisition/archive_media.py \
+            --input artifacts/alexschools-media-candidates.jsonl \
+            --db artifacts/edu_hub_owned_media.sqlite \
+            --media-root artifacts/owned-media \
+            --coverage artifacts/media_coverage.csv \
+            --max-assets 1500
+          cat artifacts/media_coverage.summary.json
+          du -sh artifacts/owned-media || true
+          du -h artifacts/edu_hub_owned_media.sqlite
+
+      - name: Upload owned media acquisition artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: edu-hub-owned-media-alexschools-pilot
+          path: |
+            artifacts/alexschools.jsonl
+            artifacts/alexschools.report.json
+            artifacts/alexschools-media-candidates.jsonl
+            artifacts/alexschools-media-candidates.report.json
+            artifacts/edu_hub_owned_media.sqlite
+            artifacts/media_coverage.csv
+            artifacts/media_coverage.summary.json
+            artifacts/owned-media/
+          if-no-files-found: error
+          retention-days: 30
