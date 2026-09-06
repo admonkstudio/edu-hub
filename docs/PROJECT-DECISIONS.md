@@ -60,6 +60,18 @@ Record durable decisions here. Do not use this file for temporary task notes.
 
 **Decision:** Build Edu Hub cleanly but do not prematurely create a generic multi-vertical SaaS framework. Generalize only after another real vertical demonstrates reusable boundaries.
 
+## 2026-09-06 — Owned data and runtime independence
+
+**Decision:** Edu Hub must hold its own persistent copy of acquired institution records. Third-party directories, government sites and APIs are acquisition/refresh inputs only; they must never be required to render an institution already acquired by Edu Hub.
+
+**Decision:** Public page rendering must use Edu Hub-controlled database projections rather than live source API calls.
+
+**Decision:** Media is a first-class part of the acquisition corpus. Media candidates, their provenance and—where acquisition is permitted—the binary copies themselves must be preserved under Admonk-controlled storage. Published pages must not depend on source-site image hotlinks.
+
+**Decision:** Operational possession/control of a media copy is separate from copyright/publication rights. Media rights state and public-use eligibility must be tracked explicitly, with public use disabled by default until a defensible reuse basis is established.
+
+**Decision:** Database records and media storage must be portable and independently restorable. Provider accounts are infrastructure, not the only backup/source of truth.
+
 ## Pending decisions
 
 - final public brand name
@@ -70,3 +82,4 @@ Record durable decisions here. Do not use this file for temporary task notes.
 - final map provider
 - final analytics/consent stack
 - exact first public institution/data cohort
+- final Admonk-controlled production object-storage/CDN implementation for media
