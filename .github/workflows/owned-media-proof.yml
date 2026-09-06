@@ -8,6 +8,7 @@ on:
     paths:
       - ".github/workflows/owned-media-proof.yml"
       - "tools/data-acquisition/init_owned_archive.py"
+      - "tools/data-acquisition/ingest_web_snapshots.py"
       - "tools/data-acquisition/discover_media.py"
       - "tools/data-acquisition/archive_media.py"
 
