@@ -70,3 +70,13 @@ Record durable decisions here. Do not use this file for temporary task notes.
 - final map provider
 - final analytics/consent stack
 - exact first public institution/data cohort
+
+## 2026-09-06 — Acquisition data and media ownership
+
+**Decision:** Edu Hub holds an owned copy of acquired raw records. External APIs, websites and directories are ingestion and provenance sources, not the dashboard or website runtime database.
+
+**Decision:** Acquired media binaries are stored in Edu Hub-controlled content-addressed storage. External image URLs remain provenance and re-acquisition references, not the permanent public rendering path.
+
+**Decision:** Internal storage and public reuse are separate states. Media is private by default and may be publicly projected only when rights or permission are explicitly recorded.
+
+**Decision:** The raw acquisition layer remains separate from canonical institution identity, public publication and SEO indexability.
