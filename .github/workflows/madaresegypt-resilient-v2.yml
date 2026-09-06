@@ -1,0 +1,194 @@
+name: MadaresEgypt bounded resilient acquisition v2
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/madaresegypt-resilient-v2.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  crawl:
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - {name: school-01, category: school, start: 1, end: 50}
+          - {name: school-02, category: school, start: 51, end: 100}
+          - {name: school-03, category: school, start: 101, end: 150}
+          - {name: school-04, category: school, start: 151, end: 200}
+          - {name: school-05, category: school, start: 201, end: 250}
+          - {name: school-06, category: school, start: 251, end: 300}
+          - {name: school-07, category: school, start: 301, end: 350}
+          - {name: school-08, category: school, start: 351, end: 400}
+          - {name: school-09, category: school, start: 401, end: 450}
+          - {name: school-10, category: school, start: 451, end: 500}
+          - {name: school-11, category: school, start: 501, end: 550}
+          - {name: school-12, category: school, start: 551, end: 600}
+          - {name: school-13, category: school, start: 601, end: 650}
+          - {name: school-14, category: school, start: 651, end: 700}
+          - {name: school-15, category: school, start: 701, end: 750}
+          - {name: school-16, category: school, start: 751, end: 800}
+          - {name: school-17, category: school, start: 801, end: 850}
+          - {name: school-18, category: school, start: 851, end: 900}
+          - {name: school-19, category: school, start: 901, end: 950}
+          - {name: school-20, category: school, start: 951, end: 1000}
+          - {name: school-21, category: school, start: 1001, end: 1050}
+          - {name: school-22, category: school, start: 1051, end: 1100}
+          - {name: school-23, category: school, start: 1101, end: 1150}
+          - {name: school-24, category: school, start: 1151, end: 1200}
+          - {name: school-25, category: school, start: 1201, end: 1250}
+          - {name: school-26, category: school, start: 1251, end: 1300}
+          - {name: school-27, category: school, start: 1301, end: 1350}
+          - {name: school-28, category: school, start: 1351, end: 1388}
+          - {name: nursery-01, category: nursery, start: 1, end: 50}
+          - {name: nursery-02, category: nursery, start: 51, end: 100}
+          - {name: nursery-03, category: nursery, start: 101, end: 150}
+          - {name: nursery-04, category: nursery, start: 151, end: 200}
+          - {name: nursery-05, category: nursery, start: 201, end: 250}
+          - {name: nursery-06, category: nursery, start: 251, end: 300}
+          - {name: nursery-07, category: nursery, start: 301, end: 350}
+          - {name: nursery-08, category: nursery, start: 351, end: 400}
+          - {name: nursery-09, category: nursery, start: 401, end: 450}
+          - {name: nursery-10, category: nursery, start: 451, end: 500}
+          - {name: nursery-11, category: nursery, start: 501, end: 550}
+          - {name: nursery-12, category: nursery, start: 551, end: 584}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    name: crawl (${{ matrix.name }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Crawl listing pages
+        run: |
+          mkdir -p artifacts/madaresegypt
+          python tools/data-acquisition/scrape_madaresegypt_listings_v2.py \
+            --category "${{ matrix.category }}" \
+            --start-page "${{ matrix.start }}" \
+            --end-page "${{ matrix.end }}" \
+            --output "artifacts/madaresegypt/${{ matrix.name }}.jsonl" \
+            --delay 0.75
+          cat "artifacts/madaresegypt/${{ matrix.name }}.report.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: madaresegypt-v2-${{ matrix.name }}
+          path: |
+            artifacts/madaresegypt/${{ matrix.name }}.jsonl
+            artifacts/madaresegypt/${{ matrix.name }}.report.json
+          if-no-files-found: error
+          retention-days: 30
+
+  merge:
+    needs: crawl
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: madaresegypt-v2-*
+          path: shards
+          merge-multiple: true
+      - name: Merge source IDs and validate shard coverage
+        run: |
+          mkdir -p artifacts
+          python - <<'PY'
+          import glob, json
+          from pathlib import Path
+
+          expected = [f'school-{i:02d}' for i in range(1,29)] + [f'nursery-{i:02d}' for i in range(1,13)]
+          report_paths = sorted(glob.glob('shards/*.report.json'))
+          present = {Path(p).name.removesuffix('.report.json') for p in report_paths}
+          missing = [name for name in expected if name not in present]
+
+          rows = {}
+          for path in sorted(glob.glob('shards/*.jsonl')):
+              for line in Path(path).read_text(encoding='utf-8').splitlines():
+                  if not line.strip():
+                      continue
+                  row = json.loads(line)
+                  sid = str(row.get('source_record_id') or '').strip()
+                  if not sid:
+                      continue
+                  old = rows.get(sid)
+                  if old is None:
+                      row.setdefault('payload', {}).setdefault('listing_categories', [row.get('entity_type_raw')])
+                      rows[sid] = row
+                      continue
+                  op = old.setdefault('payload', {})
+                  rp = row.get('payload') or {}
+                  cats = op.setdefault('listing_categories', [old.get('entity_type_raw')])
+                  incoming_cat = row.get('entity_type_raw')
+                  if incoming_cat and incoming_cat not in cats:
+                      cats.append(incoming_cat)
+                  if not old.get('name_raw') and row.get('name_raw'):
+                      old['name_raw'] = row['name_raw']
+                  for key in ('listing_names','listing_urls','listing_contexts'):
+                      vals = op.setdefault(key, [])
+                      for value in rp.get(key, []):
+                          if value not in vals:
+                              vals.append(value)
+                      if key == 'listing_contexts':
+                          del vals[10:]
+
+          reports=[]
+          unresolved=[]
+          bad_shards=[]
+          for path in report_paths:
+              r=json.loads(Path(path).read_text(encoding='utf-8'))
+              reports.append(r)
+              shard_name=Path(path).name.removesuffix('.report.json')
+              if not r.get('ok'):
+                  bad_shards.append(shard_name)
+              unresolved.extend({'category':r['category'],'page':p,'shard':shard_name} for p in r.get('unresolved_failed_pages',[]))
+
+          out=Path('artifacts/madaresegypt_all_v2.jsonl')
+          def sort_key(x):
+              return int(x) if x.isdigit() else x
+          with out.open('w',encoding='utf-8') as f:
+              for sid in sorted(rows,key=sort_key):
+                  f.write(json.dumps(rows[sid],ensure_ascii=False)+'\n')
+
+          by_type={}
+          category_occurrences={'school':0,'nursery':0}
+          for row in rows.values():
+              t=row.get('entity_type_raw') or 'unknown'
+              by_type[t]=by_type.get(t,0)+1
+              for cat in row.get('payload',{}).get('listing_categories',[]):
+                  if cat in category_occurrences:
+                      category_occurrences[cat]+=1
+
+          report={
+              'ok': not missing and not bad_shards and not unresolved,
+              'expected_shards': len(expected),
+              'present_shards': len(present),
+              'missing_shards': missing,
+              'bad_shards': sorted(set(bad_shards)),
+              'unique_source_ids': len(rows),
+              'named_records': sum(bool(r.get('name_raw')) for r in rows.values()),
+              'by_primary_raw_type': by_type,
+              'category_occurrences': category_occurrences,
+              'unresolved_failed_pages': unresolved,
+              'shards': reports,
+          }
+          Path('artifacts/madaresegypt_report_v2.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(report,ensure_ascii=False))
+          PY
+          wc -l artifacts/madaresegypt_all_v2.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: madaresegypt-directory-v3-r2
+          path: |
+            artifacts/madaresegypt_all_v2.jsonl
+            artifacts/madaresegypt_report_v2.json
+          if-no-files-found: error
+          retention-days: 30
