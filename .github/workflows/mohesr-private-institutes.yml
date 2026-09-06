@@ -1,0 +1,119 @@
+name: MOHESR current private institute registry
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/mohesr-private-institutes.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Acquire official registry page
+        run: |
+          mkdir -p artifacts
+          python - <<'PY'
+          import hashlib,json,re,requests
+          from bs4 import BeautifulSoup
+          from pathlib import Path
+
+          URL='https://mohesr.gov.eg/?id=193&option=com_sppagebuilder'
+          s=requests.Session(); s.headers['User-Agent']='EduHubResearchBot/0.8 (+https://github.com/admonkstudio/edu-hub; public-source-acquisition)'
+          r=s.get(URL,timeout=60,allow_redirects=True); r.raise_for_status()
+          soup=BeautifulSoup(r.text,'html.parser')
+
+          # Preserve the page snapshot text, then parse only the numbered registry section.
+          raw_text='\n'.join(' '.join(x.split()) for x in soup.stripped_strings if ' '.join(x.split()))
+          Path('artifacts/mohesr_private_institutes_page.txt').write_text(raw_text,encoding='utf-8')
+          lines=[x.strip() for x in raw_text.splitlines() if x.strip()]
+
+          start=next((i for i,x in enumerate(lines) if '208' in x and 'معهد' in x and 'الخاصة' in x),None)
+          if start is None:
+              raise SystemExit('Could not locate MOHESR 208-institute registry heading')
+          section_lines=lines[start:]
+
+          category=None
+          records=[]
+          cat_patterns=(
+            ('engineering','الهندسية'),
+            ('commercial','الشعبة التجارية'),
+            ('computer_science','علوم الحاسب'),
+            ('languages_media','اللغات والإعلام'),
+            ('social_work','الخدمة الاجتماعية'),
+            ('health_nursing','العلوم الصحية'),
+            ('agriculture','الزراعية'),
+            ('tourism_hotels','السياحة والفنادق'),
+          )
+          numbered=re.compile(r'^\s*([0-9٠-٩]+)[\.\-،:]?\s*(.+?)\s*$')
+          trans=str.maketrans('٠١٢٣٤٥٦٧٨٩','0123456789')
+          for line in section_lines:
+              for key,needle in cat_patterns:
+                  if needle in line and ('معاهد' in line or 'المعاهد' in line or 'شعبة' in line):
+                      category=key
+              m=numbered.match(line.translate(trans))
+              if not m or not category:
+                  continue
+              name=re.sub(r'\s+',' ',m.group(2)).strip(' .،-')
+              if len(name)<5 or any(x in name for x in ('العاصمة الادارية','جميع الحقوق','تواصل معنا')):
+                  continue
+              records.append({'ordinal':int(m.group(1)),'name_raw':name,'category_raw':category})
+
+          # Registry categories can repeat the same institute when it belongs to more than one academic division.
+          grouped={}
+          for rec in records:
+              key=re.sub(r'[\sـ]+',' ',rec['name_raw']).strip().casefold()
+              row=grouped.setdefault(key,{'name_raw':rec['name_raw'],'categories_raw':[],'occurrences':[]})
+              if rec['category_raw'] not in row['categories_raw']:
+                  row['categories_raw'].append(rec['category_raw'])
+              row['occurrences'].append({'category_raw':rec['category_raw'],'ordinal':rec['ordinal']})
+
+          out=Path('artifacts/mohesr_private_institutes.jsonl')
+          with out.open('w',encoding='utf-8') as f:
+              for key,row in sorted(grouped.items()):
+                  sid='mohesr-private-'+hashlib.sha256(key.encode()).hexdigest()[:16]
+                  payload={
+                    'source_record_id':sid,
+                    'source_url':r.url,
+                    'name_raw':row['name_raw'],
+                    'entity_type_raw':'private_higher_institute',
+                    'location_raw':None,
+                    'payload':{
+                      'registry':'MOHESR current private higher institutes',
+                      'categories_raw':row['categories_raw'],
+                      'occurrences':row['occurrences'],
+                      'retrieval_url':r.url,
+                    }
+                  }
+                  f.write(json.dumps(payload,ensure_ascii=False)+'\n')
+
+          report={
+            'ok':True,
+            'source_url':r.url,
+            'registry_claimed_count':208,
+            'numbered_occurrences':len(records),
+            'unique_normalized_names':len(grouped),
+            'category_occurrences':{},
+          }
+          for rec in records:
+              report['category_occurrences'][rec['category_raw']]=report['category_occurrences'].get(rec['category_raw'],0)+1
+          Path('artifacts/mohesr_private_institutes_report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(report,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mohesr-private-institutes-v3
+          path: |
+            artifacts/mohesr_private_institutes.jsonl
+            artifacts/mohesr_private_institutes_report.json
+            artifacts/mohesr_private_institutes_page.txt
+          if-no-files-found: error
+          retention-days: 30
