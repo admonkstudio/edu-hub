@@ -46,7 +46,11 @@ def discover(s: requests.Session, max_pages: int, delay: float) -> dict[str, dic
     found: dict[str, dict] = {}
     for page in range(1, max_pages + 1):
         u = ARCHIVE if page == 1 else f"{ARCHIVE}page/{page}/"
-        r = s.get(u, timeout=45); r.raise_for_status()
+        r = s.get(u, timeout=45)
+        if r.status_code == 404:
+            print(json.dumps({"stage":"archive_end","page":page,"reason":"404","total":len(found)}, ensure_ascii=False), flush=True)
+            break
+        r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
         page_urls = []
         for a in soup.find_all("a", href=True):
@@ -90,7 +94,6 @@ def parse_profile(url: str, discovered: dict, html: str, final_url: str) -> dict
     m = re.search(r"تبدأ\s+المصاريف\s+من\s*(?:LE|جنيه)?\s*([0-9][0-9,\.]*)", text_before, re.I)
     if m: fee = m.group(1)
 
-    # Capture public taxonomy labels by nearby section headings/blocks.
     tax = {}
     heading_keys = {
         "لغات":"languages", "مراحل":"stages", "جهات اعتماد":"accreditations", "تلاميذ":"gender",
