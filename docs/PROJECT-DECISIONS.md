@@ -72,6 +72,10 @@ Record durable decisions here. Do not use this file for temporary task notes.
 
 **Decision:** Database records and media storage must be portable and independently restorable. Provider accounts are infrastructure, not the only backup/source of truth.
 
+**Decision:** Owned acquisition exports must be portable and independently verifiable with database and media checksum manifests.
+
+**Decision:** Identical media binaries should be stored once by content hash while retaining every source-record-to-media provenance link.
+
 ## Pending decisions
 
 - final public brand name
