@@ -35,7 +35,7 @@ jobs:
           out = Path("artifacts/madares-media/input.jsonl")
           with out.open("w", encoding="utf-8") as f:
               for sid in ids:
-                  f.write(json.dumps({"source_record_id": sid, "source_url": f"https://madaresegypt.com/ar/Item/{sid}"}) + "\\n")
+                  f.write(json.dumps({"source_record_id": sid, "source_url": f"https://madaresegypt.com/ar/Item/{sid}"}) + "\n")
           print(json.dumps({"records": len(ids), "output": str(out)}))
           PY
       - name: Discover profile media candidates
