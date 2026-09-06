@@ -1,9 +1,9 @@
-name: EMIS school directory diagnostic
+name: EMIS current school directory diagnostic
 
 on:
   push:
     branches:
-      - data-acquisition-egypt
+      - data-acquisition-egypt-v3
     paths:
       - ".github/workflows/emis-diagnostic.yml"
   workflow_dispatch:
@@ -14,39 +14,80 @@ permissions:
 jobs:
   diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - name: Install dependencies
         run: pip install requests beautifulsoup4
-      - name: Inspect public EMIS directory pages
+      - name: Discover current public school-directory entrypoint
         run: |
           python - <<'PY'
-          import requests, re
+          import json,re,requests
           from bs4 import BeautifulSoup
-          S=requests.Session(); S.headers['User-Agent']='EduHubResearchBot/0.3 (+https://github.com/admonkstudio/edu-hub; public-source-diagnostic)'
-          urls=['https://search.emis.gov.eg/','https://search.emis.gov.eg/search_schpriv.aspx']
-          for u in urls:
-              print('\n===',u,'===')
+          from urllib.parse import urljoin
+
+          S=requests.Session()
+          S.headers['User-Agent']='EduHubResearchBot/1.2 (+https://github.com/admonkstudio/edu-hub; public-source-diagnostic)'
+          seed=['https://emis.gov.eg/','https://www.emis.gov.eg/']
+          seen=set(); candidates=[]
+          for u in seed:
+              print('\n=== HOME',u,'===',flush=True)
               try:
-                  r=S.get(u,timeout=60,allow_redirects=True); print('STATUS',r.status_code,'FINAL',r.url,'LEN',len(r.text)); r.raise_for_status()
+                  r=S.get(u,timeout=45,allow_redirects=True)
+                  print('STATUS',r.status_code,'FINAL',r.url,'LEN',len(r.text),'TYPE',r.headers.get('content-type'),flush=True)
+                  r.raise_for_status()
               except Exception as e:
-                  print('ERROR',repr(e)); continue
+                  print('ERROR',repr(e),flush=True); continue
               soup=BeautifulSoup(r.text,'html.parser')
-              print('TITLE',soup.title.get_text(' ',strip=True) if soup.title else None)
               for a in soup.find_all('a',href=True):
-                  href=a.get('href',''); txt=' '.join(a.get_text(' ',strip=True).split())
-                  if txt or 'search' in href.lower(): print('A',href,'TEXT',txt[:160])
-              f=soup.find('form')
-              if f:
-                  print('FORM',f.get('method'),f.get('action'),f.get('id'),f.get('name'))
-                  for x in f.find_all(['input','select','button']):
-                      attrs={k:x.get(k) for k in ('type','name','id','value','onclick') if x.get(k) is not None}
-                      txt=' '.join(x.get_text(' ',strip=True).split())
+                  href=urljoin(r.url,a.get('href',''))
+                  txt=' '.join(a.get_text(' ',strip=True).split())
+                  blob=(txt+' '+href).lower()
+                  if any(k in blob for k in ('دليل المدارس','school','search.emis','schools')):
+                      print('CANDIDATE',json.dumps({'text':txt,'href':href},ensure_ascii=False),flush=True)
+                      if href not in seen:
+                          seen.add(href); candidates.append(href)
+              for script in soup.find_all('script'):
+                  src=script.get('src')
+                  if src:
+                      full=urljoin(r.url,src)
+                      if 'emis' in full.lower(): print('SCRIPT_SRC',full,flush=True)
+                  txt=script.string or script.get_text() or ''
+                  if any(k in txt.lower() for k in ('school','مدارس','search.emis')):
+                      print('INLINE_SCRIPT',' '.join(txt.split())[:6000],flush=True)
+
+          # Historical endpoints remain diagnostic fallbacks, not assumed-current URLs.
+          for fallback in ('https://search.emis.gov.eg/','https://search.emis.gov.eg/search_schpriv.aspx'):
+              if fallback not in seen:
+                  candidates.append(fallback)
+
+          print('\nDISCOVERED_TARGETS',json.dumps(candidates,ensure_ascii=False),flush=True)
+          for u in candidates[:20]:
+              print('\n=== TARGET',u,'===',flush=True)
+              try:
+                  r=S.get(u,timeout=45,allow_redirects=True)
+                  print('STATUS',r.status_code,'FINAL',r.url,'LEN',len(r.text),'TYPE',r.headers.get('content-type'),flush=True)
+                  if r.status_code>=400: continue
+              except Exception as e:
+                  print('ERROR',repr(e),flush=True); continue
+              soup=BeautifulSoup(r.text,'html.parser')
+              print('TITLE',soup.title.get_text(' ',strip=True) if soup.title else None,flush=True)
+              for f in soup.find_all('form')[:8]:
+                  print('FORM',json.dumps({'method':f.get('method'),'action':urljoin(r.url,f.get('action') or ''),'id':f.get('id'),'name':f.get('name')},ensure_ascii=False),flush=True)
+                  for x in f.find_all(['input','select','button'],limit=120):
+                      info={k:x.get(k) for k in ('type','name','id','value','onclick') if x.get(k) is not None}
                       if x.name=='select':
-                          opts=[((o.get('value') or ''),' '.join(o.get_text(' ',strip=True).split())) for o in x.find_all('option')][:30]
-                          print('SELECT',attrs,'OPTS',opts)
-                      else: print(x.name.upper(),attrs,'TEXT',txt[:120])
+                          opts=[{'value':o.get('value'),'text':' '.join(o.get_text(' ',strip=True).split())} for o in x.find_all('option')[:40]]
+                          info['options_count']=len(x.find_all('option')); info['options_sample']=opts
+                      print('FIELD',json.dumps({'tag':x.name,**info},ensure_ascii=False),flush=True)
+              refs=set()
+              for tag in soup.find_all('script',src=True): refs.add(urljoin(r.url,tag.get('src')))
               for script in soup.find_all('script'):
                   txt=script.string or script.get_text() or ''
-                  if any(k in txt.lower() for k in ['ajax','webmethod','search','gridview','postback']): print('SCRIPT',txt[:5000])
+                  if any(k in txt.lower() for k in ('ajax','fetch(','xmlhttprequest','school','مدرس','govern','admin','webmethod')):
+                      print('SCRIPT',' '.join(txt.split())[:10000],flush=True)
+                  for m in re.findall(r"['\"]([^'\"]+\.(?:php|aspx|ashx|asmx|json)(?:\?[^'\"]*)?)['\"]",txt,re.I):
+                      refs.add(urljoin(r.url,m))
+              for ref in sorted(refs):
+                  if any(k in ref.lower() for k in ('school','search','ajax','api','get_','emis')):
+                      print('ENDPOINT_REF',ref,flush=True)
           PY
