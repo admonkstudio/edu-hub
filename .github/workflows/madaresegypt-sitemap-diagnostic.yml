@@ -1,0 +1,48 @@
+name: MadaresEgypt sitemap diagnostic
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/madaresegypt-sitemap-diagnostic.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Inspect robots and sitemap endpoints
+        run: |
+          python - <<'PY'
+          import requests, re
+          from urllib.parse import urljoin
+          s=requests.Session(); s.headers['User-Agent']='EduHubResearchBot/0.4 (+https://github.com/admonkstudio/edu-hub; public-source-diagnostic)'
+          urls=[
+            'https://madaresegypt.com/robots.txt',
+            'https://madaresegypt.com/sitemap.xml',
+            'https://madaresegypt.com/sitemap_index.xml',
+            'https://madaresegypt.com/sitemap',
+            'https://www.madaresegypt.com/robots.txt',
+            'https://www.madaresegypt.com/sitemap.xml',
+          ]
+          for u in urls:
+            print('\n===',u,'===')
+            try:
+              r=s.get(u,timeout=30,allow_redirects=True)
+              print('STATUS',r.status_code,'FINAL',r.url,'TYPE',r.headers.get('content-type'),'LEN',len(r.content))
+              txt=r.text
+              print(txt[:5000])
+              locs=re.findall(r'<loc>\s*([^<]+)\s*</loc>',txt,re.I)
+              if locs:
+                print('LOCS',len(locs),locs[:30])
+              items=re.findall(r'https?://[^\s<\"\']+/(?:ar|en)/Item/\d+[^\s<\"\']*',txt,re.I)
+              if items:
+                print('ITEM_URLS',len(items),items[:20])
+            except Exception as e:
+              print('ERROR',repr(e))
+          PY
