@@ -22,21 +22,22 @@ jobs:
         run: |
           mkdir -p artifacts
           python - <<'PY'
-          import json,re,requests
+          import json,re,requests,urllib3
           from bs4 import BeautifulSoup
           from pathlib import Path
 
           URL='https://sis.gov.eg/ar/المركز-الإعلامي/الأخبار/التعليم-العالي-تعلن-القوائم-المحدثة-لمؤسسات-التعليم-العالي-المعتمدة-بجمهورية-مصر-العربية/'
-          s=requests.Session(); s.headers['User-Agent']='EduHubResearchBot/0.9 (+https://github.com/admonkstudio/edu-hub; public-source-acquisition)'
-          r=s.get(URL,timeout=60,allow_redirects=True); r.raise_for_status()
+          urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+          s=requests.Session(); s.headers['User-Agent']='EduHubResearchBot/1.0 (+https://github.com/admonkstudio/edu-hub; public-source-acquisition)'
+          # SIS currently presents an incomplete certificate chain to the hosted runner.
+          # We retain the requested/final URL in the snapshot and treat this as a
+          # government republication source, while explicitly recording tls_verify=false.
+          r=s.get(URL,timeout=60,allow_redirects=True,verify=False); r.raise_for_status()
           soup=BeautifulSoup(r.text,'html.parser')
           lines=[' '.join(x.split()) for x in soup.stripped_strings]
           lines=[x for x in lines if x]
           Path('artifacts/sis_higher_ed_page.txt').write_text('\n'.join(lines),encoding='utf-8')
 
-          # Preserve every plausible numbered institution line with its nearest
-          # preceding visible section heading. This is a raw snapshot, not a
-          # canonical institution model.
           heading=None
           rows=[]
           heading_words=('جامعة','جامعات','معهد','معاهد','كلية','كليات','أكاديمية','أكاديميات','فروع الجامعات','مؤسسات تعليمية')
@@ -44,8 +45,7 @@ jobs:
           trans=str.maketrans('٠١٢٣٤٥٦٧٨٩','0123456789')
           for line in lines:
               normalized=line.translate(trans)
-              # Section headings tend to be short and contain an institution-family keyword.
-              if len(line) <= 180 and any(w in line for w in heading_words) and not numeral.match(normalized):
+              if len(line) <= 220 and any(w in line for w in heading_words) and not numeral.match(normalized):
                   if any(marker in line for marker in ('الجامعات','المعاهد','الكليات','الأكاديميات','فروع','مؤسسات تعليمية')):
                       heading=line
               m=numeral.match(normalized)
@@ -61,20 +61,20 @@ jobs:
           out=Path('artifacts/sis_higher_ed_numbered_rows.jsonl')
           with out.open('w',encoding='utf-8') as f:
               for i,row in enumerate(rows,1):
-                  row={
+                  payload={
                     'source_record_id':f'sis-he-{i:04d}',
                     'source_url':r.url,
                     'entity_type_raw':'higher_education_registry_row',
                     'name_raw':row['name_raw'],
                     'location_raw':None,
-                    'payload':row,
+                    'payload':{**row,'requested_url':URL,'final_url':r.url,'tls_verify':False},
                   }
-                  f.write(json.dumps(row,ensure_ascii=False)+'\n')
+                  f.write(json.dumps(payload,ensure_ascii=False)+'\n')
 
           by_section={}
           for row in rows:
               by_section[row['section_raw']]=by_section.get(row['section_raw'],0)+1
-          report={'ok':True,'url':r.url,'numbered_rows':len(rows),'sections':by_section}
+          report={'ok':True,'requested_url':URL,'url':r.url,'tls_verify':False,'numbered_rows':len(rows),'sections':by_section}
           Path('artifacts/sis_higher_ed_report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
           print(json.dumps(report,ensure_ascii=False))
           PY
