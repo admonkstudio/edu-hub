@@ -76,6 +76,8 @@ Record durable decisions here. Do not use this file for temporary task notes.
 
 **Decision:** Identical media binaries should be stored once by content hash while retaining every source-record-to-media provenance link.
 
+**Decision:** Raw snapshot hashes must include source-record identity and the complete stored row, not payload content alone, so distinct records with identical payloads cannot be dropped by uniqueness constraints.
+
 ## Pending decisions
 
 - final public brand name
