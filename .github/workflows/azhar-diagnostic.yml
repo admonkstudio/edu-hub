@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Install diagnostic dependencies
         run: pip install requests beautifulsoup4
-      - name: Test complete public search combination
+      - name: Test governorate-wide full-filter search
         run: |
           python - <<'PY'
           import re, requests
@@ -28,36 +28,21 @@ jobs:
           from urllib.parse import urljoin
           U='https://azhar.gov.eg/IDSC/InstGuide/Guide_Search.aspx'
           S=requests.Session(); S.headers['User-Agent']='EduHubResearchBot/0.2 diagnostic'
-          def base(form):
+          def base(f):
               d={}
-              for x in form.find_all('input',attrs={'name':True}):
-                  t=(x.get('type') or 'text').lower()
-                  if t not in ('submit','button','image','file'): d[x['name']]=x.get('value','')
-              for x in form.find_all('select',attrs={'name':True}):
+              for x in f.find_all('input',attrs={'name':True}):
+                  if (x.get('type') or 'text').lower() not in ('submit','button','image','file'): d[x['name']]=x.get('value','')
+              for x in f.find_all('select',attrs={'name':True}):
                   o=x.find('option',selected=True) or x.find('option'); d[x['name']]=o.get('value','') if o else ''
               return d
-          def realopts(sel): return [(o.get('value',''),o.get_text(' ',strip=True)) for o in sel.find_all('option') if o.get('value','').strip() not in ('','0','-1')]
-          def postback(html,idx,val):
-              s=BeautifulSoup(html,'html.parser'); f=s.find('form'); sels=f.find_all('select'); d=base(f); d[sels[idx]['name']]=val; d['__EVENTTARGET']=sels[idx]['name']; d['__EVENTARGUMENT']=''; rr=S.post(urljoin(U,f.get('action') or U),data=d,timeout=60); rr.raise_for_status(); return rr.text
-          r=S.get(U,timeout=60); r.raise_for_status(); html=r.text
-          s=BeautifulSoup(html,'html.parser'); sels=s.find('form').find_all('select')
-          gv=realopts(sels[0])[0][0]; print('gov',gv)
-          html=postback(html,0,gv)
-          s=BeautifulSoup(html,'html.parser'); sels=s.find('form').find_all('select'); av=realopts(sels[1])[0][0]; print('admin',av)
-          html=postback(html,1,av)
-          s=BeautifulSoup(html,'html.parser'); sels=s.find('form').find_all('select')
-          vals={0:gv,1:av}
-          for idx in (2,3,4):
-              oo=realopts(sels[idx]); print('select',idx,oo[:10]); vals[idx]=oo[0][0]
-          f=s.find('form'); d=base(f)
-          for idx,val in vals.items(): d[sels[idx]['name']]=val
+          r=S.get(U,timeout=60); r.raise_for_status(); s=BeautifulSoup(r.text,'html.parser'); f=s.find('form'); sels=f.find_all('select')
+          gv='101'; d=base(f); d[sels[0]['name']]=gv; d['__EVENTTARGET']=sels[0]['name']; d['__EVENTARGUMENT']=''; r=S.post(urljoin(U,f.get('action') or U),data=d,timeout=60); r.raise_for_status()
+          s=BeautifulSoup(r.text,'html.parser'); f=s.find('form'); sels=f.find_all('select'); d=base(f)
+          vals=['101','0','1','1','1']
+          for sel,val in zip(sels,vals): d[sel['name']]=val
           d['ctl00$MainContent$btnSearch']='بحث'; d['__EVENTTARGET']=''; d['__EVENTARGUMENT']=''
-          rr=S.post(urljoin(U,f.get('action') or U),data=d,timeout=60,allow_redirects=True); rr.raise_for_status()
-          print('SEARCH',rr.url,len(rr.text),'values',vals)
-          print('RESULT URLS',re.findall(r'Guide_Resault\.aspx[^\"\'<> ]*',rr.text,re.I)[:50])
-          print('IDS',sorted(set(re.findall(r'Guide_Resault\.aspx\?id=([0-9]+)',rr.text,re.I)))[:50])
-          ss=BeautifulSoup(rr.text,'html.parser')
-          print('text sample',' '.join(ss.get_text(' ',strip=True).split())[-4000:])
-          for x in ss.find_all(['a','input'],href=True):
-              print('LINK',x.get('href'),x.get_text(' ',strip=True)[:150])
+          rr=S.post(urljoin(U,f.get('action') or U),data=d,timeout=60); rr.raise_for_status()
+          ids=sorted(set(re.findall(r'Guide_Resault\.aspx\?id=([0-9]+)',rr.text,re.I)))
+          print('SEARCH',len(rr.text),'ids',len(ids),ids[:50])
+          print('TEXT',' '.join(BeautifulSoup(rr.text,'html.parser').get_text(' ',strip=True).split())[-2500:])
           PY
