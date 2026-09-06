@@ -1,0 +1,87 @@
+name: MOSS nursery public-data diagnostic
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/moss-nursery-diagnostic.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Inspect public ministry and digital-platform assets
+        run: |
+          python - <<'PY'
+          import json,re,requests
+          from bs4 import BeautifulSoup
+          from urllib.parse import urljoin,urlparse
+
+          S=requests.Session()
+          S.headers['User-Agent']='EduHubResearchBot/1.2 (+https://github.com/admonkstudio/edu-hub; public-source-diagnostic)'
+          seeds=['https://www.moss.gov.eg/','https://digital.moss.gov.eg/ar']
+          js_urls=[]
+          page_links=[]
+          for u in seeds:
+              print('\n=== PAGE',u,'===',flush=True)
+              try:
+                  r=S.get(u,timeout=45,allow_redirects=True)
+                  print('STATUS',r.status_code,'FINAL',r.url,'LEN',len(r.text),'TYPE',r.headers.get('content-type'),flush=True)
+                  r.raise_for_status()
+              except Exception as e:
+                  print('ERROR',repr(e),flush=True); continue
+              soup=BeautifulSoup(r.text,'html.parser')
+              text=' '.join(soup.get_text(' ',strip=True).split())
+              for needle in ('حضان','nurser','طفولة','early child','خريطة'):
+                  if needle.lower() in text.lower(): print('PAGE_MATCH',needle,flush=True)
+              for a in soup.find_all('a',href=True):
+                  href=urljoin(r.url,a.get('href',''))
+                  label=' '.join(a.get_text(' ',strip=True).split())
+                  blob=(label+' '+href).lower()
+                  if any(k in blob for k in ('حضان','nurser','طفولة','early','map','خريطة')):
+                      print('LINK',json.dumps({'text':label,'href':href},ensure_ascii=False),flush=True)
+                      page_links.append(href)
+              for tag in soup.find_all('script',src=True):
+                  src=urljoin(r.url,tag.get('src'))
+                  if src not in js_urls: js_urls.append(src)
+                  print('SCRIPT_SRC',src,flush=True)
+              for script in soup.find_all('script'):
+                  txt=script.string or script.get_text() or ''
+                  if any(k in txt.lower() for k in ('nurser','حضان','api','map','خريطة')):
+                      print('INLINE_SCRIPT',' '.join(txt.split())[:10000],flush=True)
+
+          print('\nJS_COUNT',len(js_urls),flush=True)
+          endpoint_patterns=(
+              r"https?://[^'\"\s)]+",
+              r"['\"](/[^'\"]*(?:api|nurser|child|حضان|map|lookup|search)[^'\"]*)['\"]",
+          )
+          for js in js_urls[:80]:
+              try:
+                  r=S.get(js,timeout=35,allow_redirects=True)
+                  if r.status_code>=400 or len(r.text)>8_000_000: continue
+                  txt=r.text
+              except Exception as e:
+                  print('JS_ERROR',js,repr(e),flush=True); continue
+              low=txt.lower()
+              if not any(k in low for k in ('nurser','حضان','earlychild','early-child','childhood','api/','/api','map')):
+                  continue
+              print('\n=== JS_MATCH',js,'LEN',len(txt),'===',flush=True)
+              for token in ('nursery','nurseries','حضانة','حضانات','earlychild','early-child','childhood'):
+                  pos=low.find(token.lower())
+                  if pos>=0: print('CONTEXT',txt[max(0,pos-500):pos+1800].replace('\n',' ')[:2500],flush=True)
+              refs=set()
+              for pat in endpoint_patterns:
+                  for m in re.findall(pat,txt,re.I):
+                      val=m if isinstance(m,str) else m[0]
+                      if isinstance(val,str) and any(k in val.lower() for k in ('api','nurser','child','map','search','lookup')):
+                          refs.add(urljoin(js,val))
+              for ref in sorted(refs)[:120]: print('ENDPOINT_REF',ref,flush=True)
+          PY
