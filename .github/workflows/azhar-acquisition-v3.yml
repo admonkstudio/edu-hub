@@ -1,0 +1,124 @@
+name: Al-Azhar official directory acquisition v3
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/azhar-acquisition-v3.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  acquire-shards:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include:
+          - name: gov-01-06
+            start: 1
+            end: 6
+          - name: gov-07-12
+            start: 7
+            end: 12
+          - name: gov-13-18
+            start: 13
+            end: 18
+          - name: gov-19-23
+            start: 19
+            end: 23
+          - name: gov-24-27
+            start: 24
+            end: 27
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Acquire official directory shard
+        run: |
+          mkdir -p artifacts/azhar
+          python tools/data-acquisition/scrape_azhar.py \
+            --output artifacts/azhar/${{ matrix.name }}.jsonl \
+            --start-governorate-index ${{ matrix.start }} \
+            --end-governorate-index ${{ matrix.end }} \
+            --delay 0.12
+          wc -l artifacts/azhar/${{ matrix.name }}.jsonl
+      - name: Upload shard
+        uses: actions/upload-artifact@v4
+        with:
+          name: azhar-${{ matrix.name }}
+          path: artifacts/azhar/${{ matrix.name }}.jsonl
+          if-no-files-found: error
+          retention-days: 30
+
+  merge:
+    needs: acquire-shards
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Download shards
+        uses: actions/download-artifact@v4
+        with:
+          pattern: azhar-*
+          path: shards
+          merge-multiple: true
+      - name: Merge by official source record ID
+        run: |
+          mkdir -p artifacts
+          python - <<'PY'
+          import glob, json
+          from pathlib import Path
+
+          rows={}
+          input_rows=0
+          for path in sorted(glob.glob('shards/*.jsonl')):
+              with open(path,encoding='utf-8') as f:
+                  for line in f:
+                      if not line.strip():
+                          continue
+                      input_rows += 1
+                      row=json.loads(line)
+                      sid=str(row.get('source_record_id') or '').strip()
+                      if not sid:
+                          continue
+                      existing=rows.get(sid)
+                      if existing is None:
+                          rows[sid]=row
+                      else:
+                          # Same official ID should normally be identical. Prefer
+                          # the row with a populated name/location while keeping
+                          # all original payload evidence in that selected row.
+                          score=lambda r: int(bool(r.get('name_raw'))) + int(bool(r.get('location_raw')))
+                          if score(row) > score(existing):
+                              rows[sid]=row
+          out=Path('artifacts/azhar_snapshot.jsonl')
+          with out.open('w',encoding='utf-8') as f:
+              for sid in sorted(rows, key=lambda x:int(x)):
+                  f.write(json.dumps(rows[sid],ensure_ascii=False)+'\n')
+          named=sum(bool(r.get('name_raw')) for r in rows.values())
+          located=sum(bool(r.get('location_raw')) for r in rows.values())
+          report={'ok':True,'input_rows':input_rows,'unique_official_ids':len(rows),'named':named,'located':located,'output':str(out)}
+          Path('artifacts/azhar_report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(report,ensure_ascii=False))
+          PY
+          wc -l artifacts/azhar_snapshot.jsonl
+      - name: Upload complete official snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: azhar-official-directory-v3
+          path: |
+            artifacts/azhar_snapshot.jsonl
+            artifacts/azhar_report.json
+          if-no-files-found: error
+          retention-days: 30
