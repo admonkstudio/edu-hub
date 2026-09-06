@@ -126,11 +126,50 @@ These controls are copied into convenient raw fields but remain source-specific 
 
 Known official 2025/26 aggregate target: **62,690 schools**.
 
-The current record-level directory at `search.emis.gov.eg` is not yet reliably reachable from the acquisition runner. Direct hosted-runner diagnostics repeatedly time out. Historical snapshots may be retained for discovery/matching but must never be treated as current verification.
+The current `https://emis.gov.eg/` homepage and its live `main.js` were inspected on 2026-09-06. The current official JavaScript explicitly advertises:
 
-A separate NCEEE endpoint diagnostic was also attempted; the candidate public endpoints returned 404 and are not currently a viable school-registry substitute.
+- `https://schools.emis.gov.eg/` as **المدرسة**
+- `https://search.emis.gov.eg/` as **دليل المدارس المصرية** (Egyptian Schools Directory)
 
-Status: **current record-level acquisition unresolved**.
+This establishes that `search.emis.gov.eg` is still the current official directory endpoint; it is not merely a historical URL.
+
+However, the record-level directory repeatedly times out from GitHub-hosted acquisition runners even while `emis.gov.eg` and `main.js` remain reachable. Direct requests to both the directory root and the historical `search_schpriv.aspx` path time out from hosted runners. No alternate public row-level API was exposed by the current homepage JavaScript.
+
+Historical snapshots may be retained for discovery/matching but must never be treated as current verification. A separate NCEEE endpoint diagnostic was also attempted; the candidate public endpoints returned 404 and are not currently a viable school-registry substitute.
+
+Status: **current official directory confirmed; current row-level bulk acquisition unresolved because the directory host is unreachable from the hosted acquisition environment**.
+
+Preferred next acquisition paths, in order:
+
+1. test the official directory from an Egypt/local browser or Egypt-hosted runner;
+2. if reachable, inspect its public requests and export/enumerate the public directory at a conservative rate;
+3. request a current CSV/XLSX database export directly from MOE/EMIS;
+4. retain secondary directories and historical data only as discovery evidence until an official current extract is obtained.
+
+#### Ministry of Social Solidarity — nursery census
+
+Official current universe: **48,225 nurseries** from the national comprehensive nursery census.
+
+The current MOSS website exposes a public 2025 census PDF covering all **27 directorates**. The published census is aggregate rather than row-level. Current published headline facts include:
+
+- 48,225 nurseries
+- 1,764,881 enrolled children
+- 133,375 classes
+- 254,322 employees
+
+A direct public-platform diagnostic was run against `www.moss.gov.eg` and `digital.moss.gov.eg`. No public row-level nursery API/map endpoint was found in the obvious public pages or JavaScript assets.
+
+MOSS currently states that it is working with the Ministry of Communications to develop a digital early-childhood platform and nursery map intended to expose information including the nearest nursery, licensing status, capacity and fees. This indicates that the row-level public map is **planned/in development rather than currently exposed as a downloadable public registry**.
+
+Authenticated nursery-licensing/service flows on the digital platform are private service functionality and are explicitly outside the acquisition scope.
+
+Status: **official national universe confirmed; public row-level database not currently exposed**.
+
+Preferred next acquisition paths:
+
+1. request the census row-level CSV/XLSX/database export directly from MOSS;
+2. monitor the planned public nursery map/platform and acquire only its public data after launch;
+3. use MadaresEgypt and other public directories as secondary discovery coverage in the meantime, without calling them official census coverage.
 
 ### Secondary discovery sources
 
@@ -168,7 +207,14 @@ Treatment: secondary discovery source only.
 
 Acquisition strategy is deliberately **listing-first** rather than exhaustively copying every profile. Listing records preserve source item ID, name, category, source URL and bounded nearby listing context. Profile enrichment should be selective and justified later.
 
+The source's live paginator currently exposes:
+
+- schools through page **1,388**
+- nurseries through page **584**
+
 The source is slow and intermittently times out. The crawler is therefore sharded into bounded school/nursery page ranges, retries transient failures and performs a repair pass before a shard is accepted. The broad MadaresEgypt run is **not included in the V4 pre-Madares totals above until its merged report passes**.
+
+At the latest checkpoint, the first eight school shards had completed successfully. For example, school pages 1–100 produced **1,003 named unique source IDs**, and a transient page-56 timeout was recovered by the repair pass with zero unresolved pages.
 
 No review/comment/media corpus is collected.
 
@@ -209,6 +255,11 @@ Additional official higher-education acquisition now includes:
 7. MOHESR private higher-institute sector list
 8. MOHESR technological colleges / technical institutes
 
+Current official-access diagnostics also cover:
+
+9. EMIS homepage/current school-directory route discovery
+10. MOSS national nursery census/public-platform endpoint discovery
+
 ### Sharding
 
 Long public directories are acquired in bounded shards to improve observability and prevent one slow source from invalidating all work.
@@ -235,6 +286,8 @@ Shard output is merged by **source record ID only**. This is source-level dedupl
 10. Canonical matching, assertions, conflict review and index readiness happen after raw acquisition.
 11. Sector-list occurrence counts are not automatically unique institution counts.
 12. A secondary republication used to recover a missing official section remains a separate secondary source record.
+13. A public aggregate count is a coverage target, not proof that its row-level records were acquired.
+14. Authenticated government service systems are not scraped to obtain private/non-public records.
 
 ## Exit criteria for this workstream
 
@@ -244,7 +297,7 @@ Raw acquisition is ready for matching/schema retrospective when:
 - broad secondary discovery sources have been sampled/acquired enough to expose taxonomy and field gaps;
 - source counts and field inventory are generated;
 - every raw record remains attributable to a source;
-- current vs historical sources are distinguishishable;
+- current vs historical sources are distinguishable;
 - acquisition failures and inaccessible sources are documented;
 - no canonical cross-source merge has been performed prematurely.
 
