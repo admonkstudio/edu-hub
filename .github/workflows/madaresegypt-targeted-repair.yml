@@ -27,6 +27,7 @@ on:
       - data-acquisition-egypt-v3
     paths:
       - ".github/workflows/madaresegypt-targeted-repair.yml"
+      - "tools/data-acquisition/scrape_madaresegypt_listings_v2.py"
 
 permissions:
   contents: read
@@ -38,17 +39,30 @@ jobs:
     timeout-minutes: 120
     strategy:
       fail-fast: false
-      max-parallel: 1
+      max-parallel: 2
       matrix:
         include:
-          - repair_name: school-01-repair
+          - repair_name: school-gap-01
             category: school
-            start_page: 1
-            end_page: 50
-          - repair_name: school-02-repair
+            pages: "1,575,576,579,580,581,604,605,656,657,678,679,680,681,682,683,684,685,707,708,709,710,711,712,713,718,719,720,721,722"
+          - repair_name: school-gap-02
             category: school
-            start_page: 51
-            end_page: 100
+            pages: "723,724,725,751,752,753,754,755,756,757,758,801,802,1055,1056,1057,1058,1059,1060,1061,1062,1101,1102,1103,1104,1105,1106,1107,1108,1151"
+          - repair_name: school-gap-03
+            category: school
+            pages: "1152,1153,1154,1155,1156,1157,1158,1201,1202,1203,1204,1205,1206,1207,1208,1251,1252,1253,1254,1255,1256,1257,1258,1301,1302,1303,1304,1305,1306,1307"
+          - repair_name: school-gap-04
+            category: school
+            pages: "1308,1351,1352,1353,1354,1355,1356,1357,1358"
+          - repair_name: nursery-gap-01
+            category: nursery
+            pages: "1,2,3,4,5,6,7,8,51,52,53,54,55,56,57,58,101,102,103,104,105,106,107,108,151,152,153,154,155,201"
+          - repair_name: nursery-gap-02
+            category: nursery
+            pages: "202,203,204,205,271,313,314,315,316,381,389,391,392,393,394,395,396,397,398,407,408,409,410,411,412,413,414,451,452,453"
+          - repair_name: nursery-gap-03
+            category: nursery
+            pages: "454,455,456,457,458,501,502,503,504,505,506,507,508,551,552,553,554,555,556,557,558"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -56,16 +70,14 @@ jobs:
           python-version: "3.12"
       - name: Install dependencies
         run: pip install requests beautifulsoup4
-      - name: Reacquire known incomplete range
+      - name: Reacquire exact unresolved pages
         run: |
           mkdir -p artifacts/madaresegypt-repair
-          START="${{ matrix.start_page }}"
-          END="${{ matrix.end_page }}"
-          SPAN=$((END - START + 1))
+          PAGES="${{ matrix.pages }}"
+          SPAN=$(awk -F, '{print NF}' <<< "$PAGES")
           python tools/data-acquisition/scrape_madaresegypt_listings_v2.py \
             --category "${{ matrix.category }}" \
-            --start-page "$START" \
-            --end-page "$END" \
+            --pages "$PAGES" \
             --output "artifacts/madaresegypt-repair/${{ matrix.repair_name }}.jsonl" \
             --delay 0.75 \
             --max-consecutive-failures "$SPAN"
