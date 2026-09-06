@@ -1,0 +1,38 @@
+name: AlexSchools public directory acquisition
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/alexschools-acquisition.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Acquire public school profiles
+        run: |
+          mkdir -p artifacts
+          python tools/data-acquisition/scrape_alexschools.py --output artifacts/alexschools.jsonl --max-pages 20 --delay 0.35
+          wc -l artifacts/alexschools.jsonl
+          cat artifacts/alexschools.report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: alexschools-directory-v3
+          path: |
+            artifacts/alexschools.jsonl
+            artifacts/alexschools.report.json
+          if-no-files-found: error
+          retention-days: 30
