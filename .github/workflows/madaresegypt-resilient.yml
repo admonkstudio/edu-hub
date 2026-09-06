@@ -1,0 +1,147 @@
+name: MadaresEgypt resilient directory acquisition
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - "tools/data-acquisition/scrape_madaresegypt_listings.py"
+      - ".github/workflows/madaresegypt-resilient.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  crawl:
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - {name: school-01, category: school, start: 1, end: 100}
+          - {name: school-02, category: school, start: 101, end: 200}
+          - {name: school-03, category: school, start: 201, end: 300}
+          - {name: school-04, category: school, start: 301, end: 400}
+          - {name: school-05, category: school, start: 401, end: 500}
+          - {name: school-06, category: school, start: 501, end: 600}
+          - {name: school-07, category: school, start: 601, end: 700}
+          - {name: school-08, category: school, start: 701, end: 800}
+          - {name: school-09, category: school, start: 801, end: 900}
+          - {name: school-10, category: school, start: 901, end: 1000}
+          - {name: school-11, category: school, start: 1001, end: 1100}
+          - {name: school-12, category: school, start: 1101, end: 1200}
+          - {name: school-13, category: school, start: 1201, end: 1300}
+          - {name: school-14, category: school, start: 1301, end: 1388}
+          - {name: nursery-01, category: nursery, start: 1, end: 100}
+          - {name: nursery-02, category: nursery, start: 101, end: 200}
+          - {name: nursery-03, category: nursery, start: 201, end: 300}
+          - {name: nursery-04, category: nursery, start: 301, end: 400}
+          - {name: nursery-05, category: nursery, start: 401, end: 500}
+          - {name: nursery-06, category: nursery, start: 501, end: 584}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    name: crawl (${{ matrix.name }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Crawl listing pages
+        run: |
+          mkdir -p artifacts/madaresegypt
+          python tools/data-acquisition/scrape_madaresegypt_listings.py \
+            --category "${{ matrix.category }}" \
+            --start-page "${{ matrix.start }}" \
+            --end-page "${{ matrix.end }}" \
+            --output "artifacts/madaresegypt/${{ matrix.name }}.jsonl" \
+            --delay 0.75
+          cat "artifacts/madaresegypt/${{ matrix.name }}.report.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: madaresegypt-${{ matrix.name }}
+          path: |
+            artifacts/madaresegypt/${{ matrix.name }}.jsonl
+            artifacts/madaresegypt/${{ matrix.name }}.report.json
+          if-no-files-found: error
+          retention-days: 30
+
+  merge:
+    needs: crawl
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: madaresegypt-*
+          path: shards
+          merge-multiple: true
+      - name: Merge source IDs and reports
+        run: |
+          mkdir -p artifacts
+          python - <<'PY'
+          import glob, json
+          from pathlib import Path
+
+          rows = {}
+          for path in sorted(glob.glob('shards/*.jsonl')):
+              for line in Path(path).read_text(encoding='utf-8').splitlines():
+                  if not line.strip():
+                      continue
+                  row = json.loads(line)
+                  sid = str(row.get('source_record_id') or '').strip()
+                  if not sid:
+                      continue
+                  old = rows.get(sid)
+                  if old is None:
+                      rows[sid] = row
+                      continue
+                  if not old.get('name_raw') and row.get('name_raw'):
+                      old['name_raw'] = row['name_raw']
+                  op = old.setdefault('payload', {})
+                  rp = row.get('payload') or {}
+                  for key in ('listing_names','listing_urls','listing_contexts'):
+                      vals = op.setdefault(key, [])
+                      for value in rp.get(key, []):
+                          if value not in vals:
+                              vals.append(value)
+                      if key == 'listing_contexts':
+                          del vals[10:]
+
+          reports=[]
+          unresolved=[]
+          for path in sorted(glob.glob('shards/*.report.json')):
+              r=json.loads(Path(path).read_text(encoding='utf-8'))
+              reports.append(r)
+              unresolved.extend({'category':r['category'],'page':p,'shard':Path(path).name} for p in r.get('unresolved_failed_pages',[]))
+
+          out=Path('artifacts/madaresegypt_all.jsonl')
+          with out.open('w',encoding='utf-8') as f:
+              for sid in sorted(rows,key=lambda x:int(x)):
+                  f.write(json.dumps(rows[sid],ensure_ascii=False)+'\n')
+          by_type={}
+          for row in rows.values():
+              t=row.get('entity_type_raw') or 'unknown'
+              by_type[t]=by_type.get(t,0)+1
+          report={
+              'ok': not unresolved,
+              'unique_source_ids': len(rows),
+              'named_records': sum(bool(r.get('name_raw')) for r in rows.values()),
+              'by_type': by_type,
+              'unresolved_failed_pages': unresolved,
+              'shards': reports,
+          }
+          Path('artifacts/madaresegypt_report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(report,ensure_ascii=False))
+          PY
+          wc -l artifacts/madaresegypt_all.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: madaresegypt-directory-v3
+          path: |
+            artifacts/madaresegypt_all.jsonl
+            artifacts/madaresegypt_report.json
+          if-no-files-found: error
+          retention-days: 30
