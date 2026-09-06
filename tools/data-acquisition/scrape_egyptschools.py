@@ -7,7 +7,7 @@ import json
 import re
 import time
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
+from urllib.parse import unquote, urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -62,13 +62,53 @@ def strip_ugc(soup: BeautifulSoup) -> None:
             node.decompose()
 
 
-def parse_profile(url: str, listing_text: str, html: str) -> dict:
-    soup = BeautifulSoup(html, "html.parser")
-    strip_ugc(soup)
+def infer_name(soup: BeautifulSoup, listing_text: str, meta_description: str | None, url: str) -> str | None:
     h1 = soup.find("h1")
     title = clean_text(h1.get_text(" ", strip=True) if h1 else None)
+    if title:
+        return title
+
+    og = soup.find("meta", attrs={"property": "og:title"})
+    title = clean_text(og.get("content") if og else None)
+    if title:
+        title = re.sub(r"\s*[|\-–—]\s*دليل المدارس المصرية.*$", "", title).strip()
+        if title:
+            return title
+
+    # EgyptSchools profile descriptions consistently introduce the institution
+    # after the phrase "جهات اعتماد". Preserve that published name rather than
+    # deriving a canonical name ourselves.
+    if meta_description:
+        m = re.search(r"جهات\s+اعتماد\s+(.+)$", meta_description)
+        if m:
+            return clean_text(m.group(1))
+
+    # Listing-card text contains the published name followed by curriculum/stage
+    # labels. Use only as a fallback; the full listing text remains in payload.
+    if listing_text:
+        stop_tokens = (
+            "الدبلومة الأمريكية", "الشهادة البريطانية", "ثانوية عامة مصرية",
+            "الإعدادية", "الإبتدائية", "الابتدائية", "الحضانة", "كي جي",
+        )
+        cut = len(listing_text)
+        for token in stop_tokens:
+            idx = listing_text.find(token)
+            if idx > 0:
+                cut = min(cut, idx)
+        candidate = clean_text(listing_text[:cut])
+        if candidate:
+            return candidate
+
+    slug = unquote([x for x in urlparse(url).path.split("/") if x][-1]).replace("-", " ")
+    return clean_text(slug)
+
+
+def parse_profile(url: str, listing_text: str, html: str) -> dict:
+    soup = BeautifulSoup(html, "html.parser")
     meta = soup.find("meta", attrs={"name": "description"})
     meta_description = clean_text(meta.get("content") if meta else None)
+    title = infer_name(soup, listing_text, meta_description, url)
+    strip_ugc(soup)
 
     sections: dict[str, list[str]] = {}
     for heading in soup.find_all(re.compile(r"^h[2-6]$")):
@@ -116,14 +156,6 @@ def parse_profile(url: str, listing_text: str, html: str) -> dict:
                 contacts["websites"].append(href)
     contacts = {k: list(dict.fromkeys(v))[:20] for k, v in contacts.items()}
 
-    jsonld = []
-    for tag in soup.find_all("script", attrs={"type": "application/ld+json"}):
-        raw = tag.string or tag.get_text()
-        try:
-            jsonld.append(json.loads(raw))
-        except Exception:
-            continue
-
     slug = [x for x in urlparse(url).path.split("/") if x][-1]
     return {
         "source_record_id": slug,
@@ -139,7 +171,6 @@ def parse_profile(url: str, listing_text: str, html: str) -> dict:
             "sections": sections,
             "tables": tables,
             "contacts": contacts,
-            "jsonld": jsonld,
         },
     }
 
