@@ -1,0 +1,70 @@
+name: NCEEE public school selector diagnostic
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/nceee-school-directory-diagnostic.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Inspect public NCEEE selector pages
+        run: |
+          python - <<'PY'
+          import json,re,requests
+          from bs4 import BeautifulSoup
+          from urllib.parse import urljoin
+
+          s=requests.Session()
+          s.headers['User-Agent']='EduHubResearchBot/0.7 (+https://github.com/admonkstudio/edu-hub; public-source-diagnostic)'
+          urls=[
+            'https://www.nceee.edu.eg/problems/get_schools.php',
+            'https://nceee.edu.eg/problems/get_schools.php',
+            'https://www.nceee.edu.eg/fail_students2025_new2025/report_issue.php',
+            'https://www.nceee.edu.eg/kg_evl2025_1/new_kg/general.php',
+          ]
+          for u in urls:
+            print('\n===',u,'===',flush=True)
+            try:
+              r=s.get(u,timeout=40,allow_redirects=True)
+              print('STATUS',r.status_code,'FINAL',r.url,'LEN',len(r.text),'TYPE',r.headers.get('content-type'),flush=True)
+              r.raise_for_status()
+            except Exception as e:
+              print('ERROR',repr(e),flush=True); continue
+            soup=BeautifulSoup(r.text,'html.parser')
+            print('TITLE',soup.title.get_text(' ',strip=True) if soup.title else None)
+            forms=soup.find_all('form')
+            print('FORMS',len(forms))
+            for fi,f in enumerate(forms):
+              print('FORM',fi,{'method':f.get('method'),'action':f.get('action'),'id':f.get('id'),'name':f.get('name')})
+              for x in f.find_all(['input','select','button'],attrs={'name':True}):
+                info={'tag':x.name,'name':x.get('name'),'id':x.get('id'),'type':x.get('type'),'value':x.get('value')}
+                if x.name=='select':
+                  opts=[{'value':o.get('value'),'text':' '.join(o.get_text(' ',strip=True).split())} for o in x.find_all('option')]
+                  info['options_count']=len(opts); info['options_sample']=opts[:15]
+                print('FIELD',json.dumps(info,ensure_ascii=False))
+            refs=set()
+            for tag in soup.find_all(['script','a','form'],src=True): refs.add(urljoin(r.url,tag.get('src')))
+            for tag in soup.find_all(['a','form'],href=True): refs.add(urljoin(r.url,tag.get('href')))
+            for script in soup.find_all('script'):
+              txt=script.string or script.get_text() or ''
+              for m in re.findall(r"['\"]([^'\"]+\.(?:php|aspx|ashx|json)(?:\?[^'\"]*)?)['\"]",txt,re.I):
+                refs.add(urljoin(r.url,m))
+              if any(k in txt.lower() for k in ('ajax','fetch(','xmlhttprequest','school','مدرس','govern','admin')):
+                compact=' '.join(txt.split())
+                print('SCRIPT',compact[:8000])
+            print('ENDPOINT_REFS')
+            for ref in sorted(refs):
+              if any(k in ref.lower() for k in ('school','govern','admin','problem','issue','kg','ajax','get_')):
+                print(ref)
+          PY
