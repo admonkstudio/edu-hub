@@ -168,6 +168,7 @@ def rebuild_field_inventory(db: sqlite3.Connection) -> None:
 
 
 def export_reports(db: sqlite3.Connection, outdir: Path) -> None:
+    outdir.mkdir(parents=True, exist_ok=True)
     source_counts = list(
         db.execute(
             """SELECT s.source_id,s.name,s.authority,COUNT(r.raw_id),
