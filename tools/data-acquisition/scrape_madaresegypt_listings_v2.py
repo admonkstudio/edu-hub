@@ -150,7 +150,7 @@ def write_checkpoint(out: Path, report_path: Path, records: dict[str, dict], rep
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--category", required=True, choices=("school", "nursery"))
-    ap.add_argument("--start-page", required=True, type=int)
+    ap.add_argument("--start-page", type=int)
     ap.add_argument("--end-page", type=int)
     ap.add_argument("--pages", help="Comma-separated exact page numbers; overrides start/end range")
     ap.add_argument("--output", required=True)
