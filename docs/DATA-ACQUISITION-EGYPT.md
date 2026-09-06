@@ -48,7 +48,7 @@ Entity-family raw totals:
 - higher education: 1,111
 - early education: 64
 
-These figures are raw-source totals only and must not be interpreted as unique institution counts.
+These figures are raw-source totals only and must not be interpreted as unique institution counts. AlexSchools and the broad MadaresEgypt acquisition are intentionally not added to the V4 headline until the next assembled snapshot is produced.
 
 ## Source classes
 
@@ -146,6 +146,25 @@ Preferred next acquisition paths, in order:
 3. request a current CSV/XLSX database export directly from MOE/EMIS;
 4. retain secondary directories and historical data only as discovery evidence until an official current extract is obtained.
 
+##### MOE specialized-school sources
+
+Additional current official discovery was performed for specialized school families while the main EMIS directory remains blocked.
+
+- The current Egyptian Japanese Schools service is referenced by MOE and public search indexing exposes a detailed school/address table, but `ejs4students.moe.gov.eg/programs/` returns **403** to the hosted acquisition runner. No rows have therefore been promoted into the reproducible raw snapshot from that source yet.
+- The current 2025/26 MOE STEM admission PDF exposes the operating STEM-school locations in official indexed content, but the PDF also returns **403** to the hosted acquisition runner. It remains an official source candidate, not an acquired row set.
+- The Nile Egyptian Schools site is reachable from the runner and exposes branch cards, but the live page still labels itself **Admission 2021-2022**. It is therefore a historical/stale official discovery source unless a fresher official branch list is found.
+- The MOE official international-public-schools article is discoverable, but the direct page returns **403** to the hosted runner and the available article is older. It is retained as a source lead rather than treated as a current registry.
+
+These diagnostics are useful for field/source inventory but do not change the 62,690-school acquisition status.
+
+#### CAPMAS — annual pre-university education bulletin
+
+CAPMAS publishes the official annual pre-university education bulletin as an administrative-statistics product. The 2023/24 study metadata states that the data are supplied by the Ministry of Education and Al-Azhar, cover all governorates, and use **shiyakha/village** as the geographic unit. The public release is aggregate statistical data rather than an institution-level registry.
+
+The 2023/24 release reports **73.2 thousand schools and Al-Azhar institutes combined**. This total must not be compared directly with the MOE-only 62,690-school 2025/26 target because the year and universe differ.
+
+Treatment: **primary aggregate validation/evidence source**, useful for coverage, geographic/taxonomy design and historical trend checks; not a substitute for row-level school identity acquisition.
+
 #### Ministry of Social Solidarity — nursery census
 
 Official current universe: **48,225 nurseries** from the national comprehensive nursery census.
@@ -199,6 +218,30 @@ Purpose: school discovery and field census, especially Cairo/Giza coverage.
 
 Treatment: secondary directory snapshot only. Reviews/comments/media are excluded.
 
+#### AlexSchools.info
+
+Current accepted acquisition: **125 Alexandria school profiles** across the complete 13-page public archive.
+
+Final QA run on 2026-09-06:
+
+- 125 discovered / 125 written / 0 errors
+- 125 names
+- 124 source addresses
+- 124 map-coordinate pairs
+- 117 starting-fee values
+- 121 phone-bearing profiles
+- 81 institution-contact email-bearing profiles
+- 124 public map links
+- 74 source-labelled website candidates
+- 121 raw `About` metadata blocks
+- 125 profiles with source-heading field evidence
+
+The extractor preserves exact source-heading evidence for fields such as type, languages, second language, certificates, stages, accreditations, gender, fees, facilities/additional information and contact information. These are deliberately stored as **raw source values**, not normalized Edu Hub taxonomy terms.
+
+Generic external links are kept separately from `website_candidates`; a generic link is not automatically called an official institution website. Visible email extraction is restricted to the source-labelled contact section so page-author/share emails cannot leak into institution contacts.
+
+Treatment: secondary directory snapshot only. Reviews/comments/share controls/media bodies are excluded.
+
 #### MadaresEgypt
 
 Purpose: broad school and nursery discovery.
@@ -212,9 +255,11 @@ The source's live paginator currently exposes:
 - schools through page **1,388**
 - nurseries through page **584**
 
-The source is slow and intermittently times out. The crawler is therefore sharded into bounded school/nursery page ranges, retries transient failures and performs a repair pass before a shard is accepted. The broad MadaresEgypt run is **not included in the V4 pre-Madares totals above until its merged report passes**.
+The source is slow and intermittently times out. A first broad run proved that long shards can recover from temporary outages but can still exceed hosted-runner limits. The acquisition was therefore replaced with a v2 bounded 50-page sharding strategy, shallow transport retries, explicit failed-page reporting and a repair pass.
 
-At the latest checkpoint, the first eight school shards had completed successfully. For example, school pages 1–100 produced **1,003 named unique source IDs**, and a transient page-56 timeout was recovered by the repair pass with zero unresolved pages.
+The current v2 run is active. The first two 50-page school shards began during a prolonged source outage, correctly produced `ok:false` reports and are **not accepted** merely because the GitHub job itself uploaded an artifact. Their reports show early-stop/incomplete coverage and will require targeted re-acquisition after the main run. Later shards continue independently because the matrix uses `fail-fast: false`.
+
+Acceptance rule: the broad MadaresEgypt dataset is **not included in V4 or a future V5 snapshot until the merge report shows full expected-shard coverage with no bad shards and no unresolved failed pages**. If only a bounded set of pages/shards remains bad, repair only those gaps rather than restarting the entire source.
 
 No review/comment/media corpus is collected.
 
@@ -237,11 +282,13 @@ Current headline targets include:
 - technical higher education: 8 technological colleges + 44 institutes acquired from MOHESR
 - higher education generally: measure per official category/registry because categories can overlap
 
+CAPMAS annual totals remain independent aggregate cross-checks and must be compared only after aligning year and universe.
+
 ## Acquisition workflow
 
 ### Base sources
 
-The base acquisition gathers:
+The assembled acquisition currently gathers or has accepted adapters for:
 
 1. SCU higher-education lists
 2. MasrSchools discovery snapshot
@@ -249,16 +296,18 @@ The base acquisition gathers:
 4. Al-Azhar official directory snapshot
 5. current Egypt OpenStreetMap extract
 6. historical EMIS discovery snapshot where available
-
-Additional official higher-education acquisition now includes:
-
 7. MOHESR private higher-institute sector list
 8. MOHESR technological colleges / technical institutes
+9. AlexSchools Alexandria public directory snapshot
 
-Current official-access diagnostics also cover:
+Current official-access diagnostics additionally cover:
 
-9. EMIS homepage/current school-directory route discovery
-10. MOSS national nursery census/public-platform endpoint discovery
+10. EMIS homepage/current school-directory route discovery
+11. MOSS national nursery census/public-platform endpoint discovery
+12. CAPMAS pre-university aggregate statistical releases
+13. MOE Japanese/STEM/Nile/international-public specialized-school sources
+
+MadaresEgypt remains a separate sharded acquisition until its final completeness report passes.
 
 ### Sharding
 
@@ -266,8 +315,8 @@ Long public directories are acquired in bounded shards to improve observability 
 
 Current sharded acquisition:
 
-- MadaresEgypt schools by page ranges
-- MadaresEgypt nurseries by page ranges
+- MadaresEgypt schools by 50-page ranges
+- MadaresEgypt nurseries by 50-page ranges
 - Al-Azhar by governorate-index ranges
 
 Shard output is merged by **source record ID only**. This is source-level deduplication, not institution-level canonical deduplication.
@@ -288,6 +337,8 @@ Shard output is merged by **source record ID only**. This is source-level dedupl
 12. A secondary republication used to recover a missing official section remains a separate secondary source record.
 13. A public aggregate count is a coverage target, not proof that its row-level records were acquired.
 14. Authenticated government service systems are not scraped to obtain private/non-public records.
+15. A GitHub Actions job completing successfully is not source-completeness proof; the source-specific QA/merge report must pass.
+16. Source-labelled website candidates and generic external links remain separate until canonical review establishes the institution's official website.
 
 ## Exit criteria for this workstream
 
