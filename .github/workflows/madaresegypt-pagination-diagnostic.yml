@@ -1,0 +1,52 @@
+name: MadaresEgypt pagination diagnostic
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/madaresegypt-pagination-diagnostic.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Inspect pager links
+        run: |
+          python - <<'PY'
+          import re, requests
+          from bs4 import BeautifulSoup
+          from urllib.parse import quote, urljoin, urlparse, parse_qs
+
+          s=requests.Session(); s.headers['User-Agent']='EduHubResearchBot/0.5 (+https://github.com/admonkstudio/edu-hub; public-source-diagnostic)'
+          for label in ('مدارس','حضانات'):
+              u='https://madaresegypt.com/ar/Results/'+quote(label)
+              r=s.get(u,timeout=60); r.raise_for_status()
+              soup=BeautifulSoup(r.text,'html.parser')
+              pages=[]; pager=[]
+              for a in soup.find_all('a',href=True):
+                  href=urljoin(u,a.get('href',''))
+                  txt=' '.join(a.get_text(' ',strip=True).split())
+                  qs=parse_qs(urlparse(href).query)
+                  nums=[]
+                  for key,vals in qs.items():
+                      if 'page' in key.lower():
+                          for v in vals:
+                              if str(v).isdigit(): nums.append(int(v))
+                  for m in re.findall(r'(?:page|p)[=/](\d+)',href,re.I): nums.append(int(m))
+                  if nums:
+                      pages.extend(nums); pager.append((href,txt,nums))
+              print('\nCATEGORY',label,'STATUS',r.status_code,'LEN',len(r.text))
+              print('PAGE_VALUES',sorted(set(pages))[:100],'MAX',max(pages) if pages else None)
+              print('PAGER_SAMPLE',pager[:50])
+              text=' '.join(soup.get_text(' ',strip=True).split())
+              for pat in (r'(?:صفحة|Page)\s*(\d+)\s*(?:من|of)\s*(\d+)',r'(\d[\d,]*)\s*(?:مدرسة|مدارس|حضانة|حضانات)'):
+                  print('TEXT_MATCHES',pat,re.findall(pat,text,re.I)[:30])
+          PY
