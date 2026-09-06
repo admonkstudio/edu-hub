@@ -25,6 +25,7 @@ jobs:
       - name: Acquire public school profiles
         run: |
           mkdir -p artifacts
+          # Archive currently ends cleanly after page 13; max-pages is only a safety ceiling.
           python tools/data-acquisition/scrape_alexschools.py --output artifacts/alexschools.jsonl --max-pages 20 --delay 0.35
           wc -l artifacts/alexschools.jsonl
           cat artifacts/alexschools.report.json
