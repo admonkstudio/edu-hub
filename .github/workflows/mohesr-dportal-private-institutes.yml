@@ -1,0 +1,126 @@
+name: MOHESR dportal private institute registry
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/mohesr-dportal-private-institutes.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Acquire and parse official dportal registry
+        run: |
+          mkdir -p artifacts
+          python - <<'PY'
+          import hashlib,json,re,requests
+          from bs4 import BeautifulSoup
+          from pathlib import Path
+
+          URL='https://dportal.mohesr.gov.eg/index.php?id=193&option=com_sppagebuilder&view=page'
+          s=requests.Session(); s.headers['User-Agent']='EduHubResearchBot/1.1 (+https://github.com/admonkstudio/edu-hub; public-source-acquisition)'
+          r=s.get(URL,timeout=60,allow_redirects=True); r.raise_for_status()
+          soup=BeautifulSoup(r.text,'html.parser')
+          lines=[' '.join(x.split()) for x in soup.stripped_strings]
+          lines=[x for x in lines if x]
+          Path('artifacts/mohesr_dportal_private_page.txt').write_text('\n'.join(lines),encoding='utf-8')
+
+          sections=[
+            ('engineering',55,('اولا: المعاهد الخاصة العالية الهندسية','اولا : المعاهد الخاصة العالية الهندسية')),
+            ('commercial',71,('ثانيا :المعاهد الخاصة العالية (الشعبة التجارية)','ثانيا: المعاهد الخاصة العالية (الشعبة التجارية)','ثانيا : المعاهد الخاصة العالية (الشعبة التجارية)')),
+            ('computer_science',16,('ثالثا:المعاهد الخاصة العالية "شعبة علوم الحاسب ونظم المعلومات"','ثالثا: المعاهد الخاصة العالية "شعبة علوم الحاسب ونظم المعلومات"')),
+            ('languages_media',19,('رابعا: المعاهد الخاصة العالية للغات والإعلام','رابعا : المعاهد الخاصة العالية للغات والإعلام')),
+            ('tourism_hotels',19,('خامسا: المعاهد الخاصة العالية للسياحة والفنادق','خامسا : المعاهد الخاصة العالية للسياحة والفنادق','المعاهد الخاصة العالية للسياحة والفنادق')),
+            ('social_work',16,('سادسا: المعاهد الخاصة العالية للخدمة الاجتماعية','سادسا : المعاهد الخاصة العالية للخدمة الاجتماعية','المعاهد الخاصة العالية للخدمة الاجتماعية')),
+            ('health_nursing',10,('سابعا: المعاهد الخاصة العالية التكنولوجية للعلوم الصحية التطبيقية','سابعا : المعاهد الخاصة العالية التكنولوجية للعلوم الصحية التطبيقية','المعاهد الخاصة العالية التكنولوجية للعلوم الصحية التطبيقية')),
+            ('agriculture',2,('ثامنا: المعاهد الخاصة العالية الزراعية','ثامنا : المعاهد الخاصة العالية الزراعية','المعاهد الخاصة العالية الزراعية')),
+          ]
+
+          # Some published versions use 7 section ordinals and omit tourism in the
+          # HTML while still claiming 208. Detect sections by distinctive heading
+          # phrase, never by text appearing inside an institution name.
+          found_headings=[]
+          for i,line in enumerate(lines):
+              for key,expected,variants in sections:
+                  if any(line.strip()==v for v in variants) or any(v in line and len(line)<180 for v in variants):
+                      found_headings.append((i,key,expected,line))
+          # De-duplicate repeated theme/mobile copies by first occurrence of each key.
+          first={}
+          for item in found_headings:
+              first.setdefault(item[1],item)
+          ordered=sorted(first.values())
+
+          numeral=re.compile(r'^\s*([0-9٠-٩]+)\s*[\.\-–:)،]?\s*(.+)$')
+          trans=str.maketrans('٠١٢٣٤٥٦٧٨٩','0123456789')
+          raw_rows=[]
+          section_report={}
+          for pos,(idx,key,expected,heading) in enumerate(ordered):
+              stop=ordered[pos+1][0] if pos+1<len(ordered) else min(len(lines),idx+260)
+              rows=[]
+              for line in lines[idx+1:stop]:
+                  m=numeral.match(line.translate(trans))
+                  if not m:
+                      continue
+                  name=re.sub(r'\s+',' ',m.group(2)).strip(' .،-–')
+                  if len(name)<4 or any(x in name for x in ('جميع الحقوق','العاصمة الادارية','العاصمة الإدارية','تواصل معنا')):
+                      continue
+                  ordinal=int(m.group(1))
+                  # Each sector restarts its numbering at 1. Ignore unrelated footer/date numbers.
+                  if ordinal<1 or ordinal>expected+5:
+                      continue
+                  rows.append({'category_raw':key,'ordinal_raw':ordinal,'name_raw':name,'heading_raw':heading})
+              # Keep one record per ordinal within source sector; the source itself
+              # may contain duplicate DOM copies.
+              by_ord={}
+              for row in rows:
+                  by_ord.setdefault(row['ordinal_raw'],row)
+              clean=[by_ord[k] for k in sorted(by_ord)]
+              section_report[key]={'expected':expected,'acquired':len(clean),'heading':heading}
+              raw_rows.extend(clean)
+
+          out=Path('artifacts/mohesr_dportal_private_institutes.jsonl')
+          with out.open('w',encoding='utf-8') as f:
+              for row in raw_rows:
+                  source_key=f"{row['category_raw']}|{row['ordinal_raw']}|{row['name_raw']}"
+                  payload={
+                    'source_record_id':'mohesr-private-'+hashlib.sha256(source_key.encode()).hexdigest()[:18],
+                    'source_url':r.url,
+                    'name_raw':row['name_raw'],
+                    'entity_type_raw':'private_higher_institute',
+                    'location_raw':None,
+                    'payload':row,
+                  }
+                  f.write(json.dumps(payload,ensure_ascii=False)+'\n')
+
+          expected_total=sum(x[1] for x in sections)
+          acquired_total=len(raw_rows)
+          report={
+            'ok':acquired_total==expected_total,
+            'source_url':r.url,
+            'expected_total_sector_occurrences':expected_total,
+            'acquired_total_sector_occurrences':acquired_total,
+            'sections':section_report,
+            'detected_headings':[{'line':x[0]+1,'key':x[1],'text':x[3]} for x in ordered],
+          }
+          Path('artifacts/mohesr_dportal_private_report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(report,ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mohesr-dportal-private-institutes-v3
+          path: |
+            artifacts/mohesr_dportal_private_institutes.jsonl
+            artifacts/mohesr_dportal_private_report.json
+            artifacts/mohesr_dportal_private_page.txt
+          if-no-files-found: error
+          retention-days: 30
