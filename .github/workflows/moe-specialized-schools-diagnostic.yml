@@ -1,0 +1,83 @@
+name: MOE specialized schools diagnostic
+
+on:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/moe-specialized-schools-diagnostic.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 pypdf
+      - name: Inspect current public MOE specialized-school sources
+        run: |
+          python - <<'PY'
+          import io, json, re, requests
+          from bs4 import BeautifulSoup
+          from pypdf import PdfReader
+          from urllib.parse import urljoin
+
+          s=requests.Session()
+          s.headers.update({'User-Agent':'EduHubResearchBot/1.8 (+https://github.com/admonkstudio/edu-hub; public-source-diagnostic)','Accept-Language':'ar,en;q=0.8'})
+
+          html_sources={
+              'ejs':'https://ejs4students.moe.gov.eg/programs/',
+              'nile':'https://nes.moe.gov.eg/Home/',
+              'ips':'https://moe.gov.eg/ar/what-s-on/news/international-public/',
+          }
+          for key,u in html_sources.items():
+              print('\n===',key,u,'===',flush=True)
+              try:
+                  r=s.get(u,timeout=45,allow_redirects=True)
+                  print('STATUS',r.status_code,'FINAL',r.url,'LEN',len(r.text),'TYPE',r.headers.get('content-type'),flush=True)
+                  if r.status_code>=400: continue
+              except Exception as e:
+                  print('ERROR',repr(e),flush=True); continue
+              soup=BeautifulSoup(r.text,'html.parser')
+              print('TITLE',soup.title.get_text(' ',strip=True) if soup.title else None,flush=True)
+              tables=soup.find_all('table')
+              print('TABLE_COUNT',len(tables),flush=True)
+              for ti,t in enumerate(tables[:5],1):
+                  rows=[]
+                  for tr in t.find_all('tr'):
+                      vals=[' '.join(x.get_text(' ',strip=True).split()) for x in tr.find_all(['th','td'])]
+                      if vals: rows.append(vals)
+                  print('TABLE',ti,'ROWS',len(rows),json.dumps(rows[:120],ensure_ascii=False),flush=True)
+              headings=[]
+              for h in soup.find_all(re.compile('^h[1-6]$')):
+                  txt=' '.join(h.get_text(' ',strip=True).split())
+                  if txt: headings.append(txt)
+              print('HEADINGS',json.dumps(headings[:150],ensure_ascii=False),flush=True)
+              lis=[]
+              for li in soup.find_all('li'):
+                  txt=' '.join(li.get_text(' ',strip=True).split())
+                  if txt and any(k in txt for k in ('مدرس','STEM','الدولية','النيل')): lis.append(txt)
+              print('LIST_ITEMS',json.dumps(lis[:250],ensure_ascii=False),flush=True)
+              for a in soup.find_all('a',href=True):
+                  txt=' '.join(a.get_text(' ',strip=True).split())
+                  href=urljoin(r.url,a['href'])
+                  if any(k in (txt+' '+href).lower() for k in ('school','مدرس','branch','فرع')):
+                      print('LINK',json.dumps({'text':txt[:160],'href':href},ensure_ascii=False),flush=True)
+
+          pdf='https://moe.gov.eg/media/1b0peard/stem2025.pdf'
+          print('\n=== STEM PDF',pdf,'===',flush=True)
+          try:
+              r=s.get(pdf,timeout=60,allow_redirects=True)
+              print('STATUS',r.status_code,'LEN',len(r.content),'TYPE',r.headers.get('content-type'),flush=True)
+              r.raise_for_status()
+              reader=PdfReader(io.BytesIO(r.content))
+              print('PAGES',len(reader.pages),flush=True)
+              text='\n'.join((p.extract_text() or '') for p in reader.pages)
+              print('TEXT',text[:30000],flush=True)
+          except Exception as e:
+              print('PDF_ERROR',repr(e),flush=True)
+          PY
