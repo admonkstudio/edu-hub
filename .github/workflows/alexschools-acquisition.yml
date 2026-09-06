@@ -6,6 +6,7 @@ on:
       - data-acquisition-egypt-v3
     paths:
       - ".github/workflows/alexschools-acquisition.yml"
+      - "tools/data-acquisition/scrape_alexschools.py"
   workflow_dispatch:
 
 permissions:
