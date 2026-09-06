@@ -24,13 +24,13 @@ from urllib3.util.retry import Retry
 
 SEARCH_URL = "https://azhar.gov.eg/IDSC/InstGuide/Guide_Search.aspx"
 RESULT_URL = "https://azhar.gov.eg/IDSC/InstGuide/Guide_Resault.aspx?id={}"
-USER_AGENT = "EduHubResearchBot/0.3 (+https://github.com/admonkstudio/edu-hub; public-source-acquisition)"
+USER_AGENT = "EduHubResearchBot/0.5 (+https://github.com/admonkstudio/edu-hub; public-source-acquisition)"
 GRID_EVENT_TARGET = "ctl00$MainContent$gv"
 
 
 def session() -> requests.Session:
     s = requests.Session()
-    retry = Retry(total=4, backoff_factor=1.0, status_forcelist=(429, 500, 502, 503, 504), allowed_methods=("GET", "POST"))
+    retry = Retry(total=4, backoff_factor=0.8, status_forcelist=(429, 500, 502, 503, 504), allowed_methods=("GET", "POST"), respect_retry_after_header=True)
     s.mount("https://", HTTPAdapter(max_retries=retry))
     s.headers.update({"User-Agent": USER_AGENT, "Accept-Language": "ar,en;q=0.8"})
     return s
@@ -43,7 +43,7 @@ def text(v: str | None) -> str | None:
     return v or None
 
 
-def form_payload(form: BeautifulSoup) -> dict[str, str]:
+def form_payload(form) -> dict[str, str]:
     data: dict[str, str] = {}
     for inp in form.find_all("input", attrs={"name": True}):
         typ = (inp.get("type") or "text").lower()
@@ -59,11 +59,10 @@ def form_payload(form: BeautifulSoup) -> dict[str, str]:
 
 
 def options(sel) -> list[tuple[str, str]]:
-    out = []
+    out: list[tuple[str, str]] = []
     for opt in sel.find_all("option"):
         val = (opt.get("value") or "").strip()
         label = text(opt.get_text(" ", strip=True)) or ""
-        # This WebForms app uses 0 for every placeholder option.
         if val in {"", "0", "-1"} or not label:
             continue
         out.append((val, label))
@@ -104,9 +103,6 @@ def submit_search(s: requests.Session, html: str, values: dict[int, str]) -> str
     for idx, val in values.items():
         if idx < len(selects):
             data[selects[idx].get("name")] = val
-    # Confirmed from the live form: MainContent_btnSearch is a normal submit
-    # button. The app's validation group requires gov/admin/type/stage; gender
-    # and institute name may stay at their placeholder/blank values.
     data["ctl00$MainContent$btnSearch"] = "بحث"
     data["__EVENTTARGET"] = ""
     data["__EVENTARGUMENT"] = ""
@@ -141,14 +137,12 @@ def paginate_result_ids(s: requests.Session, first_html: str, delay: float) -> s
 
 
 def input_label_map(soup: BeautifulSoup) -> dict[str, str]:
-    """Map nearby visible labels to input values without guessing canonical fields."""
     out: dict[str, str] = {}
     for inp in soup.find_all("input"):
         value = text(inp.get("value"))
         if not value:
             continue
         label = None
-        # Prefer a preceding sibling/parent label or the first cell in the row.
         parent_tr = inp.find_parent("tr")
         if parent_tr:
             cells = parent_tr.find_all(["th", "td"])
@@ -169,16 +163,35 @@ def input_label_map(soup: BeautifulSoup) -> dict[str, str]:
     return out
 
 
+def value_by_control_suffix(inputs: dict[str, str], suffix: str) -> str | None:
+    for key, value in inputs.items():
+        if key.split("$")[-1].lower() == suffix.lower():
+            return text(value)
+    return None
+
+
 def parse_profile(source_id: str, html: str) -> dict:
     soup = BeautifulSoup(html, "html.parser")
-    fields = input_label_map(soup)
+    labelled_fields = input_label_map(soup)
 
-    inputs = {}
+    inputs: dict[str, str] = {}
     for inp in soup.find_all("input", attrs={"name": True}):
         val = text(inp.get("value"))
         typ = (inp.get("type") or "text").lower()
         if val and typ not in {"hidden", "submit", "button", "image"}:
             inputs[inp.get("name")] = val
+
+    verified_live_controls = {
+        "name": value_by_control_suffix(inputs, "txtName"),
+        "famous_name": value_by_control_suffix(inputs, "txtFamousName"),
+        "educational_administration": value_by_control_suffix(inputs, "ddlcenter"),
+        "stage": value_by_control_suffix(inputs, "TxtSTG"),
+        "education_type": value_by_control_suffix(inputs, "TxtTyp"),
+        "student_gender": value_by_control_suffix(inputs, "TxtSex"),
+        "address": value_by_control_suffix(inputs, "TxtAdd"),
+        "telephone": value_by_control_suffix(inputs, "TxtTel"),
+    }
+    verified_live_controls = {k: v for k, v in verified_live_controls.items() if v}
 
     tables: list[list[list[str]]] = []
     for table in soup.find_all("table"):
@@ -190,28 +203,23 @@ def parse_profile(source_id: str, html: str) -> dict:
         if rows:
             tables.append(rows[:300])
 
-    name = None
-    for key, val in fields.items():
-        if "اسم المعهد" in key:
-            name = val
-            break
+    name = verified_live_controls.get("name")
     if not name:
-        # Known live control naming still remains raw evidence, not a canonical
-        # field mapping. Try institution-name-like controls before other inputs.
-        for k, val in inputs.items():
-            kl = k.lower()
-            if "instname" in kl or ("inst" in kl and "name" in kl):
+        for key, val in labelled_fields.items():
+            if "اسم المعهد" in key:
                 name = val
                 break
-    if not name:
-        # Public result pages expose the institution name in the document text;
-        # retain null if we cannot reliably bind it to an input.
-        name = None
 
     location_parts = []
-    for key, val in fields.items():
-        if any(x in key for x in ("العنوان", "الادارة التعليمية", "الإدارة التعليمية")):
-            if val not in location_parts:
+    for value in (
+        verified_live_controls.get("educational_administration"),
+        verified_live_controls.get("address"),
+    ):
+        if value and value not in location_parts:
+            location_parts.append(value)
+    if not location_parts:
+        for key, val in labelled_fields.items():
+            if any(x in key for x in ("العنوان", "الادارة التعليمية", "الإدارة التعليمية")) and val not in location_parts:
                 location_parts.append(val)
 
     map_urls = []
@@ -227,7 +235,8 @@ def parse_profile(source_id: str, html: str) -> dict:
         "entity_type_raw": "azhar_institute",
         "location_raw": " | ".join(location_parts) or None,
         "payload": {
-            "fields": fields,
+            "verified_live_controls": verified_live_controls,
+            "fields": labelled_fields,
             "inputs": inputs,
             "tables": tables,
             "map_urls": list(dict.fromkeys(map_urls))[:10],
@@ -239,7 +248,9 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--output", default="artifacts/azhar_snapshot.jsonl")
     ap.add_argument("--delay", type=float, default=0.25)
-    ap.add_argument("--max-governorates", type=int, default=0)
+    ap.add_argument("--start-governorate-index", type=int, default=1)
+    ap.add_argument("--end-governorate-index", type=int, default=0)
+    ap.add_argument("--max-governorates", type=int, default=0, help="Compatibility limit applied after range slicing")
     ap.add_argument("--max-admins-per-governorate", type=int, default=0)
     ap.add_argument("--max-profiles", type=int, default=0)
     args = ap.parse_args()
@@ -247,17 +258,31 @@ def main() -> None:
     s = session()
     first = s.get(SEARCH_URL, timeout=90)
     first.raise_for_status()
-    _, form, selects = form_selects(first.text)
+    _, _, selects = form_selects(first.text)
     if len(selects) < 5:
         raise RuntimeError(f"Expected 5 Azhar search selects, found {len(selects)}")
-    govs = options(selects[0])
+
+    all_govs = options(selects[0])
+    start = max(1, args.start_governorate_index)
+    end = args.end_governorate_index if args.end_governorate_index > 0 else len(all_govs)
+    govs = all_govs[start - 1:end]
     if args.max_governorates > 0:
         govs = govs[: args.max_governorates]
-    print(json.dumps({"stage": "form_inventory", "select_count": len(selects), "governorates": len(govs), "select_names": [x.get("name") for x in selects]}, ensure_ascii=False))
+
+    print(json.dumps({
+        "stage": "form_inventory",
+        "select_count": len(selects),
+        "all_governorates": len(all_govs),
+        "start_governorate_index": start,
+        "end_governorate_index": end,
+        "selected_governorates": len(govs),
+        "select_names": [x.get("name") for x in selects],
+    }, ensure_ascii=False), flush=True)
 
     ids: set[str] = set()
     query_count = 0
-    for gi, (gov_value, gov_label) in enumerate(govs, start=1):
+    for local_index, (gov_value, gov_label) in enumerate(govs, start=1):
+        absolute_index = start + local_index - 1
         try:
             gov_html = postback(s, first.text, 0, gov_value)
             _, _, gov_selects = form_selects(gov_html)
@@ -276,8 +301,6 @@ def main() -> None:
 
                     for type_value, type_label in type_opts:
                         for stage_value, stage_label in stage_opts:
-                            # Gender remains 0 (unfiltered); the live validation
-                            # message confirms it is not required.
                             result_html = submit_search(
                                 s,
                                 admin_html,
@@ -295,7 +318,7 @@ def main() -> None:
                                     "education_stage": stage_label,
                                     "found": len(combo_ids),
                                     "total_ids": len(ids | gov_found | admin_found),
-                                }, ensure_ascii=False))
+                                }, ensure_ascii=False), flush=True)
                             if args.delay:
                                 time.sleep(args.delay)
 
@@ -307,9 +330,9 @@ def main() -> None:
                         "administration": admin_label,
                         "found": len(admin_found),
                         "governorate_total": len(gov_found),
-                    }, ensure_ascii=False))
+                    }, ensure_ascii=False), flush=True)
                 except Exception as exc:
-                    print(json.dumps({"stage": "administration_error", "governorate": gov_label, "administration": admin_label, "error": repr(exc)}, ensure_ascii=False))
+                    print(json.dumps({"stage": "administration_error", "governorate": gov_label, "administration": admin_label, "error": repr(exc)}, ensure_ascii=False), flush=True)
                 if args.delay:
                     time.sleep(args.delay)
 
@@ -317,16 +340,16 @@ def main() -> None:
             ids.update(gov_found)
             print(json.dumps({
                 "stage": "governorate",
-                "index": gi,
+                "index": absolute_index,
                 "governorate": gov_label,
                 "administrations": len(admins),
                 "found": len(gov_found),
                 "new": len(ids) - before,
                 "total": len(ids),
                 "search_queries": query_count,
-            }, ensure_ascii=False))
+            }, ensure_ascii=False), flush=True)
         except Exception as exc:
-            print(json.dumps({"stage": "governorate_error", "governorate": gov_label, "error": repr(exc)}, ensure_ascii=False))
+            print(json.dumps({"stage": "governorate_error", "governorate": gov_label, "error": repr(exc)}, ensure_ascii=False), flush=True)
         if args.delay:
             time.sleep(args.delay)
 
@@ -337,6 +360,7 @@ def main() -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
     written = 0
     named = 0
+    located = 0
     with out.open("w", encoding="utf-8") as f:
         for i, source_id in enumerate(ordered, start=1):
             try:
@@ -345,15 +369,25 @@ def main() -> None:
                 row = parse_profile(source_id, r.text)
                 f.write(json.dumps(row, ensure_ascii=False) + "\n")
                 written += 1
-                if row.get("name_raw"):
-                    named += 1
+                named += int(bool(row.get("name_raw")))
+                located += int(bool(row.get("location_raw")))
             except Exception as exc:
-                print(json.dumps({"stage": "profile_error", "id": source_id, "error": repr(exc)}, ensure_ascii=False))
+                print(json.dumps({"stage": "profile_error", "id": source_id, "error": repr(exc)}, ensure_ascii=False), flush=True)
             if i % 100 == 0:
-                print(json.dumps({"stage": "profiles", "processed": i, "written": written, "named": named, "total": len(ordered)}, ensure_ascii=False))
+                print(json.dumps({"stage": "profiles", "processed": i, "written": written, "named": named, "located": located, "total": len(ordered)}, ensure_ascii=False), flush=True)
             if args.delay:
                 time.sleep(args.delay)
-    print(json.dumps({"ok": True, "discovered": len(ids), "written": written, "named": named, "search_queries": query_count, "output": str(out)}, ensure_ascii=False))
+
+    print(json.dumps({
+        "ok": True,
+        "governorate_range": [start, end],
+        "discovered": len(ids),
+        "written": written,
+        "named": named,
+        "located": located,
+        "search_queries": query_count,
+        "output": str(out),
+    }, ensure_ascii=False), flush=True)
 
 
 if __name__ == "__main__":
