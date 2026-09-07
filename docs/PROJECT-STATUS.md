@@ -1,6 +1,6 @@
 # Edu Hub Project Status
 
-Last updated: 2026-08-18
+Last updated: 2026-09-07
 
 ## Current lifecycle
 
@@ -71,14 +71,18 @@ Milestone 1 begins only after Milestone 0 acceptance criteria pass.
 - Content-addressed media deduplication produced 453 independently stored binary files; all file hashes and the SQLite database checksum were verified.
 - Media publication remains disabled by default: rights status is unknown and public-use eligibility is false until reviewed.
 - Successful proof artifact: [edu-hub-owned-alexschools-proof](https://github.com/admonkstudio/edu-hub/actions/runs/34054413762/artifacts/9995593260).
+- MadaresEgypt profile viability pilot sampled 50 record IDs across the full 11,339-record range. With retries disabled and a five-second ceiling, all 50 requests timed out; zero factual profiles or fields were accepted.
+- MadaresEgypt is therefore classified as listing-level-only for the current acquisition phase. Its 11,339 owned listing records remain usable, but profile/media crawling will not be scaled unless a materially different endpoint or access path is validated.
+- Pilot evidence: [MadaresEgypt factual profile pilot run 34070572537](https://github.com/admonkstudio/edu-hub/actions/runs/34070572537), artifact `10000387395`, SHA-256 `1bd354284ae6a00fbcd10d14da62b7446dd514c837d4c1390b114df779cbe1ed`.
 
 ## Immediate next actions
 
-1. Implement GitHub Issue #1 — Milestone 0 foundation.
-2. Verify lint, typecheck, tests/configuration, production builds and rendered app shells.
-3. Record actual deployment/runtime decisions in `docs/PLATFORM.md` and `docs/PROJECT-DECISIONS.md`.
-4. Then implement Issue #2 — canonical data foundation.
-5. Build a representative 20–30 institution test cohort after the core schema exists.
+1. Move acquisition effort away from MadaresEgypt profile crawling and evaluate the next high-yield source, prioritizing official/primary sources and sources that permit durable owned snapshots.
+2. Implement GitHub Issue #1 — Milestone 0 foundation.
+3. Verify lint, typecheck, tests/configuration, production builds and rendered app shells.
+4. Record actual deployment/runtime decisions in `docs/PLATFORM.md` and `docs/PROJECT-DECISIONS.md`.
+5. Then implement Issue #2 — canonical data foundation.
+6. Build a representative 20–30 institution test cohort after the core schema exists.
 
 ## Blockers / unresolved decisions
 
