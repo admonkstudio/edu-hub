@@ -74,10 +74,15 @@ Milestone 1 begins only after Milestone 0 acceptance criteria pass.
 - MadaresEgypt profile viability pilot sampled 50 record IDs across the full 11,339-record range. With retries disabled and a five-second ceiling, all 50 requests timed out; zero factual profiles or fields were accepted.
 - MadaresEgypt is therefore classified as listing-level-only for the current acquisition phase. Its 11,339 owned listing records remain usable, but profile/media crawling will not be scaled unless a materially different endpoint or access path is validated.
 - Pilot evidence: [MadaresEgypt factual profile pilot run 34070572537](https://github.com/admonkstudio/edu-hub/actions/runs/34070572537), artifact `10000387395`, SHA-256 `1bd354284ae6a00fbcd10d14da62b7446dd514c837d4c1390b114df779cbe1ed`.
+- V7 consolidation is complete: 24,916 owned raw records across 13 sources, with an ownership row for every record.
+- V7 retains 2,101 AlexSchools media provenance references and 453 unique content-addressed binaries. All 453 file hashes pass; public-use eligibility remains false for every asset.
+- V7 has zero duplicate `(source_id, raw_hash)` groups, zero duplicate non-empty `(source_id, source_record_id)` groups, zero foreign-key errors, and SQLite `integrity_check=ok`.
+- The earlier local V6 tarball was found truncated during an independent archive read. V7 was rebuilt from the complete extracted V6 database/media tree plus V5, and its new 38 MB archive passes gzip, archive traversal, and 455 internal checksum checks.
+- V7 archive SHA-256: `fb4e6c332bdf1c0c9505ee78ad2d720d6d96d67241431a6a21ffc79ef8f6408a`.
 
 ## Immediate next actions
 
-1. Move acquisition effort away from MadaresEgypt profile crawling and evaluate the next high-yield source, prioritizing official/primary sources and sources that permit durable owned snapshots.
+1. Import the validated V7 raw corpus into the PostgreSQL/Supabase source-and-evidence layer while preserving the portable SQLite/archive backup as the independent restore source.
 2. Implement GitHub Issue #1 — Milestone 0 foundation.
 3. Verify lint, typecheck, tests/configuration, production builds and rendered app shells.
 4. Record actual deployment/runtime decisions in `docs/PLATFORM.md` and `docs/PROJECT-DECISIONS.md`.
