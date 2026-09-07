@@ -86,6 +86,18 @@ Record durable decisions here. Do not use this file for temporary task notes.
 
 **Decision:** The existing 11,339 MadaresEgypt listing records remain part of the owned raw corpus with their source provenance. This limitation affects enrichment yield, not ownership or render independence.
 
+## 2026-09-07 — V7 consolidated owned archive
+
+**Decision:** V7 is the current complete portable acquisition archive. It consolidates V5 and V6 into 24,916 raw records across 13 sources, with explicit local ownership metadata for every record.
+
+**Decision:** V7 preserves 2,101 media provenance references and 453 content-addressed media binaries. Publication remains disabled for all acquired media until rights review.
+
+**Decision:** A release archive is accepted only after database integrity, foreign-key checks, record uniqueness checks, media hash verification, gzip/archive traversal, and the complete internal checksum manifest pass.
+
+**Decision:** The damaged local V6 tarball is superseded and must not be used for restore. The complete extracted V6 database/media tree was the validated input to V7.
+
+**Decision:** PostgreSQL/Supabase may become the operational serving database, but the portable V7 SQLite database, media tree, manifests, and checksums remain an independent owned restore source.
+
 ## Pending decisions
 
 - final public brand name
