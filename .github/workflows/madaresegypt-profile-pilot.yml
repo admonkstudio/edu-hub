@@ -14,7 +14,7 @@ permissions:
 jobs:
   acquire-profile-evidence:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -41,7 +41,7 @@ jobs:
             --input artifacts/madares-profiles/input.jsonl \
             --output artifacts/madares-profiles/enriched-profiles.jsonl \
             --delay 0.75 \
-            --timeout 12
+            --timeout 5
           cat artifacts/madares-profiles/enriched-profiles.report.json
       - name: Calculate factual field coverage
         if: always()
