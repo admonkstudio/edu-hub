@@ -78,6 +78,14 @@ Record durable decisions here. Do not use this file for temporary task notes.
 
 **Decision:** Raw snapshot hashes must include source-record identity and the complete stored row, not payload content alone, so distinct records with identical payloads cannot be dropped by uniqueness constraints.
 
+## 2026-09-07 — MadaresEgypt profile acquisition boundary
+
+**Decision:** MadaresEgypt is treated as a listing-level source for the current acquisition phase. A deterministic 50-record sample spanning the complete owned ID range produced zero accepted profiles and 50 read timeouts under a five-second, no-retry diagnostic.
+
+**Decision:** Do not scale MadaresEgypt profile or media crawling from the current `/ar/Item/{id}` route. Reconsider only if a materially different, validated source endpoint or acquisition path becomes available.
+
+**Decision:** The existing 11,339 MadaresEgypt listing records remain part of the owned raw corpus with their source provenance. This limitation affects enrichment yield, not ownership or render independence.
+
 ## Pending decisions
 
 - final public brand name
