@@ -8,6 +8,8 @@ import json
 import time
 from pathlib import Path
 
+from requests.adapters import HTTPAdapter
+
 
 def load_adapter():
     path = Path(__file__).with_name("scrape_madaresegypt.py")
@@ -24,7 +26,7 @@ def main() -> None:
     ap.add_argument("--input", required=True)
     ap.add_argument("--output", required=True)
     ap.add_argument("--delay", type=float, default=0.75)
-    ap.add_argument("--timeout", type=float, default=15.0)
+    ap.add_argument("--timeout", type=float, default=5.0)
     args = ap.parse_args()
 
     adapter = load_adapter()
@@ -32,6 +34,8 @@ def main() -> None:
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     session = adapter.session()
+    session.mount("http://", HTTPAdapter(max_retries=0))
+    session.mount("https://", HTTPAdapter(max_retries=0))
     processed = written = 0
     errors = []
 
