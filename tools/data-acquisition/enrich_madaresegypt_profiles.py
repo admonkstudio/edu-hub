@@ -24,6 +24,7 @@ def main() -> None:
     ap.add_argument("--input", required=True)
     ap.add_argument("--output", required=True)
     ap.add_argument("--delay", type=float, default=0.75)
+    ap.add_argument("--timeout", type=float, default=15.0)
     args = ap.parse_args()
 
     adapter = load_adapter()
@@ -33,6 +34,19 @@ def main() -> None:
     session = adapter.session()
     processed = written = 0
     errors = []
+
+    def write_report() -> None:
+        report = {
+            "ok": processed > 0 and not errors,
+            "records_processed": processed,
+            "records_written": written,
+            "errors": errors,
+            "output": str(output),
+            "principle": "raw factual profile evidence; no canonical overwrite",
+        }
+        output.with_suffix(".report.json").write_text(
+            json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
 
     with source.open("r", encoding="utf-8") as src, output.open("w", encoding="utf-8") as dst:
         for line in src:
@@ -53,7 +67,7 @@ def main() -> None:
                 "listing_contexts": set(payload.get("listing_contexts") or []),
             }
             try:
-                response = session.get(url, timeout=60, allow_redirects=True)
+                response = session.get(url, timeout=args.timeout, allow_redirects=True)
                 response.raise_for_status()
                 if "/Home/ErrorNotFount" in response.url or "الصفحه المطلوبة غير موجودة" in response.text:
                     raise ValueError(f"soft unavailable profile: {response.url}")
@@ -62,21 +76,16 @@ def main() -> None:
                 if not enriched.get("name_raw") and not evidence.get("sections") and not evidence.get("contacts"):
                     raise ValueError(f"profile contains no usable factual evidence: {response.url}")
                 dst.write(json.dumps(enriched, ensure_ascii=False) + "\n")
+                dst.flush()
                 written += 1
             except Exception as exc:
                 errors.append({"source_record_id": sid, "source_url": url, "error": repr(exc)})
+            write_report()
             if args.delay:
                 time.sleep(args.delay)
 
-    report = {
-        "ok": not errors,
-        "records_processed": processed,
-        "records_written": written,
-        "errors": errors,
-        "output": str(output),
-        "principle": "raw factual profile evidence; no canonical overwrite",
-    }
-    output.with_suffix(".report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_report()
+    report = json.loads(output.with_suffix(".report.json").read_text(encoding="utf-8"))
     print(json.dumps(report, ensure_ascii=False))
 
 
