@@ -1,0 +1,80 @@
+name: MadaresEgypt factual profile pilot
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - ".github/workflows/madaresegypt-profile-pilot.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-profile-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Build stratified profile batch
+        run: |
+          mkdir -p artifacts/madares-profiles
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          ids = [x.strip() for x in Path("tools/data-acquisition/manifests/madaresegypt-media-pilot-001.txt").read_text().splitlines() if x.strip()]
+          out = Path("artifacts/madares-profiles/input.jsonl")
+          with out.open("w", encoding="utf-8") as f:
+              for sid in ids:
+                  f.write(json.dumps({"source_record_id": sid, "source_url": f"https://madaresegypt.com/ar/Item/{sid}"}) + "\n")
+          print(json.dumps({"records": len(ids), "output": str(out)}))
+          PY
+      - name: Acquire factual profile evidence
+        run: |
+          python tools/data-acquisition/enrich_madaresegypt_profiles.py \
+            --input artifacts/madares-profiles/input.jsonl \
+            --output artifacts/madares-profiles/enriched-profiles.jsonl \
+            --delay 0.75
+          cat artifacts/madares-profiles/enriched-profiles.report.json
+      - name: Calculate factual field coverage
+        if: always()
+        run: |
+          python - <<'PY'
+          import collections, json
+          from pathlib import Path
+          src = Path("artifacts/madares-profiles/enriched-profiles.jsonl")
+          rows = [json.loads(x) for x in src.read_text(encoding="utf-8").splitlines() if x.strip()] if src.exists() else []
+          top = collections.Counter()
+          sections = collections.Counter()
+          contacts = collections.Counter()
+          for row in rows:
+              for key in ("name_raw", "location_raw", "latitude", "longitude"):
+                  if row.get(key) not in (None, "", [], {}):
+                      top[key] += 1
+              payload = row.get("payload") or {}
+              for key, value in payload.items():
+                  if value not in (None, "", [], {}):
+                      top[f"payload.{key}"] += 1
+              for key, value in (payload.get("sections") or {}).items():
+                  if value:
+                      sections[key] += 1
+              for key, value in (payload.get("contacts") or {}).items():
+                  if value:
+                      contacts[key] += 1
+          report = {"valid_profiles": len(rows), "field_counts": dict(top), "contact_counts": dict(contacts), "section_counts": dict(sections)}
+          Path("artifacts/madares-profiles/field-coverage.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+          print(json.dumps(report, ensure_ascii=False))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: edu-hub-madaresegypt-profile-pilot-001
+          path: artifacts/madares-profiles/
+          if-no-files-found: error
+          retention-days: 30
