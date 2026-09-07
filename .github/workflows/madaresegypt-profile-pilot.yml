@@ -40,7 +40,8 @@ jobs:
           python tools/data-acquisition/enrich_madaresegypt_profiles.py \
             --input artifacts/madares-profiles/input.jsonl \
             --output artifacts/madares-profiles/enriched-profiles.jsonl \
-            --delay 0.75
+            --delay 0.75 \
+            --timeout 12
           cat artifacts/madares-profiles/enriched-profiles.report.json
       - name: Calculate factual field coverage
         if: always()
