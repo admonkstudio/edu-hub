@@ -98,6 +98,16 @@ Record durable decisions here. Do not use this file for temporary task notes.
 
 **Decision:** PostgreSQL/Supabase may become the operational serving database, but the portable V7 SQLite database, media tree, manifests, and checksums remain an independent owned restore source.
 
+## 2026-09-09 — Private Supabase raw archive boundary
+
+**Decision:** The Supabase `edu_raw` schema is an internal evidence/archive surface, not a browser-facing Data API. Anonymous and authenticated roles receive no schema, table, sequence, or function access.
+
+**Decision:** Raw acquisition data will not be imported into either Ask Kalam Supabase project. Edu Hub requires a dedicated project/account boundary.
+
+**Decision:** V7 imports are archive-addressed, resumable and idempotent. The import ledger uses the archive version and SHA-256; records retain source hashes, media retains source identity and file hashes, and acquisition runs retain archive-local identity.
+
+**Decision:** The raw JSON payload does not receive a speculative GIN index. Public search and fast rendering will use a later purpose-built canonical/public read model rather than querying source-shaped evidence payloads.
+
 ## Pending decisions
 
 - final public brand name
