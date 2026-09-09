@@ -1,6 +1,6 @@
 # Edu Hub Project Status
 
-Last updated: 2026-09-07
+Last updated: 2026-09-09
 
 ## Current lifecycle
 
@@ -79,10 +79,13 @@ Milestone 1 begins only after Milestone 0 acceptance criteria pass.
 - V7 has zero duplicate `(source_id, raw_hash)` groups, zero duplicate non-empty `(source_id, source_record_id)` groups, zero foreign-key errors, and SQLite `integrity_check=ok`.
 - The earlier local V6 tarball was found truncated during an independent archive read. V7 was rebuilt from the complete extracted V6 database/media tree plus V5, and its new 38 MB archive passes gzip, archive traversal, and 455 internal checksum checks.
 - V7 archive SHA-256: `fb4e6c332bdf1c0c9505ee78ad2d720d6d96d67241431a6a21ffc79ef8f6408a`.
+- The secure PostgreSQL/Supabase V7 import package is complete: private `edu_raw` hardening, explicit access revocation, RLS defense in depth, ownership/import-ledger tables, an idempotent resumable importer, and read-only verification SQL.
+- The V7 import dry-run passes all record/media counts, SQLite integrity, ownership payload hashes, source hash uniqueness, media foreign references, and media-rights gating.
+- No Edu Hub Supabase project currently exists in the connected organization. The two visible projects belong to Ask Kalam and must not receive Edu Hub data.
 
 ## Immediate next actions
 
-1. Import the validated V7 raw corpus into the PostgreSQL/Supabase source-and-evidence layer while preserving the portable SQLite/archive backup as the independent restore source.
+1. Create/connect a dedicated Edu Hub Supabase project, then apply the prepared schema and execute the verified V7 importer against that project only.
 2. Implement GitHub Issue #1 — Milestone 0 foundation.
 3. Verify lint, typecheck, tests/configuration, production builds and rendered app shells.
 4. Record actual deployment/runtime decisions in `docs/PLATFORM.md` and `docs/PROJECT-DECISIONS.md`.
