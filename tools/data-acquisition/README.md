@@ -89,3 +89,31 @@ First:
 9. then import.
 
 The source systems must never be required for normal website rendering after import.
+
+## V7 PostgreSQL/Supabase import
+
+V7 is the consolidated owned archive: 24,916 raw records across 13 sources,
+2,101 media provenance rows, and 453 unique locally held media files.
+
+The operational import remains deliberately separate from public rendering:
+
+1. Apply `infra/owned-data/001_raw_archive.sql`.
+2. Apply `infra/owned-data/002_v7_import_hardening.sql`.
+3. Run a non-mutating archive check:
+
+   ```bash
+   python tools/data-acquisition/import_v7_postgres.py \
+     --sqlite /path/to/edu_hub_owned_archive_v7.sqlite \
+     --archive /path/to/edu-hub-egypt-owned-v7.tar.gz \
+     --report /path/to/V7-POSTGRES-IMPORT-DRY-RUN.json
+   ```
+
+4. Install the pinned importer dependency from
+   `tools/data-acquisition/requirements-postgres-import.txt`.
+5. Perform the live import from a trusted server environment by adding
+   `--database-url "$EDU_HUB_DATABASE_URL"`.
+
+The database URL is never committed. The importer is resumable and idempotent:
+records use `(source_id, raw_hash)`, media uses its source identity, and imported
+acquisition runs retain their V7 archive identity. The `edu_raw` schema is not a
+public read API: anonymous and authenticated roles receive no access.
