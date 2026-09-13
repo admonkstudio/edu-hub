@@ -19,7 +19,7 @@ from typing import Any, Iterable
 from urllib.parse import urlparse
 
 NORMALIZATION_VERSION = 1
-EGYPT_BOUNDS = (22.0, 31.8, 24.5, 37.2)
+EGYPT_BOUNDS = (22.0, 31.8, 24.5, 37.2)  # south, north, west, east
 AGGREGATE_MARKERS = {
     "aggregate", "aggregates", "statistics", "statistic", "summary", "coverage",
     "census_total", "official_total", "report_total", "governorate_total",
@@ -347,7 +347,7 @@ def build(database_url: str, report_path: Path | None = None, batch_size: int = 
                                     candidate["source_url"], confidence, verification_status,
                                 ),
                             )
-                conn.commit()
+                # No commit here: the candidate/field build remains one atomic transaction.
 
         after = canonical_counts(conn)
         if before != after:
