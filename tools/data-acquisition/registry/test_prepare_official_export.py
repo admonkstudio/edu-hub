@@ -29,7 +29,7 @@ class OfficialExportIntakeTests(unittest.TestCase):
                     "source_id": "secondary",
                     "name": "Secondary",
                     "authority_class": "secondary_directory",
-                    "coverage_target": null
+                    "coverage_target": None
                 }
             ]
         }), encoding="utf-8")
