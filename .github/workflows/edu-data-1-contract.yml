@@ -11,6 +11,16 @@ on:
       - 'tools/data-acquisition/scrape_scu.py'
       - 'tools/data-acquisition/scrape_azhar.py'
       - '.github/workflows/edu-data-1-contract.yml'
+  pull_request:
+    branches:
+      - data-acquisition-egypt-v3
+    paths:
+      - 'docs/EDU-DATA-1-NATIONAL-REGISTRY.md'
+      - 'infra/owned-data/004_national_registry_layers.sql'
+      - 'tools/data-acquisition/registry/**'
+      - 'tools/data-acquisition/scrape_scu.py'
+      - 'tools/data-acquisition/scrape_azhar.py'
+      - '.github/workflows/edu-data-1-contract.yml'
   workflow_dispatch:
 
 permissions:
