@@ -98,13 +98,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r tools/data-acquisition/requirements-postgres-import.txt
 
-      - name: Apply private raw and staging boundaries
+      - name: Apply private raw staging and matching boundaries
         shell: bash
         run: |
           set -euo pipefail
           psql "$EDU_DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/owned-data/001_raw_archive.sql
           psql "$EDU_DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/owned-data/002_v7_import_hardening.sql
           psql "$EDU_DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/owned-data/004_staging_boundary.sql
+          psql "$EDU_DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/owned-data/005_identity_matching_hardening.sql
 
       - name: Import verified V7 into edu_raw only
         shell: bash
@@ -131,7 +132,15 @@ jobs:
             --database-url "$EDU_DATABASE_URL" \
             --report artifacts/reports/staging-normalization.json
 
-      - name: Export staging quality summary
+      - name: Generate review-only identity proposals
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/data-acquisition/match_staging_identities.py \
+            --database-url "$EDU_DATABASE_URL" \
+            --report artifacts/reports/identity-matching.json
+
+      - name: Export staging and matching quality summaries
         shell: bash
         run: |
           set -euo pipefail
@@ -154,6 +163,36 @@ jobs:
             group by reason
             order by records desc, reason;
           " | tee artifacts/reports/staging-review-reasons.txt
+          psql "$EDU_DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -c "
+            select match_status, count(*) as pairs,
+                   round(avg(score)::numeric,4) as avg_score,
+                   round(min(score)::numeric,4) as min_score,
+                   round(max(score)::numeric,4) as max_score
+            from edu_staging.identity_matches
+            group by match_status
+            order by match_status;
+          " | tee artifacts/reports/identity-match-status-counts.txt
+          psql "$EDU_DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -c "
+            select e.evidence_type, count(*) as occurrences
+            from edu_staging.identity_match_evidence e
+            group by e.evidence_type
+            order by occurrences desc, e.evidence_type;
+          " | tee artifacts/reports/identity-evidence-counts.txt
+          psql "$EDU_DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -c "
+            select count(*) as auto_accepted_matches
+            from edu_staging.identity_matches
+            where match_status='accepted';
+          " | tee artifacts/reports/identity-auto-acceptance-check.txt
+
+      - name: Refuse accidental automatic acceptance
+        shell: bash
+        run: |
+          set -euo pipefail
+          ACCEPTED="$(psql "$EDU_DATABASE_URL" -Atc "select count(*) from edu_staging.identity_matches where match_status='accepted'")"
+          if [ "$ACCEPTED" != "0" ]; then
+            echo "::error::Identity matching created accepted merges. EDU-DATA-1 v1 is review-only."
+            exit 1
+          fi
 
       - name: Upload recovery reports only
         uses: actions/upload-artifact@v4
