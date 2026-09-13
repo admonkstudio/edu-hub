@@ -53,9 +53,13 @@ jobs:
           python -m py_compile tools/data-acquisition/registry/validate_registry.py
           python -m py_compile tools/data-acquisition/registry/build_staging_seed.py
           python -m py_compile tools/data-acquisition/registry/test_build_staging_seed.py
+          python -m py_compile tools/data-acquisition/registry/prepare_official_export.py
+          python -m py_compile tools/data-acquisition/registry/test_prepare_official_export.py
           python -m py_compile tools/data-acquisition/emis_local_capture.py
       - name: Enforce staging coverage safety rules
         run: python tools/data-acquisition/registry/test_build_staging_seed.py
+      - name: Enforce official export intake safety rules
+        run: python tools/data-acquisition/registry/test_prepare_official_export.py
       - uses: actions/upload-artifact@v4
         with:
           name: edu-data-1-contract-report
