@@ -1,0 +1,109 @@
+name: EDU-DATA-1 staging boundary CI
+
+on:
+  push:
+    branches:
+      - reconstruction/edu-data-1
+    paths:
+      - ".github/workflows/edu-data-1-ci.yml"
+      - ".github/workflows/edu-data-1-recover-v7.yml"
+      - "infra/owned-data/**"
+      - "tools/data-acquisition/build_staging_candidates.py"
+      - "tools/data-acquisition/tests/**"
+  pull_request:
+    paths:
+      - "infra/owned-data/**"
+      - "tools/data-acquisition/build_staging_candidates.py"
+      - "tools/data-acquisition/tests/**"
+
+permissions:
+  contents: read
+
+jobs:
+  staging-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: eduhub
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d eduhub"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/eduhub
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pinned PostgreSQL dependency
+        run: pip install -r tools/data-acquisition/requirements-postgres-import.txt
+
+      - name: Run normalization unit tests
+        run: python -m unittest discover -s tools/data-acquisition/tests -p 'test_*.py' -v
+
+      - name: Create Supabase-compatible database roles
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
+          do $$ begin
+            if not exists (select 1 from pg_roles where rolname='anon') then create role anon; end if;
+            if not exists (select 1 from pg_roles where rolname='authenticated') then create role authenticated; end if;
+            if not exists (select 1 from pg_roles where rolname='service_role') then create role service_role; end if;
+          end $$;
+          SQL
+
+      - name: Apply raw and staging schemas
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/owned-data/001_raw_archive.sql
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/owned-data/002_v7_import_hardening.sql
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/owned-data/004_staging_boundary.sql
+
+      - name: Seed representative raw evidence and canonical guard row
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
+          create table public.institutions (id bigint primary key, official_name text not null);
+          insert into public.institutions values (1, 'guard-row');
+
+          insert into edu_raw.sources(source_id,name,url,source_type,authority)
+          values ('ci_source','CI source','https://directory.example','directory','secondary');
+
+          insert into edu_raw.raw_records
+            (source_id,source_record_id,entity_family,entity_type_raw,name_raw,name_en_raw,location_raw,
+             latitude,longitude,source_url,retrieved_at,raw_hash,payload_json)
+          values
+            ('ci_source','1','school','private school','Cairo International School','Cairo International School','Cairo',
+             30.04,31.23,'https://directory.example/school/1',now(),repeat('a',64),
+             '{"website":"https://school.example","email":"info@school.example","phone":"+20 2 1234567","governorate":"Cairo"}'::jsonb),
+            ('ci_source','2','statistics','aggregate','Official school total',null,'Egypt',
+             null,null,'https://directory.example/stats',now(),repeat('b',64),'{}'::jsonb),
+            ('ci_source','3','school','school',null,null,'Giza',
+             null,null,'https://directory.example/school/3',now(),repeat('c',64),'{}'::jsonb),
+            ('ci_source','4','school','school','Bad coordinate school',null,'Cairo',
+             52.52,13.40,'https://directory.example/school/4',now(),repeat('d',64),'{}'::jsonb);
+          SQL
+
+      - name: Build staging twice to prove idempotency
+        run: |
+          python tools/data-acquisition/build_staging_candidates.py --database-url "$DATABASE_URL" --report /tmp/staging-1.json --batch-size 2
+          python tools/data-acquisition/build_staging_candidates.py --database-url "$DATABASE_URL" --report /tmp/staging-2.json --batch-size 3
+          cat /tmp/staging-2.json
+
+      - name: Assert staging statuses and canonical immutability
+        run: |
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.entity_candidates")" = "4"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.entity_candidates where candidate_status='ready'")" = "1"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.entity_candidates where candidate_status='needs_review'")" = "1"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.entity_candidates where candidate_status='suppressed'")" = "1"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.entity_candidates where candidate_status='invalid'")" = "1"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.institutions")" = "1"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.entity_candidates where website_url='https://school.example'")" = "1"
