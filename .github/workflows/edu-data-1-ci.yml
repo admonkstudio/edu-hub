@@ -9,11 +9,13 @@ on:
       - ".github/workflows/edu-data-1-recover-v7.yml"
       - "infra/owned-data/**"
       - "tools/data-acquisition/build_staging_candidates.py"
+      - "tools/data-acquisition/match_staging_identities.py"
       - "tools/data-acquisition/tests/**"
   pull_request:
     paths:
       - "infra/owned-data/**"
       - "tools/data-acquisition/build_staging_candidates.py"
+      - "tools/data-acquisition/match_staging_identities.py"
       - "tools/data-acquisition/tests/**"
 
 permissions:
@@ -49,7 +51,7 @@ jobs:
       - name: Install pinned PostgreSQL dependency
         run: pip install -r tools/data-acquisition/requirements-postgres-import.txt
 
-      - name: Run normalization unit tests
+      - name: Run data-boundary unit tests
         run: python -m unittest discover -s tools/data-acquisition/tests -p 'test_*.py' -v
 
       - name: Create Supabase-compatible database roles
@@ -62,11 +64,12 @@ jobs:
           end $$;
           SQL
 
-      - name: Apply raw and staging schemas
+      - name: Apply raw staging and matching schemas
         run: |
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/owned-data/001_raw_archive.sql
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/owned-data/002_v7_import_hardening.sql
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/owned-data/004_staging_boundary.sql
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/owned-data/005_identity_matching_hardening.sql
 
       - name: Seed representative raw evidence and canonical guard row
         run: |
@@ -75,7 +78,9 @@ jobs:
           insert into public.institutions values (1, 'guard-row');
 
           insert into edu_raw.sources(source_id,name,url,source_type,authority)
-          values ('ci_source','CI source','https://directory.example','directory','secondary');
+          values
+            ('ci_source','CI source','https://directory.example','directory','secondary'),
+            ('ci_source_2','CI source 2','https://directory-two.example','registry','primary');
 
           insert into edu_raw.raw_records
             (source_id,source_record_id,entity_family,entity_type_raw,name_raw,name_en_raw,location_raw,
@@ -89,7 +94,10 @@ jobs:
             ('ci_source','3','school','school',null,null,'Giza',
              null,null,'https://directory.example/school/3',now(),repeat('c',64),'{}'::jsonb),
             ('ci_source','4','school','school','Bad coordinate school',null,'Cairo',
-             52.52,13.40,'https://directory.example/school/4',now(),repeat('d',64),'{}'::jsonb);
+             52.52,13.40,'https://directory.example/school/4',now(),repeat('d',64),'{}'::jsonb),
+            ('ci_source_2','official-1','school','school','Cairo International School','Cairo International School','Cairo',
+             30.04002,31.23002,'https://directory-two.example/school/official-1',now(),repeat('e',64),
+             '{"website":"https://school.example","phone":"02 1234567","governorate":"Cairo"}'::jsonb);
           SQL
 
       - name: Build staging twice to prove idempotency
@@ -100,10 +108,26 @@ jobs:
 
       - name: Assert staging statuses and canonical immutability
         run: |
-          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.entity_candidates")" = "4"
-          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.entity_candidates where candidate_status='ready'")" = "1"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.entity_candidates")" = "5"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.entity_candidates where candidate_status='ready'")" = "2"
           test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.entity_candidates where candidate_status='needs_review'")" = "1"
           test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.entity_candidates where candidate_status='suppressed'")" = "1"
           test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.entity_candidates where candidate_status='invalid'")" = "1"
           test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.institutions")" = "1"
-          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.entity_candidates where website_url='https://school.example'")" = "1"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.entity_candidates where website_url='https://school.example'")" = "2"
+
+      - name: Match identities twice to prove idempotency
+        run: |
+          python tools/data-acquisition/match_staging_identities.py --database-url "$DATABASE_URL" --report /tmp/matching-1.json
+          python tools/data-acquisition/match_staging_identities.py --database-url "$DATABASE_URL" --report /tmp/matching-2.json
+          cat /tmp/matching-2.json
+
+      - name: Assert identity evidence and canonical immutability
+        run: |
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.identity_matches")" = "1"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.identity_matches where match_status='proposed'")" = "1"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.review_tasks where task_type='identity_match_review' and status='open'")" = "1"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.identity_match_evidence")" -ge "4"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.matching_runs where status='verified'")" = "2"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from public.institutions")" = "1"
+          test "$(psql "$DATABASE_URL" -Atc "select count(*) from edu_staging.identity_matches where match_status='accepted'")" = "0"
