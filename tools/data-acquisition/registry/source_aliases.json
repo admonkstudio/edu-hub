@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "aliases": [
+    {
+      "raw_source_id": "azhar_official_institute_guide",
+      "registry_source_id": "azhar_institute_guide",
+      "authority_class": "primary_official_registry",
+      "coverage_credit": "current",
+      "default_candidate_status": "ready"
+    },
+    {
+      "raw_source_id": "scu_official_snapshot",
+      "registry_source_id": "scu_institutions",
+      "authority_class": "primary_official_registry",
+      "coverage_credit": "current",
+      "default_candidate_status": "ready"
+    },
+    {
+      "raw_source_id": "emis_getdata_2022",
+      "registry_source_id": "moe_emis_school_directory",
+      "authority_class": "historical_official",
+      "coverage_credit": "historical",
+      "default_candidate_status": "needs_review"
+    },
+    {
+      "raw_source_id": "osm_geofabrik_egypt",
+      "registry_source_id": "osm_egypt_education",
+      "authority_class": "secondary_open_data",
+      "coverage_credit": "none",
+      "default_candidate_status": "needs_review"
+    },
+    {
+      "raw_source_id": "egyptschools_public_directory",
+      "registry_source_id": null,
+      "authority_class": "secondary_directory",
+      "coverage_credit": "none",
+      "default_candidate_status": "needs_review"
+    },
+    {
+      "raw_source_id": "egyptschools_github_excel",
+      "registry_source_id": null,
+      "authority_class": "secondary_directory",
+      "coverage_credit": "none",
+      "default_candidate_status": "needs_review"
+    },
+    {
+      "raw_source_id": "masrschools_public_directory",
+      "registry_source_id": null,
+      "authority_class": "secondary_directory",
+      "coverage_credit": "none",
+      "default_candidate_status": "needs_review"
+    },
+    {
+      "raw_source_id": "mohesr_private_higher_institutes",
+      "registry_source_id": "mohesr_private_higher_institutes",
+      "authority_class": "primary_official_registry",
+      "coverage_credit": "current",
+      "default_candidate_status": "ready"
+    },
+    {
+      "raw_source_id": "mohesr_technical_institutes",
+      "registry_source_id": "mohesr_technical_institutes",
+      "authority_class": "primary_official_registry",
+      "coverage_credit": "current",
+      "default_candidate_status": "ready"
+    }
+  ]
+}
