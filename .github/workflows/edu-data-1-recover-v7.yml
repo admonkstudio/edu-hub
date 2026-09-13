@@ -1,0 +1,164 @@
+name: EDU-DATA-1 recover V7 into private staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact_run_id:
+        description: "GitHub Actions run ID containing the preserved V7 archive artifact"
+        required: true
+        type: string
+      artifact_name:
+        description: "Exact artifact name containing the V7 tar.gz"
+        required: true
+        type: string
+      archive_relative_path:
+        description: "Path to the V7 tar.gz inside the downloaded artifact"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: edu-data-1-v7-recovery
+  cancel-in-progress: false
+
+env:
+  EXPECTED_V7_SHA256: fb4e6c332bdf1c0c9505ee78ad2d720d6d96d67241431a6a21ffc79ef8f6408a
+
+jobs:
+  recover-private-staging:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      EDU_DATABASE_URL: ${{ secrets.EDU_DATABASE_URL }}
+    steps:
+      - name: Checkout reconstruction branch
+        uses: actions/checkout@v4
+
+      - name: Refuse missing dedicated database secret
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${EDU_DATABASE_URL:-}" ]; then
+            echo "::error::EDU_DATABASE_URL is not configured. This workflow will not fall back to any generic or Ask Kalam database credential."
+            exit 1
+          fi
+
+      - name: Download preserved V7 artifact
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.artifact_run_id }}
+          name: ${{ inputs.artifact_name }}
+          path: artifacts/input
+
+      - name: Verify exact V7 archive identity
+        id: archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARCHIVE="artifacts/input/${{ inputs.archive_relative_path }}"
+          if [ ! -f "$ARCHIVE" ]; then
+            echo "::error::V7 archive not found at $ARCHIVE"
+            find artifacts/input -maxdepth 4 -type f -print || true
+            exit 1
+          fi
+          ACTUAL_SHA256="$(sha256sum "$ARCHIVE" | awk '{print $1}')"
+          if [ "$ACTUAL_SHA256" != "$EXPECTED_V7_SHA256" ]; then
+            echo "::error::V7 checksum mismatch: expected $EXPECTED_V7_SHA256, got $ACTUAL_SHA256"
+            exit 1
+          fi
+          echo "archive=$ARCHIVE" >> "$GITHUB_OUTPUT"
+          echo "sha256=$ACTUAL_SHA256" >> "$GITHUB_OUTPUT"
+
+      - name: Extract V7 and locate read-only source database
+        id: extract
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/v7 artifacts/reports
+          tar -xzf "${{ steps.archive.outputs.archive }}" -C artifacts/v7
+          SQLITE_PATH="$(find artifacts/v7 -type f -name 'edu_hub_owned_archive_v7.sqlite' -print -quit)"
+          if [ -z "$SQLITE_PATH" ] || [ ! -f "$SQLITE_PATH" ]; then
+            echo "::error::edu_hub_owned_archive_v7.sqlite not found inside verified archive"
+            exit 1
+          fi
+          sqlite3 "$SQLITE_PATH" 'pragma integrity_check;' | tee artifacts/reports/sqlite-integrity.txt
+          echo "sqlite=$SQLITE_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Install PostgreSQL client and pinned importer dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends postgresql-client
+          python -m pip install --upgrade pip
+          pip install -r tools/data-acquisition/requirements-postgres-import.txt
+
+      - name: Apply private raw and staging boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$EDU_DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/owned-data/001_raw_archive.sql
+          psql "$EDU_DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/owned-data/002_v7_import_hardening.sql
+          psql "$EDU_DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/owned-data/004_staging_boundary.sql
+
+      - name: Import verified V7 into edu_raw only
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/data-acquisition/import_v7_postgres.py \
+            --sqlite "${{ steps.extract.outputs.sqlite }}" \
+            --archive "${{ steps.archive.outputs.archive }}" \
+            --database-url "$EDU_DATABASE_URL" \
+            --report artifacts/reports/v7-import.json
+
+      - name: Verify raw archive boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$EDU_DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/owned-data/003_v7_verify.sql \
+            | tee artifacts/reports/v7-postgres-verify.txt
+
+      - name: Build deterministic staging candidates
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/data-acquisition/build_staging_candidates.py \
+            --database-url "$EDU_DATABASE_URL" \
+            --report artifacts/reports/staging-normalization.json
+
+      - name: Export staging quality summary
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$EDU_DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -c "
+            select candidate_status, count(*) as records
+            from edu_staging.entity_candidates
+            group by candidate_status
+            order by candidate_status;
+          " | tee artifacts/reports/staging-status-counts.txt
+          psql "$EDU_DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -c "
+            select source_id, candidate_status, count(*) as records
+            from edu_staging.entity_candidates
+            group by source_id, candidate_status
+            order by source_id, candidate_status;
+          " | tee artifacts/reports/staging-source-status-counts.txt
+          psql "$EDU_DATABASE_URL" -v ON_ERROR_STOP=1 -P pager=off -c "
+            select unnest(review_reasons) as reason, count(*) as records
+            from edu_staging.entity_candidates
+            where cardinality(review_reasons) > 0
+            group by reason
+            order by records desc, reason;
+          " | tee artifacts/reports/staging-review-reasons.txt
+
+      - name: Upload recovery reports only
+        uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-1-v7-staging-reports
+          path: artifacts/reports
+          if-no-files-found: error
+          retention-days: 30
