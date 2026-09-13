@@ -6,8 +6,11 @@ on:
       - edu-data-1-national-registry
     paths:
       - 'docs/EDU-DATA-1-NATIONAL-REGISTRY.md'
+      - 'docs/EDU-DATA-1-BASELINE-*.md'
+      - 'docs/requests/**'
       - 'infra/owned-data/004_national_registry_layers.sql'
       - 'tools/data-acquisition/registry/**'
+      - 'tools/data-acquisition/emis_local_capture.py'
       - 'tools/data-acquisition/scrape_scu.py'
       - 'tools/data-acquisition/scrape_azhar.py'
       - '.github/workflows/edu-data-1-contract.yml'
@@ -16,8 +19,11 @@ on:
       - data-acquisition-egypt-v3
     paths:
       - 'docs/EDU-DATA-1-NATIONAL-REGISTRY.md'
+      - 'docs/EDU-DATA-1-BASELINE-*.md'
+      - 'docs/requests/**'
       - 'infra/owned-data/004_national_registry_layers.sql'
       - 'tools/data-acquisition/registry/**'
+      - 'tools/data-acquisition/emis_local_capture.py'
       - 'tools/data-acquisition/scrape_scu.py'
       - 'tools/data-acquisition/scrape_azhar.py'
       - '.github/workflows/edu-data-1-contract.yml'
@@ -40,8 +46,10 @@ jobs:
           mkdir -p artifacts/edu-data-1
           python tools/data-acquisition/registry/validate_registry.py \
             --report artifacts/edu-data-1/source-registry-validation.json
-      - name: Compile validator
-        run: python -m py_compile tools/data-acquisition/registry/validate_registry.py
+      - name: Compile registry and local-acquisition tools
+        run: |
+          python -m py_compile tools/data-acquisition/registry/validate_registry.py
+          python -m py_compile tools/data-acquisition/emis_local_capture.py
       - uses: actions/upload-artifact@v4
         with:
           name: edu-data-1-contract-report
