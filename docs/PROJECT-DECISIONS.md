@@ -108,6 +108,18 @@ Record durable decisions here. Do not use this file for temporary task notes.
 
 **Decision:** The raw JSON payload does not receive a speculative GIN index. Public search and fast rendering will use a later purpose-built canonical/public read model rather than querying source-shaped evidence payloads.
 
+## 2026-09-13 — Private staging and canonical promotion boundary
+
+**Decision:** `edu_staging` is a private intermediate layer between `edu_raw` and the future canonical core. Raw records are normalized into source-linked candidates before any identity resolution or canonical promotion occurs.
+
+**Decision:** Staging candidates use explicit states (`ready`, `needs_review`, `suppressed`, `invalid`). Aggregate/statistical records are retained as evidence in `edu_raw` but are suppressed from the institution candidate universe rather than deleted.
+
+**Decision:** Canonical/public promotion is a separate future command and must never occur as a side effect of raw import or normalization. The staging builder records canonical institution row counts before and after its transaction and fails if they change.
+
+**Decision:** A V7 recovery into PostgreSQL is allowed only through the dedicated Edu Hub database credential `EDU_DATABASE_URL` and only after the archive matches SHA-256 `fb4e6c332bdf1c0c9505ee78ad2d720d6d96d67241431a6a21ffc79ef8f6408a`. There is no fallback to Ask Kalam or a generic database secret.
+
+**Decision:** The staging boundary is accepted only with executable PostgreSQL integration coverage. GitHub Actions run `34738829590` passed schema application, normalization tests, repeated idempotent staging builds, expected candidate-state classification, website-source safeguards, and canonical-row immutability.
+
 ## Pending decisions
 
 - final public brand name
