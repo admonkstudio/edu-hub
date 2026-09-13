@@ -1,6 +1,6 @@
 # Edu Hub Project Status
 
-Last updated: 2026-09-09
+Last updated: 2026-09-13
 
 ## Current lifecycle
 
@@ -12,8 +12,8 @@ Last updated: 2026-09-09
 04 Content + Structure   IN PROGRESS
 05 Creative Direction    NOT STARTED
 06 Design + Systemize    NOT STARTED
-07 Build + Connect       READY FOR MILESTONE 0
-08 Verify + Optimize     NOT STARTED
+07 Build + Connect       ACTIVE — DATA RECONSTRUCTION
+08 Verify + Optimize     ACTIVE FOR DATA BOUNDARY
 09 Review + Launch       NOT STARTED
 10 Handoff + Learn       NOT STARTED
 ```
@@ -55,62 +55,80 @@ Phase 2 commercial functionality is intentionally deferred.
 - curated programmatic SEO only
 - PostgreSQL search first; dedicated search infrastructure only after evidence justifies it
 
-## Current implementation milestone
+## Current reconstruction milestone
 
-**Milestone 0 — Foundation**
+**EDU-DATA-1 — Egypt National Education Registry**
 
-Milestone 0 should create the trustworthy engineering foundation only. It must not implement the canonical institution data model from Milestone 1 beyond minimal connectivity/schema tooling required to prove the stack.
+The data path is now explicitly separated into:
 
-Milestone 1 begins only after Milestone 0 acceptance criteria pass.
+```text
+external / official sources
+→ edu_raw
+→ edu_staging
+→ identity matching + review
+→ canonical core
+→ public read model
+→ website / CMS
+```
 
-## Data acquisition status — 2026-09-06
+Raw data is evidence. Staging data is a candidate/matching surface. Neither is public canonical data.
 
-- Egypt raw acquisition remains active; canonical modelling, cross-source deduplication and public projections remain gated by acquisition audits.
-- MadaresEgypt bounded acquisition repair is complete: all 180 remaining page gaps were recovered and the source-level merge now holds 11,339 named source records with zero unresolved crawl pages.
-- The V6 owned archive contains 11,464 raw records: 11,339 MadaresEgypt records plus 125 Alexandria records. Alexandria media includes 2,101 mirrored references covering all 125 records.
-- Content-addressed media deduplication produced 453 independently stored binary files; all file hashes and the SQLite database checksum were verified.
-- Media publication remains disabled by default: rights status is unknown and public-use eligibility is false until reviewed.
-- Successful proof artifact: [edu-hub-owned-alexschools-proof](https://github.com/admonkstudio/edu-hub/actions/runs/34054413762/artifacts/9995593260).
-- MadaresEgypt profile viability pilot sampled 50 record IDs across the full 11,339-record range. With retries disabled and a five-second ceiling, all 50 requests timed out; zero factual profiles or fields were accepted.
-- MadaresEgypt is therefore classified as listing-level-only for the current acquisition phase. Its 11,339 owned listing records remain usable, but profile/media crawling will not be scaled unless a materially different endpoint or access path is validated.
-- Pilot evidence: [MadaresEgypt factual profile pilot run 34070572537](https://github.com/admonkstudio/edu-hub/actions/runs/34070572537), artifact `10000387395`, SHA-256 `1bd354284ae6a00fbcd10d14da62b7446dd514c837d4c1390b114df779cbe1ed`.
-- V7 consolidation is complete: 24,916 owned raw records across 13 sources, with an ownership row for every record.
-- V7 retains 2,101 AlexSchools media provenance references and 453 unique content-addressed binaries. All 453 file hashes pass; public-use eligibility remains false for every asset.
-- V7 has zero duplicate `(source_id, raw_hash)` groups, zero duplicate non-empty `(source_id, source_record_id)` groups, zero foreign-key errors, and SQLite `integrity_check=ok`.
-- The earlier local V6 tarball was found truncated during an independent archive read. V7 was rebuilt from the complete extracted V6 database/media tree plus V5, and its new 38 MB archive passes gzip, archive traversal, and 455 internal checksum checks.
-- V7 archive SHA-256: `fb4e6c332bdf1c0c9505ee78ad2d720d6d96d67241431a6a21ffc79ef8f6408a`.
-- The secure PostgreSQL/Supabase V7 import package is complete: private `edu_raw` hardening, explicit access revocation, RLS defense in depth, ownership/import-ledger tables, an idempotent resumable importer, and read-only verification SQL.
-- The V7 import dry-run passes all record/media counts, SQLite integrity, ownership payload hashes, source hash uniqueness, media foreign references, and media-rights gating.
-- No Edu Hub Supabase project currently exists in the connected organization. The two visible projects belong to Ask Kalam and must not receive Edu Hub data.
+## Data acquisition and recovery status — 2026-09-13
+
+- Egypt raw acquisition remains active; canonical modelling, cross-source deduplication and public projections remain gated by matching/review.
+- MadaresEgypt bounded acquisition repair is complete: 11,339 listing-level records with zero unresolved crawl pages. Profile crawling remains disabled on the current route after the deterministic 50-record viability test produced 50 timeouts and zero accepted profiles.
+- V7 is the current complete portable owned archive: 24,916 raw records across 13 sources and 24,916 ownership rows.
+- V7 retains 2,101 AlexSchools media provenance references and 453 unique content-addressed binaries. Public-use eligibility remains false for every acquired asset pending rights review.
+- V7 has zero duplicate `(source_id, raw_hash)` groups, zero duplicate non-empty `(source_id, source_record_id)` groups, zero foreign-key errors and SQLite `integrity_check=ok`.
+- V7 archive SHA-256 is `fb4e6c332bdf1c0c9505ee78ad2d720d6d96d67241431a6a21ffc79ef8f6408a`.
+- The PostgreSQL `edu_raw` import package remains hardened, private, resumable and idempotent.
+- A new private `edu_staging` layer now exists on branch `reconstruction/edu-data-1` with normalization runs, entity candidates, field candidates, identity-match evidence and review-task structures.
+- The deterministic raw→staging normalizer classifies each source row as `ready`, `needs_review`, `suppressed` or `invalid`; aggregate/statistical rows are suppressed rather than promoted as institutions.
+- The normalizer performs conservative Arabic/English name normalization, basic education-type classification, Egypt coordinate validation, source-aware website extraction, contact extraction and provenance-preserving field candidate generation.
+- The staging build is atomic. Canonical institution row counts are checked before and after; a change causes the operation to fail rather than silently crossing the boundary.
+- A checksum-gated manual V7 recovery workflow exists. It accepts only the exact pinned V7 archive and only the dedicated `EDU_DATABASE_URL`; it has no Ask Kalam/generic database fallback.
+- PostgreSQL integration CI run `34738829590` passed on 2026-09-13. It proved schema creation, unit normalization tests, two consecutive idempotent staging builds, expected candidate-state classification, source/website safeguards and canonical-row immutability.
+- No live V7→staging recovery has been claimed yet because the exact preserved V7 Actions artifact/run still needs to be identified and a dedicated Edu Hub database credential must be available.
+- No canonical/public promotion has occurred from this reconstruction branch.
+
+## National registry acquisition target
+
+Edu Hub must cover the national identity universe rather than only institutions with rich commercial profiles.
+
+Current official control totals identified for acquisition auditing include:
+
+- Ministry of Education / EMIS: 62,690 pre-university schools for 2025/26.
+- Ministry of Social Solidarity: 48,225 nurseries from the national nursery census.
+- Higher-education registries from MOHESR/SCU, plus Al-Azhar and other official institution classes.
+
+The working acquisition target is therefore 120,000+ canonical education entities, with progressive completeness rather than rejecting legitimate institutions because optional profile fields are missing.
 
 ## Immediate next actions
 
-1. Create/connect a dedicated Edu Hub Supabase project, then apply the prepared schema and execute the verified V7 importer against that project only.
-2. Implement GitHub Issue #1 — Milestone 0 foundation.
-3. Verify lint, typecheck, tests/configuration, production builds and rendered app shells.
-4. Record actual deployment/runtime decisions in `docs/PLATFORM.md` and `docs/PROJECT-DECISIONS.md`.
-5. Then implement Issue #2 — canonical data foundation.
-6. Build a representative 20–30 institution test cohort after the core schema exists.
+1. Implement the first identity-resolution pass in `edu_staging`: deterministic exact signals first, then scored fuzzy proposals with review evidence.
+2. Locate the exact preserved V7 Actions artifact and verify its tarball against the pinned SHA-256 before any live recovery.
+3. Connect/create a dedicated Edu Hub PostgreSQL/Supabase database and configure `EDU_DATABASE_URL`; never use either Ask Kalam project.
+4. Run the V7 recovery workflow into `edu_raw` and `edu_staging`, then inspect source-by-source candidate/review distributions before canonical promotion.
+5. Start/repair the official MOE/EMIS row-level adapter and measure acquired school identities against the 62,690 official control total.
+6. Continue Al-Azhar and higher-education official registry adapters; pursue MOSS nursery row-level/public-data access or institutional data-sharing in parallel.
+7. Design the canonical promotion command only after identity matching quality is measured. Promotion must be explicit, reviewable and reversible.
+8. Rejoin the application/runtime reconstruction only after the data contract and public projection are stable enough for the frontend to consume.
 
-## Blockers / unresolved decisions
+## Current blockers / unresolved dependencies
 
-These do not block Milestone 0:
-
-- final public brand name and domain
-- final hosting/adapter selection
-- final visual identity
-- final production design system
-- final map provider
-- final analytics implementation
-- exact initial search-demand prioritization by location/curriculum
-
-They must be resolved before the relevant downstream milestone.
+- exact historical V7 Actions artifact/run/path has not yet been identified
+- dedicated live Edu Hub database/`EDU_DATABASE_URL` is not currently verifiable through the GitHub connector
+- MOSS national nursery census row-level public export is not yet confirmed
+- MOE/EMIS row-level extraction must be validated against the current official directory implementation
+- final public brand/domain, hosting adapter, visual identity, map provider, analytics stack and production media CDN remain downstream decisions
 
 ## Non-negotiable project constraints
 
-- Do not build monetization during Phase 1 foundation work.
+- Do not publish directly from raw or staging data.
+- Do not use Ask Kalam databases for Edu Hub.
+- Do not invent missing institution facts; unknown remains unknown.
 - Do not equate paid status with verification.
 - Do not auto-index every database entity or filter combination.
-- Do not allow AI to silently overwrite verified factual data.
+- Do not allow AI to silently overwrite verified canonical facts.
 - Do not commit secrets.
-- Keep Arabic/RTL and performance requirements active from the beginning.
+- Keep Arabic/RTL, provenance, performance and media-rights requirements active from the beginning.
