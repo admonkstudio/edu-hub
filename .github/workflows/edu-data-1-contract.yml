@@ -1,0 +1,94 @@
+name: EDU-DATA-1 Registry Contract
+
+on:
+  push:
+    branches:
+      - edu-data-1-national-registry
+    paths:
+      - 'docs/EDU-DATA-1-NATIONAL-REGISTRY.md'
+      - 'infra/owned-data/004_national_registry_layers.sql'
+      - 'tools/data-acquisition/registry/**'
+      - 'tools/data-acquisition/scrape_scu.py'
+      - 'tools/data-acquisition/scrape_azhar.py'
+      - '.github/workflows/edu-data-1-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    name: Validate registry contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate source registry
+        run: |
+          mkdir -p artifacts/edu-data-1
+          python tools/data-acquisition/registry/validate_registry.py \
+            --report artifacts/edu-data-1/source-registry-validation.json
+      - name: Compile validator
+        run: python -m py_compile tools/data-acquisition/registry/validate_registry.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-1-contract-report
+          path: artifacts/edu-data-1/source-registry-validation.json
+          if-no-files-found: error
+          retention-days: 30
+
+  official-source-smoke:
+    name: Probe accessible official registries
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install acquisition dependencies
+        run: pip install -r tools/data-acquisition/requirements.txt
+      - name: Refresh SCU higher-education snapshot
+        run: |
+          mkdir -p artifacts/edu-data-1
+          python tools/data-acquisition/scrape_scu.py
+          cp tools/data-acquisition/seeds/scu_higher_ed_snapshot.csv artifacts/edu-data-1/
+          cp tools/data-acquisition/seeds/scu_higher_ed_snapshot.csv.report.json artifacts/edu-data-1/
+      - name: Validate SCU result is substantive
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('tools/data-acquisition/seeds/scu_higher_ed_snapshot.csv.report.json')
+          data = json.loads(p.read_text(encoding='utf-8'))
+          total = int(data.get('total', 0))
+          print(json.dumps(data, ensure_ascii=False, indent=2))
+          if total < 250:
+              raise SystemExit(f'SCU smoke acquisition unexpectedly small: {total}')
+          PY
+      - name: Probe Al-Azhar live adapter with a bounded sample
+        run: |
+          python tools/data-acquisition/scrape_azhar.py \
+            --output artifacts/edu-data-1/azhar-smoke.jsonl \
+            --max-governorates 1 \
+            --max-admins-per-governorate 1 \
+            --max-profiles 5 \
+            --delay 0.5
+      - name: Validate Al-Azhar smoke result
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('artifacts/edu-data-1/azhar-smoke.jsonl')
+          rows = [line for line in p.read_text(encoding='utf-8').splitlines() if line.strip()]
+          print({'azhar_smoke_records': len(rows)})
+          if not rows:
+              raise SystemExit('Al-Azhar smoke acquisition returned zero records')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-1-official-source-smoke
+          path: artifacts/edu-data-1/
+          if-no-files-found: error
+          retention-days: 30
