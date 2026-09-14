@@ -3,11 +3,16 @@
 
 This stage starts from the accepted incremental identity-review artifacts for the
 original 106-row universe and may add only discovery rows that have already passed
-a separate D2.1 primary/recognized eligibility review. It never treats absence of
-a match as uniqueness proof and never admits unqualified supporting leads.
+a separate D2.1 primary/recognized eligibility review.
 
-Qualified discovery rows without an explicit D2.2 identity decision remain in a
-separate qualified-identity queue rather than being auto-canonicalized.
+Two explicit relationships are supported:
+1. a qualified discovery row reviewed as a standalone institution identity; and
+2. a qualified discovery row reviewed as the same institution as an original
+   source row that is still in the accepted D2.2 review queue.
+
+Neither relationship is inferred automatically. Absence of a match is never
+uniqueness proof, and qualified discovery rows without an explicit D2.2 decision
+remain in a separate queue.
 """
 from __future__ import annotations
 
@@ -45,6 +50,10 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
             handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
 
 
+def current_name(row: dict) -> str:
+    return str(row.get("name_en") or row.get("name_ar") or row.get("parent_university_en") or "")
+
+
 def discover_decisions() -> list[Path]:
     paths = sorted((HERE / "seeds").glob(DEFAULT_DECISION_GLOB))
     if not paths:
@@ -75,6 +84,10 @@ def build(base_dir: Path, qualified_leads_path: Path, decision_paths: list[Path]
     if len(lead_by_key) != len(discovery_rows):
         raise AssertionError("duplicate discovery source key in reviewed-lead input")
 
+    original_queue_by_key = {(row["source_id"], row["source_record_id"]): row for row in original_queue}
+    if len(original_queue_by_key) != len(original_queue):
+        raise AssertionError("duplicate source key in accepted original-source identity queue")
+
     institution_by_review_key = {row["review_identity_key"]: row for row in institutions}
     if len(institution_by_review_key) != len(institutions):
         raise AssertionError("duplicate review identity key in incremental identity base")
@@ -90,7 +103,9 @@ def build(base_dir: Path, qualified_leads_path: Path, decision_paths: list[Path]
     }
 
     discovered_memberships: list[dict] = []
+    overlap_original_memberships: list[dict] = []
     seen_discovery_source_keys: set[tuple[str, str]] = set()
+    reviewed_original_overlap_keys: set[tuple[str, str]] = set()
     seen_batch_ids: set[str] = set()
     batch_details: list[dict] = []
 
@@ -117,8 +132,12 @@ def build(base_dir: Path, qualified_leads_path: Path, decision_paths: list[Path]
             raise AssertionError("discovery identity review must perform zero automatic merges")
 
         for decision in decision_rows:
-            if decision.get("decision") != "confirmed_discovered_single_source_identity":
-                raise AssertionError(f"unsupported discovery identity decision: {decision.get('decision')}")
+            decision_type = decision.get("decision")
+            if decision_type not in {
+                "confirmed_discovered_single_source_identity",
+                "confirmed_discovery_overlap_with_original_source_identity",
+            }:
+                raise AssertionError(f"unsupported discovery identity decision: {decision_type}")
             if decision.get("decision_confidence") != "high":
                 raise AssertionError("discovery identities require high-confidence explicit review")
             if len(decision.get("evidence_urls") or []) < 2:
@@ -128,42 +147,75 @@ def build(base_dir: Path, qualified_leads_path: Path, decision_paths: list[Path]
             if review_key in institution_by_review_key:
                 raise AssertionError(f"discovery identity review key already exists: {review_key}")
 
-            source_key = (decision["source_id"], decision["source_record_id"])
-            if source_key in existing_source_keys or source_key in seen_discovery_source_keys:
-                raise AssertionError(f"discovery source row already has a reviewed D2.2 membership: {source_key}")
-            source = lead_by_key.get(source_key)
-            if source is None:
-                raise AssertionError(f"discovery identity source row missing from reviewed lead input: {source_key}")
-            if source.get("scope_state") != "eligible":
-                raise AssertionError(f"discovery identity row must pass D2.1 eligibility first: {source_key}")
-            if source.get("eligibility_review_state") != "reviewed_primary_or_recognized_evidence":
-                raise AssertionError(f"discovery identity row lacks explicit D2.1 primary review: {source_key}")
-            if source.get("name_en") != decision["source_name"]:
+            discovery_key = (decision["source_id"], decision["source_record_id"])
+            if discovery_key in existing_source_keys or discovery_key in seen_discovery_source_keys:
+                raise AssertionError(f"discovery source row already has a reviewed D2.2 membership: {discovery_key}")
+            discovery = lead_by_key.get(discovery_key)
+            if discovery is None:
+                raise AssertionError(f"discovery identity source row missing from reviewed lead input: {discovery_key}")
+            if discovery.get("scope_state") != "eligible":
+                raise AssertionError(f"discovery identity row must pass D2.1 eligibility first: {discovery_key}")
+            if discovery.get("eligibility_review_state") != "reviewed_primary_or_recognized_evidence":
+                raise AssertionError(f"discovery identity row lacks explicit D2.1 primary review: {discovery_key}")
+            if discovery.get("name_en") != decision["source_name"]:
                 raise AssertionError(
-                    f"discovery source name drift for {source_key}: "
-                    f"expected={decision['source_name']!r} current={source.get('name_en')!r}"
+                    f"discovery source name drift for {discovery_key}: "
+                    f"expected={decision['source_name']!r} current={discovery.get('name_en')!r}"
                 )
 
-            membership = {
-                "source_id": source["source_id"],
-                "source_record_id": source["source_record_id"],
-                "source_name": source["name_en"],
+            discovery_membership = {
+                "source_id": discovery["source_id"],
+                "source_record_id": discovery["source_record_id"],
+                "source_name": discovery["name_en"],
                 "division_scope": None,
-                "source_scope_state": source["scope_state"],
-                "source_url": source["source_url"],
-                "eligibility_review_batch_id": source.get("eligibility_review_batch_id"),
+                "source_scope_state": discovery["scope_state"],
+                "source_url": discovery["source_url"],
+                "eligibility_review_batch_id": discovery.get("eligibility_review_batch_id"),
             }
+            source_memberships = [discovery_membership]
+            review_origin = "explicit_qualified_discovery_single_source_identity_review"
+
+            if decision_type == "confirmed_discovery_overlap_with_original_source_identity":
+                original_key = (decision["original_source_id"], decision["original_source_record_id"])
+                if original_key in existing_source_keys or original_key in reviewed_original_overlap_keys:
+                    raise AssertionError(f"original source row already has a reviewed D2.2 membership: {original_key}")
+                original = original_queue_by_key.get(original_key)
+                if original is None:
+                    raise AssertionError(f"overlap target is not in the accepted original-source review queue: {original_key}")
+                if current_name(original) != decision["original_source_name"]:
+                    raise AssertionError(
+                        f"original source name drift for {original_key}: "
+                        f"expected={decision['original_source_name']!r} current={current_name(original)!r}"
+                    )
+                if original.get("scope_state") != "eligible":
+                    raise AssertionError(f"overlap target must be scope-eligible: {original_key}")
+
+                original_membership = {
+                    "source_id": original["source_id"],
+                    "source_record_id": original["source_record_id"],
+                    "source_name": current_name(original),
+                    "division_scope": None,
+                    "source_scope_state": original.get("scope_state"),
+                    "source_url": original.get("source_url"),
+                }
+                source_memberships.insert(0, original_membership)
+                reviewed_original_overlap_keys.add(original_key)
+                del original_queue_by_key[original_key]
+                review_origin = "explicit_qualified_discovery_to_original_source_identity_review"
+            else:
+                original_membership = None
+
             draft = {
                 "draft_institution_id": stable_uuid("institution", review_key),
                 "review_identity_key": review_key,
-                "review_origin": "explicit_qualified_discovery_identity_review",
+                "review_origin": review_origin,
                 "review_batch_id": batch_id,
                 "canonical_name_en": decision["provisional_canonical_name_en"],
                 "canonical_name_status": "reviewed_provisional",
-                "identity_review_decision": decision["decision"],
+                "identity_review_decision": decision_type,
                 "identity_review_confidence": decision["decision_confidence"],
-                "source_record_count": 1,
-                "source_memberships": [membership],
+                "source_record_count": len(source_memberships),
+                "source_memberships": source_memberships,
                 "division_scoped_evidence": False,
                 "evidence_urls": list(decision["evidence_urls"]),
                 "review_note": decision["review_note"],
@@ -174,13 +226,20 @@ def build(base_dir: Path, qualified_leads_path: Path, decision_paths: list[Path]
             }
             institutions.append(draft)
             institution_by_review_key[review_key] = draft
-            seen_discovery_source_keys.add(source_key)
+            seen_discovery_source_keys.add(discovery_key)
             discovered_memberships.append({
                 "draft_institution_id": draft["draft_institution_id"],
                 "review_identity_key": review_key,
                 "review_batch_id": batch_id,
-                **membership,
+                **discovery_membership,
             })
+            if original_membership is not None:
+                overlap_original_memberships.append({
+                    "draft_institution_id": draft["draft_institution_id"],
+                    "review_identity_key": review_key,
+                    "review_batch_id": batch_id,
+                    **original_membership,
+                })
 
         batch_details.append({
             "batch_id": batch_id,
@@ -197,40 +256,48 @@ def build(base_dir: Path, qualified_leads_path: Path, decision_paths: list[Path]
         if row.get("scope_state") == "eligible"
         and (row["source_id"], row["source_record_id"]) not in seen_discovery_source_keys
     ]
+    original_queue_out = sorted(
+        original_queue_by_key.values(), key=lambda row: (row["source_id"], row["source_record_id"])
+    )
 
     institutions.sort(key=lambda row: row["review_identity_key"])
     divisions.sort(key=lambda row: (row["review_identity_key"], row["division_key"]))
-    discovered_memberships.sort(key=lambda row: row["review_identity_key"])
+    discovered_memberships.sort(key=lambda row: (row["review_identity_key"], row["source_record_id"]))
+    overlap_original_memberships.sort(key=lambda row: (row["review_identity_key"], row["source_record_id"]))
 
     output_dir.mkdir(parents=True, exist_ok=True)
     institutions_path = output_dir / "reviewed-institution-drafts.jsonl"
     divisions_path = output_dir / "reviewed-school-division-drafts.jsonl"
     discovered_memberships_path = output_dir / "discovered-source-memberships.jsonl"
+    overlap_original_memberships_path = output_dir / "discovery-overlap-original-source-memberships.jsonl"
     original_queue_path = output_dir / "original-unreviewed-source-queue.jsonl"
     discovery_queue_path = output_dir / "unqualified-discovery-queue.jsonl"
     qualified_queue_path = output_dir / "qualified-discovery-identity-queue.jsonl"
     write_jsonl(institutions_path, institutions)
     write_jsonl(divisions_path, divisions)
     write_jsonl(discovered_memberships_path, discovered_memberships)
-    write_jsonl(original_queue_path, original_queue)
+    write_jsonl(overlap_original_memberships_path, overlap_original_memberships)
+    write_jsonl(original_queue_path, original_queue_out)
     write_jsonl(discovery_queue_path, unqualified_discovery)
     write_jsonl(qualified_queue_path, qualified_identity_queue)
 
+    reviewed_source_or_lead_rows = 35 + len(reviewed_original_overlap_keys) + len(discovered_memberships)
     summary = {
-        "schema_version": 2,
+        "schema_version": 3,
         "built_at": datetime.now(timezone.utc).isoformat(),
         "work_package": "D2.2_discovery_identity_review_materialization",
         "deterministic_id_namespace": str(DRAFT_NAMESPACE),
         "base_reviewed_institution_drafts": 24,
         "discovery_identity_review_batches": len(batch_details),
         "discovery_identity_review_batch_details": batch_details,
-        "new_discovered_identity_drafts": len(discovered_memberships),
+        "new_discovery_driven_identity_drafts": len(discovered_memberships),
         "reviewed_institution_drafts": len(institutions),
         "reviewed_division_drafts": len(divisions),
         "base_reviewed_original_source_rows": 35,
+        "reviewed_original_source_rows_from_discovery_overlap": len(reviewed_original_overlap_keys),
         "reviewed_discovery_source_rows": len(discovered_memberships),
-        "reviewed_source_or_lead_rows": 35 + len(discovered_memberships),
-        "original_unreviewed_source_rows": len(original_queue),
+        "reviewed_source_or_lead_rows": reviewed_source_or_lead_rows,
+        "original_unreviewed_source_rows": len(original_queue_out),
         "unqualified_discovery_rows": len(unqualified_discovery),
         "qualified_discovery_rows_pending_identity_review": len(qualified_identity_queue),
         "full_universe_unique_institution_count_claimed": None,
@@ -244,6 +311,7 @@ def build(base_dir: Path, qualified_leads_path: Path, decision_paths: list[Path]
             "institutions": institutions_path.name,
             "school_divisions": divisions_path.name,
             "discovered_source_memberships": discovered_memberships_path.name,
+            "discovery_overlap_original_source_memberships": overlap_original_memberships_path.name,
             "original_unreviewed_source_queue": original_queue_path.name,
             "unqualified_discovery_queue": discovery_queue_path.name,
             "qualified_discovery_identity_queue": qualified_queue_path.name,
