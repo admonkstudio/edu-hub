@@ -5,11 +5,12 @@ This wrapper performs only the safe D1.3 preparation gates:
 1. capture public EMIS page/form evidence with GET requests;
 2. discover bounded same-origin school-search endpoints from that evidence;
 3. submit only the root page's top-level school-category navigation buttons;
-4. analyze the resulting saved search-form evidence offline.
+4. when required, submit one explicit non-search ASP.NET control postback to hydrate dependent selects;
+5. analyze the resulting saved search-form evidence offline.
 
 It packages only redacted/shareable evidence into one ZIP for handoff. Untouched
 raw HTML remains local and is never included in the bundle. The tool does not
-select search filters, enumerate schools or follow result pagination.
+submit a school-search button, enumerate schools or follow result pagination.
 """
 from __future__ import annotations
 
@@ -144,6 +145,7 @@ def main() -> int:
     repo_root = Path(__file__).resolve().parents[2]
     capture = repo_root / "tools" / "data-acquisition" / "emis_local_capture.py"
     navigation_probe = repo_root / "tools" / "data-acquisition" / "emis_navigation_probe.py"
+    hydration_probe = repo_root / "tools" / "data-acquisition" / "emis_control_hydration_probe.py"
     analyzer = repo_root / "tools" / "data-acquisition" / "registry" / "analyze_emis_capture.py"
     output_dir = args.output_dir
     if not output_dir.is_absolute():
@@ -177,9 +179,6 @@ def main() -> int:
             )
             return capture_rc
 
-    # The live directory uses ASP.NET submit buttons for category navigation.
-    # This bounded probe POSTs only those top-level buttons; it does not choose
-    # filters or submit a school search.
     navigation_rc = run([
         sys.executable,
         str(navigation_probe),
@@ -194,6 +193,21 @@ def main() -> int:
         print(
             f"Top-level EMIS navigation probe did not resolve a search page (exit {navigation_rc}). "
             "The diagnostic bundle will still be produced.",
+            file=sys.stderr,
+        )
+
+    hydration_rc = run([
+        sys.executable,
+        str(hydration_probe),
+        "--output-dir",
+        str(output_dir),
+        "--timeout",
+        str(args.timeout),
+    ])
+    if hydration_rc != 0:
+        print(
+            f"No safe dependent-control hydration contract was completed (exit {hydration_rc}). "
+            "This does not authorize a school search and the diagnostic bundle will still be produced.",
             file=sys.stderr,
         )
 
@@ -216,7 +230,14 @@ def main() -> int:
         print("Raw HTML remains local and is not included in the bundle.")
         return analyze_rc
 
-    print("EMIS D1.3 contract capture is ready for bounded pilot-adapter implementation.")
+    contract = json.loads((output_dir / "enumerator-contract.json").read_text(encoding="utf-8"))
+    if contract.get("government_adapter_design_unblocked"):
+        print("EMIS D1.3 government-school contract is ready for bounded pilot-adapter implementation.")
+    else:
+        print(
+            "An EMIS search-form contract is ready for bounded ASP.NET mechanics work, "
+            "but government-school national enumeration remains blocked."
+        )
     print(f"Capture report: {output_dir / 'capture-report.json'}")
     print(f"Enumerator contract: {output_dir / 'enumerator-contract.json'}")
     print(f"Shareable handoff bundle: {archive_path}")
