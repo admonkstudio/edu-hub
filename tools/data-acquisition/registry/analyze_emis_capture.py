@@ -158,6 +158,7 @@ def analyze(report: dict, capture_dir: Path) -> dict:
                     "saved_html_present": html_exists,
                     "sha256": page.get("sha256"),
                     "aspnet_detected": bool(page.get("aspnet_detected")),
+                    "visible_error_messages": page.get("visible_error_messages") or [],
                 },
                 "form": {
                     "index": form.get("index"),
@@ -176,6 +177,23 @@ def analyze(report: dict, capture_dir: Path) -> dict:
     primary = candidates[0] if candidates else None
     warnings: list[str] = []
 
+    hydration = report.get("hydration_probe") or {}
+    hydration_attempted = bool(hydration.get("performed"))
+    hydration_controls_discovered = int(hydration.get("controls_discovered") or 0)
+    hydration_controls_submitted = int(hydration.get("controls_submitted") or 0)
+    hydration_populated_selects = int(hydration.get("populated_selects") or 0)
+    hydration_exhausted_without_population = bool(
+        hydration_attempted
+        and hydration_controls_discovered > 0
+        and hydration_controls_submitted >= hydration_controls_discovered
+        and hydration_populated_selects == 0
+    )
+    hydration_error_pages = sum(
+        1
+        for page in pages
+        if page.get("request_kind") == "control_hydration" and page.get("visible_error_messages")
+    )
+
     if not reachable:
         warnings.append("No reachable EMIS page was captured; adapter design must remain blocked.")
     if primary is None:
@@ -184,10 +202,14 @@ def analyze(report: dict, capture_dir: Path) -> dict:
         multi = [s for s in primary["form"]["selects"] if s["options_count"] > 1]
         empty_selects = [s for s in primary["form"]["selects"] if s["options_count"] == 0]
         if not multi:
-            if empty_selects and primary["form"]["hydration_controls"]:
+            if empty_selects and primary["form"]["hydration_controls"] and not hydration_attempted:
                 warnings.append(
                     "Primary search form exposes empty select controls that require a bounded ASP.NET "
                     "control-hydration postback before adapter design can be finalized."
+                )
+            elif hydration_attempted:
+                warnings.append(
+                    "Bounded ASP.NET hydration was attempted, but the dependent select controls remained empty."
                 )
             else:
                 warnings.append("Primary form has no multi-option select controls to enumerate.")
@@ -200,6 +222,16 @@ def analyze(report: dict, capture_dir: Path) -> dict:
                 f"Primary usable form scope is {primary['page']['scope']}; this is not evidence that "
                 "the government-school route is healthy or enumerable."
             )
+
+    if hydration_exhausted_without_population:
+        warnings.append(
+            "All bounded non-placeholder Special Education type postbacks were tested without populating dependent controls; "
+            "treat this as a live source data-loading blocker rather than a client-side postback-format problem."
+        )
+    if hydration_error_pages:
+        warnings.append(
+            f"{hydration_error_pages} hydration response(s) exposed a visible EMIS server-side error message."
+        )
 
     inferred_roles = {}
     if primary:
@@ -223,7 +255,8 @@ def analyze(report: dict, capture_dir: Path) -> dict:
         adapter_design_unblocked and primary and primary["page"]["scope"] == "government"
     )
     hydration_probe_recommended = bool(
-        primary
+        not hydration_attempted
+        and primary
         and primary["page"]["saved_html_present"]
         and primary["form"]["selects"]
         and not any(s["options_count"] > 1 for s in primary["form"]["selects"])
@@ -241,9 +274,14 @@ def analyze(report: dict, capture_dir: Path) -> dict:
             f"Use the {primary['page']['scope']} contract only as a bounded ASP.NET mechanics pilot. "
             "Keep government-school national enumeration blocked until a healthy government search form is captured."
         )
+    elif hydration_exhausted_without_population:
+        next_gate = (
+            "Do not repeat the same EMIS hydration probes. Keep government-school enumeration blocked, periodically recheck "
+            "the official government route, and pursue the official machine-readable MOE/EMIS export in parallel."
+        )
     elif hydration_probe_recommended:
         next_gate = (
-            f"Run one bounded non-search control-hydration postback on the {primary['page']['scope']} form, "
+            f"Run bounded non-search control-hydration postbacks on the {primary['page']['scope']} form, "
             "capture the populated selects, then re-run offline analysis. Do not submit the school-search button."
         )
     else:
@@ -253,7 +291,7 @@ def analyze(report: dict, capture_dir: Path) -> dict:
         )
 
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "capture_tool": report.get("tool"),
         "capture_version": report.get("version"),
         "captured_at": report.get("captured_at"),
@@ -262,6 +300,12 @@ def analyze(report: dict, capture_dir: Path) -> dict:
         "adapter_design_unblocked": adapter_design_unblocked,
         "government_adapter_design_unblocked": government_adapter_design_unblocked,
         "hydration_probe_recommended": hydration_probe_recommended,
+        "hydration_attempted": hydration_attempted,
+        "hydration_controls_discovered": hydration_controls_discovered,
+        "hydration_controls_submitted": hydration_controls_submitted,
+        "hydration_populated_selects": hydration_populated_selects,
+        "hydration_exhausted_without_population": hydration_exhausted_without_population,
+        "hydration_error_pages": hydration_error_pages,
         "bulk_enumeration_authorized_by_this_tool": False,
         "primary_form_candidate": primary,
         "inferred_control_roles": inferred_roles,
