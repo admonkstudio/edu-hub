@@ -107,7 +107,7 @@ def similarity(left: str, right: str) -> float:
     return SequenceMatcher(None, left_compact, right_compact).ratio()
 
 
-def reconcile(scu_rows: list[dict], mohesr_rows: list[dict], fuzzy_threshold: float = 0.86) -> tuple[list[dict], list[dict], dict]:
+def reconcile(scu_rows: list[dict], mohesr_rows: list[dict], fuzzy_threshold: float = 0.90) -> tuple[list[dict], list[dict], dict]:
     scu = group_scu(scu_rows)
     mohesr = group_mohesr(mohesr_rows)
     scu_by_name = {row["normalized_name_ar"]: row for row in scu}
@@ -134,12 +134,12 @@ def reconcile(scu_rows: list[dict], mohesr_rows: list[dict], fuzzy_threshold: fl
         matched_scu.add(s["normalized_name_ar"])
         matched_moh.add(m["normalized_name_ar"])
 
-    unmatched_moh = [m for m in mohesr if m["normalized_name_ar"] not in matched_moh]
-    unmatched_scu = [s for s in scu if s["normalized_name_ar"] not in matched_scu]
+    unresolved_moh = [m for m in mohesr if m["normalized_name_ar"] not in matched_moh]
+    unresolved_scu = [s for s in scu if s["normalized_name_ar"] not in matched_scu]
 
-    for m in unmatched_moh:
+    for m in unresolved_moh:
         ranked = sorted(
-            ((similarity(m["normalized_name_ar"], s["normalized_name_ar"]), s) for s in unmatched_scu),
+            ((similarity(m["normalized_name_ar"], s["normalized_name_ar"]), s) for s in unresolved_scu),
             key=lambda item: item[0], reverse=True
         )[:3]
         candidates = [
@@ -156,17 +156,23 @@ def reconcile(scu_rows: list[dict], mohesr_rows: list[dict], fuzzy_threshold: fl
                 "candidate_scu_matches": candidates,
             })
 
+    fuzzy_edges = sum(len(task["candidate_scu_matches"]) for task in review)
     report = {
-        "schema_version": 1,
+        "schema_version": 2,
         "scu_private_source_rows": len(scu_rows),
         "scu_private_distinct_normalized_names": len(scu),
         "mohesr_sector_occurrences": len(mohesr_rows),
         "mohesr_distinct_normalized_names": len(mohesr),
         "mohesr_duplicate_sector_occurrences": len(mohesr_rows) - len(mohesr),
         "exact_normalized_name_proposals": len(exact),
+        "mohesr_unresolved_after_exact": len(unresolved_moh),
+        "scu_unresolved_after_exact": len(unresolved_scu),
+        "fuzzy_similarity_threshold": fuzzy_threshold,
         "fuzzy_review_tasks": len(review),
-        "unmatched_mohesr_distinct_names": len(unmatched_moh) - len(review),
-        "unmatched_scu_distinct_names": len(unmatched_scu),
+        "fuzzy_candidate_edges": fuzzy_edges,
+        "mohesr_without_fuzzy_suggestion": len(unresolved_moh) - len(review),
+        "unmatched_mohesr_distinct_names": len(unresolved_moh),
+        "unmatched_scu_distinct_names": len(unresolved_scu),
         "automatic_identity_acceptances": 0,
         "edu_core_rows_created": 0,
         "core_mutation_performed": False,
@@ -174,8 +180,9 @@ def reconcile(scu_rows: list[dict], mohesr_rows: list[dict], fuzzy_threshold: fl
         "notes": [
             "MOHESR sector occurrences are grouped by normalized name before cross-registry comparison.",
             "Exact normalized-name matches are proposals only and still require review before canonical merge.",
-            "Fuzzy matches are suggestions only and never automatic identity evidence.",
-            "Unmatched counts are acquisition/reconciliation gaps, not proof that one source is wrong.",
+            "Fuzzy matches are suggestions only and never reduce unresolved identity counts until a review decision is recorded.",
+            "The default fuzzy threshold is intentionally conservative to favor review precision over recall.",
+            "Unresolved counts are acquisition/reconciliation gaps, not proof that one source is wrong.",
         ],
     }
     return exact, review, report
@@ -192,7 +199,7 @@ def main() -> int:
     parser.add_argument("--scu-csv", required=True, type=Path)
     parser.add_argument("--mohesr-private", required=True, type=Path)
     parser.add_argument("--out-dir", default="artifacts/edu-data-1/higher-ed-reconciliation", type=Path)
-    parser.add_argument("--fuzzy-threshold", type=float, default=0.86)
+    parser.add_argument("--fuzzy-threshold", type=float, default=0.90)
     args = parser.parse_args()
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
