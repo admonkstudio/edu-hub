@@ -5,9 +5,11 @@ on:
     branches:
       - edu-data-2-international-registry
     paths:
+      - 'tools/data-acquisition/international/build_authoritative_seed.py'
       - 'tools/data-acquisition/international/build_accreditor_expansion.py'
       - 'tools/data-acquisition/international/plan_identity_reconciliation.py'
       - 'tools/data-acquisition/international/build_candidate_universe.py'
+      - 'tools/data-acquisition/international/seeds/ib-detail-evidence-2026-09-15.json'
       - 'tools/data-acquisition/international/seeds/cis-egypt-accreditation-evidence-2026-09-15.json'
       - 'tools/data-acquisition/international/seeds/cognia-egypt-milestones-2026-2027.json'
       - '.github/workflows/edu-data-2-accreditor-expansion.yml'
@@ -70,8 +72,8 @@ jobs:
           assert summary['database_mutation_performed'] is False
 
           assert universe['source_record_count'] == 106
-          assert universe['scope_or_lead_state_counts']['candidate'] == 68
-          assert universe['scope_or_lead_state_counts']['eligible'] == 35
+          assert universe['scope_or_lead_state_counts']['candidate'] == 67
+          assert universe['scope_or_lead_state_counts']['eligible'] == 36
           assert universe['scope_or_lead_state_counts']['excluded'] == 3
           assert universe['english_name_present'] == 106
           assert universe['arabic_name_present'] == 9
@@ -87,6 +89,7 @@ jobs:
           assert all(row['automatic_merge_performed'] is False for row in rows)
           assert all(row['decision'] == 'needs_review' for row in proposals)
           assert all(row['left_source_id'] != row['right_source_id'] for row in proposals)
+          assert all(row['matcher_version'] == 'edu-data-2-name-v2' for row in proposals)
           print(json.dumps({'expansion': summary, 'combined_universe': universe, 'identity_review_proposals': len(proposals)}, indent=2))
           PY
       - uses: actions/upload-artifact@v4
