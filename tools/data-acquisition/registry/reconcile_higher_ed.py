@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
-"""Build review-only SCU <-> MOHESR private-institute reconciliation proposals.
+"""Build review-only higher-education reconciliation proposals.
 
-No match is accepted automatically and this tool never writes to edu_core.
+The current scope reconciles SCU <-> MOHESR private-institute identities and
+preserves the official MOHESR technological-college -> technical-institute
+hierarchy as source-backed relationship proposals.
+
+No identity or relationship is accepted automatically and this tool never
+writes to edu_core or any public projection.
 """
 from __future__ import annotations
 
@@ -158,7 +163,7 @@ def reconcile(scu_rows: list[dict], mohesr_rows: list[dict], fuzzy_threshold: fl
 
     fuzzy_edges = sum(len(task["candidate_scu_matches"]) for task in review)
     report = {
-        "schema_version": 2,
+        "schema_version": 3,
         "scu_private_source_rows": len(scu_rows),
         "scu_private_distinct_normalized_names": len(scu),
         "mohesr_sector_occurrences": len(mohesr_rows),
@@ -174,6 +179,7 @@ def reconcile(scu_rows: list[dict], mohesr_rows: list[dict], fuzzy_threshold: fl
         "unmatched_mohesr_distinct_names": len(unresolved_moh),
         "unmatched_scu_distinct_names": len(unresolved_scu),
         "automatic_identity_acceptances": 0,
+        "automatic_relationship_acceptances": 0,
         "edu_core_rows_created": 0,
         "core_mutation_performed": False,
         "public_promotion_performed": False,
@@ -188,6 +194,66 @@ def reconcile(scu_rows: list[dict], mohesr_rows: list[dict], fuzzy_threshold: fl
     return exact, review, report
 
 
+def build_technical_hierarchy(parents: list[dict], institutes: list[dict]) -> tuple[list[dict], list[dict], dict]:
+    """Create review-only parent/child proposals from the official MOHESR hierarchy."""
+    parent_ids = [clean(row.get("source_record_id")) for row in parents]
+    child_ids = [clean(row.get("source_record_id")) for row in institutes]
+    duplicate_parent_ids = sorted({value for value in parent_ids if value and parent_ids.count(value) > 1})
+    duplicate_child_ids = sorted({value for value in child_ids if value and child_ids.count(value) > 1})
+    parent_by_id = {clean(row.get("source_record_id")): row for row in parents if clean(row.get("source_record_id"))}
+
+    proposals: list[dict] = []
+    review: list[dict] = []
+    for child in institutes:
+        child_id = clean(child.get("source_record_id"))
+        parent_id = clean(child.get("parent_source_record_id"))
+        parent = parent_by_id.get(parent_id)
+        if not child_id or not parent_id or parent is None:
+            review.append({
+                "task_type": "technical_hierarchy_integrity_review",
+                "status": "open",
+                "decision": "needs_review",
+                "automatic_acceptance": False,
+                "child_source_record_id": child_id or None,
+                "parent_source_record_id": parent_id or None,
+                "reason": "missing_child_id" if not child_id else "missing_parent_id" if not parent_id else "unknown_parent_reference",
+                "child": child,
+            })
+            continue
+
+        proposal_key = f"technical-hierarchy|{parent_id}|{child_id}"
+        proposals.append({
+            "proposal_id": str(uuid.uuid5(NAMESPACE, proposal_key)),
+            "task_type": "higher_ed_hierarchy_link",
+            "relationship_type": "technological_college_parent",
+            "source_authority": "primary_official_registry",
+            "decision": "unreviewed",
+            "automatic_acceptance": False,
+            "core_mutation_allowed": False,
+            "parent_source_record_id": parent_id,
+            "child_source_record_id": child_id,
+            "parent": parent,
+            "child": child,
+        })
+
+    report = {
+        "technical_parent_source_rows": len(parents),
+        "technical_parent_distinct_ids": len({value for value in parent_ids if value}),
+        "technical_parent_duplicate_ids": len(duplicate_parent_ids),
+        "technical_institute_source_rows": len(institutes),
+        "technical_institute_distinct_ids": len({value for value in child_ids if value}),
+        "technical_institute_duplicate_ids": len(duplicate_child_ids),
+        "technical_hierarchy_source_backed_proposals": len(proposals),
+        "technical_hierarchy_review_tasks": len(review),
+        "technical_hierarchy_invalid_links": len(review),
+        "automatic_relationship_acceptances": 0,
+        "edu_core_rows_created": 0,
+        "core_mutation_performed": False,
+        "public_promotion_performed": False,
+    }
+    return proposals, review, report
+
+
 def write_jsonl(path: Path, rows: list[dict]) -> None:
     with path.open("w", encoding="utf-8") as handle:
         for row in rows:
@@ -198,14 +264,32 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--scu-csv", required=True, type=Path)
     parser.add_argument("--mohesr-private", required=True, type=Path)
+    parser.add_argument("--mohesr-technical-parents", type=Path)
+    parser.add_argument("--mohesr-technical-institutes", type=Path)
     parser.add_argument("--out-dir", default="artifacts/edu-data-1/higher-ed-reconciliation", type=Path)
     parser.add_argument("--fuzzy-threshold", type=float, default=0.90)
     args = parser.parse_args()
+
+    if bool(args.mohesr_technical_parents) != bool(args.mohesr_technical_institutes):
+        raise SystemExit("Provide both --mohesr-technical-parents and --mohesr-technical-institutes, or neither")
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
     exact, review, report = reconcile(load_scu(args.scu_csv), load_jsonl(args.mohesr_private), args.fuzzy_threshold)
     write_jsonl(args.out_dir / "exact_name_proposals.jsonl", exact)
     write_jsonl(args.out_dir / "fuzzy_review_tasks.jsonl", review)
+
+    if args.mohesr_technical_parents and args.mohesr_technical_institutes:
+        hierarchy, hierarchy_review, hierarchy_report = build_technical_hierarchy(
+            load_jsonl(args.mohesr_technical_parents),
+            load_jsonl(args.mohesr_technical_institutes),
+        )
+        write_jsonl(args.out_dir / "technical_hierarchy_proposals.jsonl", hierarchy)
+        write_jsonl(args.out_dir / "technical_hierarchy_review_tasks.jsonl", hierarchy_review)
+        report.update(hierarchy_report)
+        report["notes"].append(
+            "MOHESR technological-college parent links are preserved as source-backed proposals only; no canonical relationship is accepted automatically."
+        )
+
     (args.out_dir / "reconciliation_report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
