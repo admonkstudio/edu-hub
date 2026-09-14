@@ -151,6 +151,19 @@
       "active": true
     },
     {
+      "source_id": "edarabia_egypt",
+      "name": "Edarabia - Egypt Education Directory",
+      "url": "https://www.edarabia.com/schools/egypt/",
+      "publisher": "Edarabia",
+      "authority_class": "commercial_directory_supporting_source",
+      "role": ["discovery", "identity_support", "fee_lead", "curriculum_lead", "address_lead", "website_lead", "media_discovery"],
+      "auto_eligibility": false,
+      "scope_condition": "supporting_leads_only_primary_or_regulatory_confirmation_required",
+      "acquisition_mode": "public_directory_pages",
+      "active": true,
+      "notes": "Useful for discovering candidate institutions and missing profile fields such as fees, curriculum, location, photos and reviews. Edarabia-derived factual values remain secondary assertions until corroborated by a regulator, accreditor or official institution source. Images are discovery-only and are not publication-safe by default. Ratings/reviews are not treated as canonical factual evidence."
+    },
+    {
       "source_id": "legacy_v7_archive",
       "name": "Edu Hub V7 Owned Archive",
       "url": "owned://edu-hub/v7",
