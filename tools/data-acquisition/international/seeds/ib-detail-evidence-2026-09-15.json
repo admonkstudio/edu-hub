@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "source_id": "ib_world_schools_egypt",
+  "snapshot_date": "2026-09-15",
+  "notes": "Incremental current IB school-profile evidence captured after the 2026-09-14 detail seed. Records in this file supplement, not replace, the prior detail snapshot.",
+  "records": [
+    {
+      "name": "Evolution International School - NewGiza",
+      "ib_school_code": "061134",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "eisng.lvng.net",
+      "phone": "+2001003666223",
+      "address": null,
+      "source_url": "https://www-prod.ibo.org/school/061134/",
+      "programmes": {
+        "dp_authorized_since": "2020-12-22",
+        "pyp_myp_authorized_since": "2026-03-12"
+      }
+    }
+  ],
+  "records_count": 1,
+  "eligible_private": 1,
+  "excluded_state": 0
+}
