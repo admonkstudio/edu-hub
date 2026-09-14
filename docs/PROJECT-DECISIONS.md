@@ -108,6 +108,28 @@ Record durable decisions here. Do not use this file for temporary task notes.
 
 **Decision:** The raw JSON payload does not receive a speculative GIN index. Public search and fast rendering will use a later purpose-built canonical/public read model rather than querying source-shaped evidence payloads.
 
+## 2026-09-13 — Egypt National Education Registry
+
+**Decision:** EDU-DATA-1 replaces broad scraped-directory expansion as the active data milestone. Edu Hub will first build Egypt's canonical education identity registry, then enrich known entities progressively.
+
+**Decision:** The enforced data path is `external source -> edu_raw -> edu_staging -> edu_core -> public projection -> website/CMS`. Raw/staging evidence may never be published directly.
+
+**Decision:** Institution identity validity is separate from profile completeness. A legitimate institution remains valid even when fees, contacts, websites, media or other optional fields are unknown or not applicable.
+
+**Decision:** Every externally sourced canonical fact must retain provenance. Conflicts remain competing assertions/review work until resolved; AI and enrichment processes may not invent missing facts.
+
+**Decision:** Official national totals are coverage targets, not acquired-row counts. Secondary directories cannot be used to claim complete MOE or MOSS national coverage.
+
+**Decision:** MOE/EMIS is the required primary identity source for the national school universe. If hosted runners cannot reach it, acquisition must run from an Egypt-reachable environment or use an official machine-readable export rather than substituting a secondary directory.
+
+**Decision:** MOSS nursery coverage must come from an official row-level export/data-sharing route or the ministry's public nursery platform when such data is exposed; secondary nursery directories are discovery/enrichment only.
+
+## 2026-09-14 — Higher-education hierarchy reconciliation
+
+**Decision:** MOHESR technical institutions preserve the official hierarchy of 8 technological-college parents and 44 technical institutes instead of flattening all rows into unrelated institutions.
+
+**Decision:** Source-declared parent/child relationships enter staging as source-backed relationship proposals. They are not automatically accepted into `edu_core`, and CI must enforce zero automatic identity/relationship acceptance and zero public promotion.
+
 ## Pending decisions
 
 - final public brand name
