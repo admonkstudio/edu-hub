@@ -59,6 +59,7 @@ jobs:
 
           seed_dir = Path('tools/data-acquisition/international/seeds')
           ib = json.loads((seed_dir/'ib-egypt-directory-2026-09-14.json').read_text(encoding='utf-8'))
+          ib_detail = json.loads((seed_dir/'ib-detail-evidence-2026-09-14.json').read_text(encoding='utf-8'))
           fr = json.loads((seed_dir/'french-homologation-egypt-2026-2027.json').read_text(encoding='utf-8'))
           de = json.loads((seed_dir/'german-kmk-egypt-2026-04.json').read_text(encoding='utf-8'))
           scu = json.loads((seed_dir/'scu-foreign-university-branches-2026-09-14.json').read_text(encoding='utf-8'))
@@ -66,6 +67,9 @@ jobs:
           media = json.loads((seed_dir/'wikimedia-media-verified-2026-09-14.json').read_text(encoding='utf-8'))
           assert len(ib['schools']) == ib['directory_count_observed'] == 54
           assert ib['count_conflict_requires_review'] is True
+          assert len(ib_detail['records']) == ib_detail['records_count'] == 7
+          assert ib_detail['eligible_private'] == 4
+          assert ib_detail['excluded_state'] == 3
           assert len(fr['records']) == fr['records_count'] == 17
           assert len(de['records']) == de['records_count'] == 4
           assert len(scu['records']) == scu['records_count'] == 9
@@ -74,7 +78,7 @@ jobs:
           assert all(row['public_use_allowed'] is True for row in media['assets'])
           assert all(row['rights_basis'] for row in media['assets'])
           assert all(row['identity_match_state'] == 'verified_by_file_description' for row in media['assets'])
-          print(f"validated {len(ids)} registered sources, 85 source snapshot rows and 5 reviewed media assets")
+          print(f"validated {len(ids)} registered sources, 85 source rows, 7 IB detail decisions and 5 reviewed media assets")
           PY
       - name: Test live-parser and scope boundaries
         run: python tools/data-acquisition/international/test_acquisition.py
@@ -102,8 +106,10 @@ jobs:
           p = Path('artifacts/international/authoritative-source-summary.json')
           data = json.loads(p.read_text(encoding='utf-8'))
           assert data['source_rows'] == 85
-          assert data['eligible_source_rows'] == 31
-          assert data['candidate_source_rows'] == 54
+          assert data['eligible_source_rows'] == 35
+          assert data['candidate_source_rows'] == 47
+          assert data['excluded_source_rows'] == 3
+          assert data['ib_detail_rows_applied'] == 7
           assert data['unique_institutions_claimed'] is None
           assert data['identity_reconciliation_required'] is True
           assert data['database_mutation_performed'] is False
