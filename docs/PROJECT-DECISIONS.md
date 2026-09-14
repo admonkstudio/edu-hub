@@ -1,157 +1,138 @@
 # Edu Hub Project Decisions
 
-Record durable decisions here. Do not use this file for temporary task notes.
+This file contains the **active durable decisions** for the current product scope.
 
-## 2026-08-18 — Project ownership and brand relationship
+Historical national-registry decisions remain preserved on branch `edu-data-1-national-registry` and in Git history. They are not active instructions unless explicitly carried forward below.
 
-**Decision:** Edu Hub is an Admonk-owned product venture presented as an independent brand rather than an Admonk-branded client service.
+## 2026-08-18 — Ownership and product model
 
-## 2026-08-18 — Initial market
+**Decision:** Edu Hub is an Admonk-owned product venture presented as an independent brand.
 
-**Decision:** Egypt is the first market. Global expansion is a future possibility, not a Phase 1 requirement.
+**Decision:** Egypt is the first market.
 
-## 2026-08-18 — Primary audience
+**Decision:** Parents and students are the primary audience.
 
-**Decision:** Parents and students are the primary audience. Institution/commercial demand should follow user demand.
-
-## 2026-08-18 — Phase boundary
-
-**Decision:** Phase 1 focuses on directory + editorial authority, research/admin operations, bilingual SEO architecture and the data foundation. Monetization functions are deferred to Phase 2.
+**Decision:** Phase 1 focuses on trustworthy discovery/directory data, editorial authority, research/admin operations, bilingual SEO architecture and the data foundation. Monetization is deferred.
 
 ## 2026-08-18 — Platform
 
-**Decision:** Astro + TypeScript is the approved frontend/application framework direction.
+**Decision:** Astro + TypeScript remains the approved frontend/application direction.
 
 **Decision:** PostgreSQL is the operational source of truth.
 
-**Decision:** Supabase is the approved initial backend platform direction for database/auth/storage, with PostGIS for geographic needs.
+**Decision:** Supabase is the approved initial database/auth/storage platform direction, with PostGIS for geographic needs.
 
-## 2026-08-18 — Bilingual architecture
-
-**Decision:** Arabic and English launch together as first-class locales, initially `ar-EG` and `en-EG`.
+**Decision:** Arabic and English are first-class locales from launch, initially `ar-EG` and `en-EG`.
 
 ## 2026-08-18 — Data trust
 
-**Decision:** Official/primary sources are prioritized.
+**Decision:** Official, regulatory, accreditation and institution-primary evidence is preferred over secondary directories.
 
-**Decision:** Factual/data verification is separate from commercial/payment status.
+**Decision:** Factual verification is separate from commercial/payment status.
 
-**Decision:** Important changing facts should preserve source provenance and history where practical.
+**Decision:** Important changing facts preserve source provenance and history where practical.
 
-## 2026-08-18 — SEO architecture
+**Decision:** AI may assist research, matching, localization and drafting but may not invent unsupported institution facts or silently overwrite verified canonical values.
 
-**Decision:** Database records do not automatically become indexable pages.
+## 2026-09-06 — Owned data and media independence
 
-**Decision:** Arbitrary faceted/filter combinations do not automatically generate indexable SEO URLs.
+**Decision:** Edu Hub retains its own persistent copy of acquired data needed to operate the product. Public pages do not depend on live third-party APIs after acquisition.
 
-**Decision:** Programmatic landing pages must be curated/rule-governed and justified by real user/search value.
+**Decision:** Media provenance and rights are separate from possession of a file. Public-use eligibility must be explicit.
 
-**Decision:** Dynamic database-driven routes require a database-driven sitemap strategy.
+**Decision:** Published pages must not hotlink source-site images as an operational dependency.
 
-## 2026-08-18 — Search
+**Decision:** Identical media binaries should be content-addressed/deduplicated while preserving every source-to-media provenance link.
 
-**Decision:** Start with PostgreSQL search + structured filters + PostGIS. Introduce a dedicated search engine only when measured requirements justify it.
+## 2026-09-13 — Evidence architecture retained
 
-## 2026-08-18 — AI boundary
+**Decision:** The enforced data path remains:
 
-**Decision:** AI can assist research, briefs, drafting, localization and refresh detection but must not initially publish unsupported factual content or silently overwrite verified canonical facts.
+`external source -> edu_raw -> edu_staging -> edu_core -> public projection -> website`
 
-## 2026-08-18 — Reusability
+**Decision:** `edu_raw` and `edu_staging` are private evidence/research layers and are never published directly.
 
-**Decision:** Build Edu Hub cleanly but do not prematurely create a generic multi-vertical SaaS framework. Generalize only after another real vertical demonstrates reusable boundaries.
+**Decision:** Identity validity is separate from profile completeness. Missing fees, media or contact fields do not justify invented values.
 
-## 2026-09-06 — Owned data and runtime independence
+**Decision:** Conflicting assertions remain review work until resolved.
 
-**Decision:** Edu Hub must hold its own persistent copy of acquired institution records. Third-party directories, government sites and APIs are acquisition/refresh inputs only; they must never be required to render an institution already acquired by Edu Hub.
+## 2026-09-14 — Scope reset to international education
 
-**Decision:** Public page rendering must use Edu Hub-controlled database projections rather than live source API calls.
+**Decision:** EDU-DATA-2 supersedes the national all-institution registry as the active milestone.
 
-**Decision:** Media is a first-class part of the acquisition corpus. Media candidates, their provenance and—where acquisition is permitted—the binary copies themselves must be preserved under Admonk-controlled storage. Published pages must not depend on source-site image hotlinks.
+**Decision:** Active Phase 1 coverage is limited to international education in Egypt:
 
-**Decision:** Operational possession/control of a media copy is separate from copyright/publication rights. Media rights state and public-use eligibility must be tracked explicitly, with public use disabled by default until a defensible reuse basis is established.
+- private/independent international schools;
+- private/independent IB World Schools;
+- recognized foreign-national/international school models;
+- recognized foreign university branch campuses;
+- internationally chartered/accredited independent higher-education institutions whose international status is substantive.
 
-**Decision:** Database records and media storage must be portable and independently restorable. Provider accounts are infrastructure, not the only backup/source of truth.
+**Decision:** Egyptian public schools, Egyptian public universities, the 62,690-school EMIS target and the 48,225-nursery MOSS target are no longer active product requirements.
 
-**Decision:** Owned acquisition exports must be portable and independently verifiable with database and media checksum manifests.
+**Decision:** The national-registry work is retained historically rather than deleted. It may support future expansion but must not drive current acquisition or publication.
 
-**Decision:** Identical media binaries should be stored once by content hash while retaining every source-record-to-media provenance link.
+## 2026-09-14 — International eligibility standard
 
-**Decision:** Raw snapshot hashes must include source-record identity and the complete stored row, not payload content alone, so distinct records with identical payloads cannot be dropped by uniqueness constraints.
+**Decision:** Every candidate has an explicit scope state: `candidate`, `eligible`, `excluded`, or `needs_review`.
 
-## 2026-09-07 — MadaresEgypt profile acquisition boundary
+**Decision:** International status must be evidenced. A name containing words such as `International`, `American`, `British`, `German`, etc. is never sufficient by itself.
 
-**Decision:** MadaresEgypt is treated as a listing-level source for the current acquisition phase. A deterministic 50-record sample spanning the complete owned ID range produced zero accepted profiles and 50 read timeouts under a five-second, no-retry diagnostic.
+**Decision:** Strong eligibility evidence can include active IB authorization, official French homologation, official German/KMK recognition, Egyptian regulator recognition of a foreign university branch, or comparable recognized regulatory/accreditation evidence.
 
-**Decision:** Do not scale MadaresEgypt profile or media crawling from the current `/ar/Item/{id}` route. Reconsider only if a materially different, validated source endpoint or acquisition path becomes available.
+**Decision:** British Council Partner School/attached-centre status is discovery/support evidence and does not automatically make an institution eligible. An exam centre can still be an ordinary Egyptian language/private school.
 
-**Decision:** The existing 11,339 MadaresEgypt listing records remain part of the owned raw corpus with their source provenance. This limitation affects enrichment yield, not ownership or render independence.
+**Decision:** Overture, OpenStreetMap, commercial directories and the historical V7 archive are supporting/discovery sources. They cannot establish international eligibility alone.
 
-## 2026-09-07 — V7 consolidated owned archive
+**Decision:** Public/state international-school initiatives remain excluded unless the project owner later changes scope.
 
-**Decision:** V7 is the current complete portable acquisition archive. It consolidates V5 and V6 into 24,916 raw records across 13 sources, with explicit local ownership metadata for every record.
+## 2026-09-14 — Higher-education boundary
 
-**Decision:** V7 preserves 2,101 media provenance references and 453 content-addressed media binaries. Publication remains disabled for all acquired media until rights review.
+**Decision:** Recognized foreign university branches are included.
 
-**Decision:** A release archive is accepted only after database integrity, foreign-key checks, record uniqueness checks, media hash verification, gzip/archive traversal, and the complete internal checksum manifest pass.
+**Decision:** The American University in Cairo is eligible as an internationally chartered/accredited independent institution when supported by current institutional and recognized accreditation evidence.
 
-**Decision:** The damaged local V6 tarball is superseded and must not be used for restore. The complete extracted V6 database/media tree was the validated input to V7.
+**Decision:** An Egyptian university is not classified as internationally scoped merely because it has a foreign partnership, exchange, dual degree, franchise or validated programme. Those relationships may later be represented at programme level.
 
-**Decision:** PostgreSQL/Supabase may become the operational serving database, but the portable V7 SQLite database, media tree, manifests, and checksums remain an independent owned restore source.
+## 2026-09-14 — Campus identity
 
-## 2026-09-09 — Private Supabase raw archive boundary
+**Decision:** Institution and campus identities are separate. Multiple campuses of the same school/university should not be silently represented as unrelated institutions.
 
-**Decision:** The Supabase `edu_raw` schema is an internal evidence/archive surface, not a browser-facing Data API. Anonymous and authenticated roles receive no schema, table, sequence, or function access.
+**Decision:** Source-specific campus records are reconciled under one canonical institution where the evidence supports that relationship.
 
-**Decision:** Raw acquisition data will not be imported into either Ask Kalam Supabase project. Edu Hub requires a dedicated project/account boundary.
+## 2026-09-14 — Media publication boundary
 
-**Decision:** V7 imports are archive-addressed, resumable and idempotent. The import ledger uses the archive version and SHA-256; records retain source hashes, media retains source identity and file hashes, and acquisition runs retain archive-local identity.
+**Decision:** Official institution website/social images may be collected as media discovery candidates/provenance, but they remain `public_use_allowed=false` unless a defensible reuse basis exists.
 
-**Decision:** The raw JSON payload does not receive a speculative GIN index. Public search and fast rendering will use a later purpose-built canonical/public read model rather than querying source-shaped evidence payloads.
+**Decision:** Publication-safe media may come from institution-provided permission, a verified institution claim, Wikimedia Commons/open licenses with attribution preserved, or original Edu Hub/Admonk production.
 
-## 2026-09-13 — Egypt National Education Registry
+**Decision:** When no safe media is available, the product uses a designed placeholder containing the institution's English name rather than Arabic initials, scraped imagery or hotlinks.
 
-**Decision:** EDU-DATA-1 replaces broad scraped-directory expansion as the active data milestone. Edu Hub will first build Egypt's canonical education identity registry, then enrich known entities progressively.
+## 2026-09-14 — Database cleanup strategy
 
-**Decision:** The enforced data path is `external source -> edu_raw -> edu_staging -> edu_core -> public projection -> website/CMS`. Raw/staging evidence may never be published directly.
+**Decision:** Create a new active branch `edu-data-2-international-registry` rather than destructively rewriting the historical national-registry branch.
 
-**Decision:** Institution identity validity is separate from profile completeness. A legitimate institution remains valid even when fees, contacts, websites, media or other optional fields are unknown or not applicable.
+**Decision:** The clean database extends the evidence layers with explicit providers, campuses, international eligibility, curricula, accreditations, contacts, fees, admissions, higher-education structures and rights-aware media metadata.
 
-**Decision:** Every externally sourced canonical fact must retain provenance. Conflicts remain competing assertions/review work until resolved; AI and enrichment processes may not invent missing facts.
+**Decision:** Legacy V7 data is not bulk-promoted into the clean registry. Only legacy rows matched to an EDU-DATA-2 eligible institution may contribute supporting assertions.
 
-**Decision:** Official national totals are coverage targets, not acquired-row counts. Secondary directories cannot be used to claim complete MOE or MOSS national coverage.
+**Decision:** Edu Hub must use a dedicated Supabase/PostgreSQL project. Ask Kalam database projects may not receive Edu Hub data.
 
-**Decision:** MOE/EMIS is the required primary identity source for the national school universe. If hosted runners cannot reach it, acquisition must run from an Egypt-reachable environment or use an official machine-readable export rather than substituting a secondary directory.
+## 2026-09-14 — SEO/publication boundary retained
 
-**Decision:** MOSS nursery coverage must come from an official row-level export/data-sharing route or the ministry's public nursery platform when such data is exposed; secondary nursery directories are discovery/enrichment only.
+**Decision:** A database record does not automatically become an indexable page.
 
-## 2026-09-14 — Higher-education hierarchy reconciliation
+**Decision:** Arbitrary filter combinations do not automatically generate SEO pages.
 
-**Decision:** MOHESR technical institutions preserve the official hierarchy of 8 technological-college parents and 44 technical institutes instead of flattening all rows into unrelated institutions.
-
-**Decision:** Source-declared parent/child relationships enter staging as source-backed relationship proposals. They are not automatically accepted into `edu_core`, and CI must enforce zero automatic identity/relationship acceptance and zero public promotion.
-
-## 2026-09-14 — EMIS live-route availability and pilot scope
-
-**Decision:** A category-specific EMIS form may be used to validate reusable ASP.NET state/postback mechanics only within the scope actually observed. A healthy Special Education form does not unlock or count as government-school acquisition coverage.
-
-**Decision:** Government-school enumeration remains blocked whenever the government category route returns a server-side failure, even if the EMIS root or another category is healthy. The 62,690-school national target may only be evaluated against source rows acquired from the required official government-school identity source or an official export.
-
-**Decision:** Bounded EMIS contract probes may submit top-level category navigation and non-search dependent-control postbacks only when necessary to reveal the source contract. They may not submit a school-search button, follow result pagination, enumerate school rows, mutate `edu_core`, or promote public records until a separately reviewed pilot gate is satisfied.
-
-**Decision:** The 2026-09-14 Egypt-local diagnostic exhausted all three observed non-placeholder Special Education type postbacks. Every postback was accepted, every response preserved the selected state, all dependent governorate/stage selects remained empty, and every response exposed the ministry-side page-load error. This is classified as a live source/application data-loading blocker rather than an unresolved client-side postback-format problem.
-
-**Decision:** Do not repeat the same Special Education hydration diagnostic without materially new source behavior. Routine monitoring must use only the lightweight top-level EMIS health recheck. A recovered government route triggers a fresh contract capture and review; it does not automatically authorize enumeration.
-
-**Decision:** While the live government route is unhealthy, the official machine-readable MOE/EMIS export is the primary D1.3 acquisition path. Secondary directories remain ineligible to substitute for official national school coverage.
+**Decision:** Only reviewed public projections are eligible for publication/indexing.
 
 ## Pending decisions
 
-- final public brand name
-- final domain
-- final hosting provider/Astro adapter
-- final visual identity
-- final production design system/styling strategy
-- final map provider
-- final analytics/consent stack
-- exact first public institution/data cohort
-- final Admonk-controlled production object-storage/CDN implementation for media
+- dedicated Edu Hub Supabase organization/project provisioning;
+- final public brand name/domain;
+- final hosting provider/Astro adapter;
+- final visual identity/design system;
+- final map provider;
+- final analytics/consent stack;
+- exact minimum profile completeness threshold for first public launch;
+- institution media permission/claim workflow for Phase 2.
