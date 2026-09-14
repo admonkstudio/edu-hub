@@ -94,6 +94,30 @@ def ib_records(data: dict, detail_data: dict) -> list[dict]:
     return out
 
 
+def bso_records(data: dict) -> list[dict]:
+    source_id = data["source_id"]
+    return [
+        {
+            "source_id": source_id,
+            "source_record_id": stable_id(source_id, row["name"]),
+            "source_snapshot_date": data["snapshot_date"],
+            "source_url": data["source_url"],
+            "entity_family": "pre_university",
+            "institution_type": "international_school",
+            "name_en": normalize_space(row["name"]),
+            "scope_state": "candidate",
+            "scope_class": "international_school",
+            "strong_evidence": "uk_dfe_british_school_overseas_accreditation",
+            "eligibility_pending": "private_or_independent_ownership_check",
+            "curriculum_codes": ["british"],
+            "bso_accredited_current": True,
+            "bso_list_updated": data["list_updated"],
+            "inspection_date": row["inspection_date"],
+        }
+        for row in data["records"]
+    ]
+
+
 def french_records(data: dict) -> list[dict]:
     source_id = data["source_id"]
     return [
@@ -191,6 +215,7 @@ def auc_records(data: dict) -> list[dict]:
 def validate_inputs(
     ib: dict,
     ib_detail: dict,
+    bso: dict,
     french: dict,
     german: dict,
     scu: dict,
@@ -200,6 +225,7 @@ def validate_inputs(
     assert ib_detail["records_count"] == len(ib_detail["records"]) == 7
     assert ib_detail["eligible_private"] == 4
     assert ib_detail["excluded_state"] == 3
+    assert bso["records_count"] == len(bso["records"]) == 11
     assert french["records_count"] == len(french["records"]) == 17
     assert german["records_count"] == len(german["records"]) == 4
     assert scu["records_count"] == len(scu["records"]) == 9
@@ -212,6 +238,9 @@ def validate_inputs(
     assert len(detail_names) == len(set(detail_names)), "duplicate IB detail rows"
     missing_details = sorted(set(detail_names) - set(ib_names))
     assert not missing_details, f"IB detail rows not present in directory snapshot: {missing_details}"
+    bso_names = [normalize_space(row["name"]).casefold() for row in bso["records"]]
+    assert len(bso_names) == len(set(bso_names)), "duplicate BSO seed rows"
+    assert "cairo english school" not in bso_names, "removed BSO school must not be in current seed"
     uais = [row["uai"] for row in french["records"]]
     assert len(uais) == len(set(uais)), "duplicate French UAI"
     german_names = [normalize_space(row["name"]).casefold() for row in german["records"]]
@@ -221,14 +250,16 @@ def validate_inputs(
 def build(seed_dir: Path, output_dir: Path) -> dict:
     ib = load_json(seed_dir / "ib-egypt-directory-2026-09-14.json")
     ib_detail = load_json(seed_dir / "ib-detail-evidence-2026-09-14.json")
+    bso = load_json(seed_dir / "uk-dfe-bso-egypt-2026-08-26.json")
     french = load_json(seed_dir / "french-homologation-egypt-2026-2027.json")
     german = load_json(seed_dir / "german-kmk-egypt-2026-04.json")
     scu = load_json(seed_dir / "scu-foreign-university-branches-2026-09-14.json")
     auc = load_json(seed_dir / "auc-international-evidence-2026-09-14.json")
-    validate_inputs(ib, ib_detail, french, german, scu, auc)
+    validate_inputs(ib, ib_detail, bso, french, german, scu, auc)
 
     rows = (
         ib_records(ib, ib_detail)
+        + bso_records(bso)
         + french_records(french)
         + german_records(german)
         + scu_records(scu)
