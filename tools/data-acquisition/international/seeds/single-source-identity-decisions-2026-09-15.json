@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.2_explicit_single_source_identity_review",
+  "review_method": "primary_or_authoritative_evidence_explicit_review_no_uniqueness_inference",
+  "records_count": 10,
+  "records": [
+    {
+      "review_identity_key": "british-school-alexandria",
+      "source_id": "uk_dfe_bso_egypt_2026_08",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:640c5d704081dbe4a375",
+      "source_name": "The British School of Alexandria",
+      "provisional_canonical_name_en": "The British School of Alexandria",
+      "decision": "confirmed_single_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/132609",
+        "http://www.bsalex.net"
+      ],
+      "review_note": "Current DfE/GIAS identifies one open BSO establishment at the named Alexandria address with a stable URN. The institution is reviewed as a distinct identity in the current source universe; this decision does not claim that no historical aliases or additional campuses exist."
+    },
+    {
+      "review_identity_key": "egypt-british-international-school",
+      "source_id": "uk_dfe_bso_egypt_2026_08",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:257054225b1b6daa112d",
+      "source_name": "Egypt British International School",
+      "provisional_canonical_name_en": "Egypt British International School",
+      "decision": "confirmed_single_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/150804",
+        "https://www.isc.edu.eg/ebis/about-ebis/"
+      ],
+      "review_note": "Current DfE/GIAS and the institution's first-party EBIS profile resolve to the same school. No second current source row in the 106-row universe has been reviewed as the same institution."
+    },
+    {
+      "review_identity_key": "gulf-english-school-cairo",
+      "source_id": "uk_dfe_bso_egypt_2026_08",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:9fdefb19abfebe356ac7",
+      "source_name": "Gulf English School Cairo",
+      "provisional_canonical_name_en": "Gulf English School Cairo",
+      "decision": "confirmed_single_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/151907",
+        "https://www.gescairo.com/",
+        "https://www.gescairo.com/ChairmanoftheBoard.asp"
+      ],
+      "review_note": "Current DfE/GIAS and current first-party school/governance evidence identify the same Cairo school. The source-list name variant 'Gulf English School' is normalized to the GIAS/current school name without merging any other source row."
+    },
+    {
+      "review_identity_key": "maadi-british-international-school",
+      "source_id": "uk_dfe_bso_egypt_2026_08",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:908bc386064d1339c4ed",
+      "source_name": "Maadi British International School",
+      "provisional_canonical_name_en": "Maadi British International School",
+      "decision": "confirmed_single_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/132603",
+        "https://mbisegypt.com/about-us/"
+      ],
+      "review_note": "Current DfE/GIAS and current first-party evidence resolve to one MBIS identity. The decision establishes a reviewed identity only and does not claim campus topology completeness."
+    },
+    {
+      "review_identity_key": "repton-school-cairo",
+      "source_id": "uk_dfe_bso_egypt_2026_08",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:7ed8dcbc72c59dc98e18",
+      "source_name": "Repton School Cairo",
+      "provisional_canonical_name_en": "Repton School Cairo",
+      "decision": "confirmed_single_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/152532",
+        "https://reptoncairo.org/repton-family/"
+      ],
+      "review_note": "Current DfE/GIAS and Repton Cairo's first-party site identify the same Cairo school. The separate Repton family/provider relationship is not treated as a duplicate institution."
+    },
+    {
+      "review_identity_key": "royal-british-international-school-cairo",
+      "source_id": "uk_dfe_bso_egypt_2026_08",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:93c3c5b5c0c24d256c43",
+      "source_name": "The Royal British International School, Cairo",
+      "provisional_canonical_name_en": "The Royal British International School, Cairo",
+      "decision": "confirmed_single_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/150546",
+        "https://royalbritish.edu.eg/"
+      ],
+      "review_note": "Current DfE/GIAS and current school evidence resolve to one Royal British International School identity in Cairo."
+    },
+    {
+      "review_identity_key": "uppingham-cairo",
+      "source_id": "uk_dfe_bso_egypt_2026_08",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:893750040e5cefccc569",
+      "source_name": "Uppingham Cairo",
+      "provisional_canonical_name_en": "Uppingham Cairo",
+      "decision": "confirmed_single_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/152131",
+        "https://www.uppingham.co.uk/about/uppingham-cairo",
+        "https://uppinghamcairo.com/about/"
+      ],
+      "review_note": "Current DfE/GIAS, Uppingham UK and the Cairo school identify one Uppingham Cairo school identity. The Uppingham Group/New Era relationships remain provider/partnership evidence rather than duplicate institution records."
+    },
+    {
+      "review_identity_key": "gems-british-school-al-rehab",
+      "source_id": "cis_international_accreditation_egypt",
+      "source_record_id": "cis_international_accreditation_egypt:e69a14b98712d28196aa",
+      "source_name": "The British School Al Rehab",
+      "provisional_canonical_name_en": "GEMS British School Al Rehab",
+      "decision": "confirmed_single_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/newly-accredited-the-british-school-al-rehab-egypt",
+        "https://www.gemseducation.com/en/Our-Schools/All-Our-Schools/GEMS-British-School-Al-Rehab",
+        "https://www.tbs-cairo.com/About-Us/Our-School"
+      ],
+      "review_note": "CIS's source name and the current GEMS/first-party school identity resolve to the same Al Rehab institution. The canonical draft uses the current GEMS school name while preserving the CIS source name as provenance."
+    },
+    {
+      "review_identity_key": "gems-british-international-school-madinaty",
+      "source_id": "cis_international_accreditation_egypt",
+      "source_record_id": "cis_international_accreditation_egypt:20245064fbea7b096b0e",
+      "source_name": "The British School Madinaty",
+      "provisional_canonical_name_en": "GEMS British International School Madinaty",
+      "decision": "confirmed_single_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/newly-accredited-the-british-school-madinaty-egypt",
+        "https://www.gemseducation.com/en/Our-Schools/All-Our-Schools/GEMS-British-International-School-Madinaty",
+        "https://www.bism-cairo.com/"
+      ],
+      "review_note": "CIS's source name and the current GEMS/first-party identity resolve to the same Madinaty institution. The canonical draft uses the current GEMS school name while retaining the CIS source naming as evidence."
+    },
+    {
+      "review_identity_key": "modern-education-schools",
+      "source_id": "cognia_member_milestones_egypt_2026_2027",
+      "source_record_id": "cognia_member_milestones_egypt_2026_2027:bba887d2d0c7f11d4902",
+      "source_name": "Modern Education Schools",
+      "provisional_canonical_name_en": "Modern Education Schools",
+      "decision": "confirmed_single_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://www.cognia.org/member-milestones/",
+        "https://www.mes.edu.eg/about-us/",
+        "https://www.mes.edu.eg/"
+      ],
+      "review_note": "Current first-party evidence identifies one Modern Education Schools institution with National, British and American divisions. The Cognia row is retained as a source membership while accreditation scope is handled separately at division level."
+    }
+  ],
+  "safety": {
+    "absence_of_match_treated_as_uniqueness_proof": false,
+    "automatic_identity_creation_performed": false,
+    "automatic_merges_performed": 0,
+    "canonical_database_rows_written": 0,
+    "runtime_database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
