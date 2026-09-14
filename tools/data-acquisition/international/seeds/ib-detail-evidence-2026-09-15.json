@@ -17,9 +17,49 @@
         "dp_authorized_since": "2020-12-22",
         "pyp_myp_authorized_since": "2026-03-12"
       }
+    },
+    {
+      "name": "Narmer American College",
+      "ib_school_code": "051886",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "nacegypt.com",
+      "phone": "+200225874000",
+      "address": "20 El-Narguis Service Area, El-Tagamoa El Khames, New Cairo, Cairo 11477, Egypt",
+      "source_url": "https://ibo.org/school/051886/"
+    },
+    {
+      "name": "Cairo American College",
+      "ib_school_code": "000708",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.cacegypt.org/",
+      "phone": "+20227555555",
+      "address": "1 Midan Digla, Maadi, Cairo 11431, Egypt",
+      "source_url": "https://ibo.org/school/000708/"
+    },
+    {
+      "name": "Cairo English School",
+      "ib_school_code": "004939",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.cesegypt.com/",
+      "phone": "+20222490200",
+      "address": "First Settlement, Mirage City, New Cairo, Cairo, Egypt",
+      "source_url": "https://ibo.org/en/school/004939/"
+    },
+    {
+      "name": "New Cairo British International School",
+      "ib_school_code": "004510",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.ncbis.co.uk",
+      "phone": "+2025657115",
+      "address": "Road 17, 1st District, 3rd Zone, 5th Settlement, New Cairo, Cairo 11835, Egypt",
+      "source_url": "https://ibo.org/fr/programmes/find-an-ib-school/ibaem/n/new-cairo-british-international-school/"
     }
   ],
-  "records_count": 1,
-  "eligible_private": 1,
+  "records_count": 5,
+  "eligible_private": 5,
   "excluded_state": 0
 }
