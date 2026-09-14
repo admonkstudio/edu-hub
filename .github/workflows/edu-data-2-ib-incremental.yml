@@ -1,0 +1,145 @@
+name: EDU-DATA-2 Incremental IB Details
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'tools/data-acquisition/international/build_authoritative_seed.py'
+      - 'tools/data-acquisition/international/apply_ib_detail_batches.py'
+      - 'tools/data-acquisition/international/build_accreditor_expansion.py'
+      - 'tools/data-acquisition/international/build_candidate_universe.py'
+      - 'tools/data-acquisition/international/validate_identity_review_decisions.py'
+      - 'tools/data-acquisition/international/build_reviewed_canonical_artifacts.py'
+      - 'tools/data-acquisition/international/seeds/ib-detail-evidence-*-batch*.json'
+      - 'tools/data-acquisition/international/seeds/identity-review-decisions-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/division-review-decisions-2026-09-15.json'
+      - '.github/workflows/edu-data-2-ib-incremental.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integrate:
+    name: Validate all incremental IB detail batches and downstream contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile integration tools
+        run: |
+          python -m py_compile tools/data-acquisition/international/build_authoritative_seed.py
+          python -m py_compile tools/data-acquisition/international/apply_ib_detail_batches.py
+          python -m py_compile tools/data-acquisition/international/build_accreditor_expansion.py
+          python -m py_compile tools/data-acquisition/international/build_candidate_universe.py
+          python -m py_compile tools/data-acquisition/international/validate_identity_review_decisions.py
+          python -m py_compile tools/data-acquisition/international/build_reviewed_canonical_artifacts.py
+      - name: Build foundational 96-row source universe
+        run: python tools/data-acquisition/international/build_authoritative_seed.py --output-dir artifacts/international
+      - name: Apply all checked-in incremental IB detail batches
+        run: python tools/data-acquisition/international/apply_ib_detail_batches.py
+      - name: Build accreditor-expanded universe from upgraded base
+        run: |
+          python tools/data-acquisition/international/build_accreditor_expansion.py \
+            --base artifacts/international/ib-incremental/authoritative-source-candidates-with-incremental-ib.jsonl \
+            --output-dir artifacts/international/ib-incremental/accreditor-expansion
+      - name: Build upgraded candidate universe
+        run: |
+          python tools/data-acquisition/international/build_candidate_universe.py \
+            --authoritative artifacts/international/ib-incremental/accreditor-expansion/authoritative-source-candidates-with-accreditors.jsonl \
+            --output-dir artifacts/international/ib-incremental/candidate-universe
+      - name: Revalidate D2.2 reviewed identities and drafts
+        run: |
+          python tools/data-acquisition/international/validate_identity_review_decisions.py \
+            --universe artifacts/international/ib-incremental/accreditor-expansion/authoritative-source-candidates-with-accreditors.jsonl \
+            --output-dir artifacts/international/ib-incremental/identity-review
+          python tools/data-acquisition/international/build_reviewed_canonical_artifacts.py \
+            --universe artifacts/international/ib-incremental/accreditor-expansion/authoritative-source-candidates-with-accreditors.jsonl \
+            --output-dir artifacts/international/ib-incremental/reviewed-canonical-draft
+      - name: Assert incremental IB and downstream safety contracts
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('artifacts/international/ib-incremental')
+          overlay = json.loads((root/'ib-incremental-summary.json').read_text(encoding='utf-8'))
+          applied = [json.loads(line) for line in (root/'ib-incremental-applied.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+
+          assert overlay['foundational_source_rows'] == 96
+          assert overlay['incremental_batch_count'] == 2
+          assert overlay['incremental_detail_rows'] == overlay['applied_rows'] == len(applied) == 10
+          assert overlay['source_record_ids_changed'] == 0
+          assert overlay['before_scope_states'] == {'candidate': 53, 'eligible': 40, 'excluded': 3}
+          assert overlay['after_scope_states'] == {'candidate': 43, 'eligible': 50, 'excluded': 3}
+          assert overlay['accepted_ib_detail_rows_after_overlay'] == 22
+          assert overlay['unique_institutions_claimed'] is None
+          assert overlay['identity_merges_performed'] == 0
+          assert overlay['canonical_institutions_created'] == 0
+          assert overlay['database_mutation_performed'] is False
+          assert overlay['public_projection_rows_created'] == 0
+          assert [row['records'] for row in overlay['batches']] == [5, 5]
+
+          expected_names = {
+              'AIA School',
+              'Al-Hoda International School',
+              'American International School in Egypt',
+              'American International School in Egypt West Campus',
+              'Bedayia International School',
+              'Capital International Schools',
+              'Carleton College International School',
+              'Deutsche Schule Beverly Hills Kairo',
+              'École Oasis Internationale',
+              'Egyptian American School',
+          }
+          assert {row['name_en'] for row in applied} == expected_names
+          assert all(row['previous_scope_state'] == 'candidate' for row in applied)
+          assert all(row['new_scope_state'] == 'eligible' for row in applied)
+
+          expansion = json.loads((root/'accreditor-expansion/accreditor-expansion-summary.json').read_text(encoding='utf-8'))
+          assert expansion['base_source_rows'] == 96
+          assert expansion['combined_source_rows'] == 106
+          assert expansion['international_eligibility_granted_by_expansion'] == 0
+          assert expansion['canonical_institutions_created'] == 0
+
+          universe = json.loads((root/'candidate-universe/candidate-universe-summary.json').read_text(encoding='utf-8'))
+          assert universe['source_record_count'] == 106
+          assert universe['scope_or_lead_state_counts']['eligible'] == 50
+          assert universe['scope_or_lead_state_counts']['candidate'] == 53
+          assert universe['scope_or_lead_state_counts']['excluded'] == 3
+          assert universe['english_name_present'] == 106
+          assert universe['arabic_name_present'] == 9
+          assert universe['bilingual_name_gap_count'] == 97
+          assert universe['canonical_institutions_created'] == 0
+          assert universe['automatic_merges_performed'] == 0
+          assert universe['public_projection_rows_created'] == 0
+
+          review = json.loads((root/'identity-review/identity-review-summary.json').read_text(encoding='utf-8'))
+          assert review['source_universe_rows'] == 106
+          assert review['review_groups'] == 9
+          assert review['reviewed_source_rows'] == 20
+          assert review['missing_source_rows'] == 0
+          assert review['name_drift_rows'] == 0
+          assert review['canonical_merges_performed'] == 0
+
+          draft = json.loads((root/'reviewed-canonical-draft/reviewed-canonical-draft-summary.json').read_text(encoding='utf-8'))
+          assert draft['source_universe_rows'] == 106
+          assert draft['reviewed_identity_groups'] == 9
+          assert draft['reviewed_source_memberships'] == 20
+          assert draft['draft_school_division_records'] == 4
+          assert draft['resolved_canonical_campuses'] == 0
+          assert draft['unreviewed_source_rows'] == 86
+          assert draft['canonical_database_rows_written'] == 0
+          assert draft['runtime_database_mutation_performed'] is False
+          assert draft['public_projection_rows_created'] == 0
+
+          print(json.dumps({'ib_incremental': overlay, 'candidate_universe': universe, 'identity_review': review, 'reviewed_draft': draft}, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-ib-incremental
+          path: artifacts/international/ib-incremental/
+          if-no-files-found: error
