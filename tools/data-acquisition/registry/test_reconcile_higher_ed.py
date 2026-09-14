@@ -51,6 +51,37 @@ class HigherEdReconciliationTests(unittest.TestCase):
         self.assertEqual(len(filtered), 1)
         self.assertEqual(filtered[0]["seed_id"], "SCU-2")
 
+    def test_technical_hierarchy_is_proposal_only(self):
+        parents = [
+            {"source_record_id": "P-1", "name_raw": "الكلية التكنولوجية بالمطرية", "entity_type_raw": "technological_college"},
+            {"source_record_id": "P-2", "name_raw": "الكلية التكنولوجية بالصحافة", "entity_type_raw": "technological_college"},
+        ]
+        institutes = [
+            {"source_record_id": "C-1", "parent_source_record_id": "P-1", "name_raw": "المعهد الفني الصناعي بالمطرية", "entity_type_raw": "technical_institute"},
+            {"source_record_id": "C-2", "parent_source_record_id": "P-2", "name_raw": "المعهد الفني الصناعي بالصحافة", "entity_type_raw": "technical_institute"},
+        ]
+        proposals, review, report = mod.build_technical_hierarchy(parents, institutes)
+        self.assertEqual(len(proposals), 2)
+        self.assertEqual(review, [])
+        self.assertEqual(report["technical_hierarchy_source_backed_proposals"], 2)
+        self.assertEqual(report["technical_hierarchy_invalid_links"], 0)
+        self.assertEqual(report["automatic_relationship_acceptances"], 0)
+        self.assertEqual(report["edu_core_rows_created"], 0)
+        self.assertFalse(report["core_mutation_performed"])
+        self.assertFalse(report["public_promotion_performed"])
+        self.assertTrue(all(not row["automatic_acceptance"] for row in proposals))
+        self.assertEqual(proposals[0]["relationship_type"], "technological_college_parent")
+
+    def test_technical_hierarchy_unknown_parent_becomes_review_task(self):
+        parents = [{"source_record_id": "P-1", "name_raw": "كلية"}]
+        institutes = [{"source_record_id": "C-1", "parent_source_record_id": "P-MISSING", "name_raw": "معهد"}]
+        proposals, review, report = mod.build_technical_hierarchy(parents, institutes)
+        self.assertEqual(proposals, [])
+        self.assertEqual(len(review), 1)
+        self.assertEqual(review[0]["reason"], "unknown_parent_reference")
+        self.assertEqual(report["technical_hierarchy_invalid_links"], 1)
+        self.assertEqual(report["automatic_relationship_acceptances"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()
