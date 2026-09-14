@@ -1,0 +1,116 @@
+name: EDU-DATA-2 Incremental Campus Review
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'tools/data-acquisition/international/build_authoritative_seed.py'
+      - 'tools/data-acquisition/international/apply_ib_detail_batches.py'
+      - 'tools/data-acquisition/international/apply_bso_scope_review.py'
+      - 'tools/data-acquisition/international/build_accreditor_expansion.py'
+      - 'tools/data-acquisition/international/apply_accreditor_scope_review.py'
+      - 'tools/data-acquisition/international/build_extended_identity_artifacts.py'
+      - 'tools/data-acquisition/international/build_hierarchy_review_artifacts.py'
+      - 'tools/data-acquisition/international/build_incremental_identity_review_artifacts.py'
+      - 'tools/data-acquisition/international/build_british_council_browser_discovery.py'
+      - 'tools/data-acquisition/international/apply_british_council_primary_scope_review.py'
+      - 'tools/data-acquisition/international/build_discovery_identity_review_artifacts.py'
+      - 'tools/data-acquisition/international/build_reviewed_campus_artifacts.py'
+      - 'tools/data-acquisition/international/build_incremental_campus_review_artifacts.py'
+      - 'tools/data-acquisition/international/seeds/campus-review-decisions-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/campus-review-decisions-*-batch*.json'
+      - 'tools/data-acquisition/international/seeds/discovered-identity-decisions-*.json'
+      - 'tools/data-acquisition/international/seeds/british-council-primary-scope-review-*.json'
+      - '.github/workflows/edu-data-2-incremental-campus-review.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  campus:
+    name: Validate additive current-campus evidence
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile data tools
+        run: |
+          python -m py_compile tools/data-acquisition/international/build_authoritative_seed.py
+          python -m py_compile tools/data-acquisition/international/apply_ib_detail_batches.py
+          python -m py_compile tools/data-acquisition/international/apply_bso_scope_review.py
+          python -m py_compile tools/data-acquisition/international/build_accreditor_expansion.py
+          python -m py_compile tools/data-acquisition/international/apply_accreditor_scope_review.py
+          python -m py_compile tools/data-acquisition/international/build_extended_identity_artifacts.py
+          python -m py_compile tools/data-acquisition/international/build_hierarchy_review_artifacts.py
+          python -m py_compile tools/data-acquisition/international/build_incremental_identity_review_artifacts.py
+          python -m py_compile tools/data-acquisition/international/build_british_council_browser_discovery.py
+          python -m py_compile tools/data-acquisition/international/apply_british_council_primary_scope_review.py
+          python -m py_compile tools/data-acquisition/international/build_discovery_identity_review_artifacts.py
+          python -m py_compile tools/data-acquisition/international/build_reviewed_campus_artifacts.py
+          python -m py_compile tools/data-acquisition/international/build_incremental_campus_review_artifacts.py
+      - name: Rebuild current 106-row scope-reviewed universe
+        run: |
+          python tools/data-acquisition/international/build_authoritative_seed.py --output-dir artifacts/international
+          python tools/data-acquisition/international/apply_ib_detail_batches.py
+          python tools/data-acquisition/international/apply_bso_scope_review.py
+          python tools/data-acquisition/international/build_accreditor_expansion.py \
+            --base artifacts/international/bso-scope-review/authoritative-source-candidates-with-bso-scope-review.jsonl \
+            --output-dir artifacts/international/bso-scope-review/accreditor-expansion
+          python tools/data-acquisition/international/apply_accreditor_scope_review.py
+      - name: Rebuild current 26-identity D2.2 artifact
+        run: |
+          python tools/data-acquisition/international/build_extended_identity_artifacts.py
+          python tools/data-acquisition/international/build_hierarchy_review_artifacts.py
+          python tools/data-acquisition/international/build_incremental_identity_review_artifacts.py
+          python tools/data-acquisition/international/build_british_council_browser_discovery.py
+          python tools/data-acquisition/international/apply_british_council_primary_scope_review.py
+          python tools/data-acquisition/international/build_discovery_identity_review_artifacts.py
+      - name: Rebuild accepted first 9-campus package
+        run: python tools/data-acquisition/international/build_reviewed_campus_artifacts.py
+      - name: Apply incremental current-campus review batches
+        run: python tools/data-acquisition/international/build_incremental_campus_review_artifacts.py
+      - name: Assert incremental campus safety contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('artifacts/international/incremental-campus-review')
+          summary = json.loads((root/'incremental-campus-summary.json').read_text(encoding='utf-8'))
+          campuses = [json.loads(line) for line in (root/'reviewed-current-campus-drafts.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          structures = [json.loads(line) for line in (root/'campus-structure-review.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          new = [json.loads(line) for line in (root/'incremental-current-campus-drafts.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          pending = [json.loads(line) for line in (root/'campus-review-queue.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+
+          assert summary['reviewed_institution_drafts'] == 26
+          assert summary['base_current_campus_records'] == 9
+          assert summary['incremental_review_batches'] == 1
+          assert summary['new_current_campus_records'] == len(new) == 2
+          assert summary['reviewed_current_campus_records'] == len(campuses) == 11
+          assert summary['institutions_with_current_campus_evidence'] == len(structures) == 11
+          assert summary['institutions_pending_current_campus_review'] == len(pending) == 15
+          assert summary['campus_structure_complete_records'] == 0
+          assert summary['additional_current_campuses_ruled_out_records'] == 0
+          assert summary['automatic_additional_campus_inference_performed'] is False
+          assert summary['canonical_campus_rows_created'] == 0
+          assert summary['canonical_database_rows_written'] == 0
+          assert summary['runtime_database_mutation_performed'] is False
+          assert summary['public_projection_rows_created'] == 0
+
+          expected = {'kings-school-the-crown', 'international-school-choueifat-cairo'}
+          assert {row['review_identity_key'] for row in new} == expected
+          assert all(row['campus_structure_complete'] is False for row in campuses)
+          assert all(row['additional_current_campuses_ruled_out'] is False for row in campuses)
+          assert len({row['draft_campus_id'] for row in campuses}) == len(campuses)
+
+          print(json.dumps(summary, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-incremental-campus-review
+          path: artifacts/international/incremental-campus-review/
+          if-no-files-found: error
