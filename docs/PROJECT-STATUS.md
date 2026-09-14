@@ -75,13 +75,7 @@ These are **source records, not unique institutions**.
 
 The current British Council Partner Schools PDF is a **19-page discovery/contact source**. Partner School or attached-centre status does **not** establish international eligibility.
 
-A first browser-reviewed discovery batch now adds **35 supporting leads** that were not part of the 106-row strong-source universe. The batch preserves PDF page references and available website references while performing:
-
-- 0 automatic eligibility decisions;
-- 0 canonical identity creation;
-- 0 automatic merges;
-- 0 database writes;
-- 0 public projection.
+A first browser-reviewed discovery batch adds **35 supporting leads** that were not part of the 106-row strong-source universe. The batch preserves PDF page references and available website references while performing zero automatic eligibility, canonical identity creation, merges, database writes or public projection.
 
 The raw expanded D2.1 discovery universe is therefore:
 
@@ -127,26 +121,29 @@ Supporting discovery evidence may expand the research universe but may not indep
 
 ## D2.2 — Identity, campus and division reconciliation
 
-Status: **ACTIVE IN PARALLEL WITH OPEN D2.1 DISCOVERY — EXPLICIT REVIEW GATES OPERATIONAL**
+Status: **ACTIVE IN PARALLEL WITH OPEN D2.1 DISCOVERY — ORIGINAL AND QUALIFIED-DISCOVERY IDENTITY GATES OPERATIONAL**
 
 Current accepted chain:
 
-`scope-reviewed universe -> cross-source identity review -> explicit single-source review -> institution/division hierarchy review -> known-distinct safeguards -> incremental explicit identity batches`
+`scope-reviewed universe -> cross-source identity review -> explicit single-source review -> hierarchy review -> known-distinct safeguards -> incremental original-source identity batches -> qualified-discovery identity review -> incremental campus review`
 
 ### Current reviewed identity state
 
-After the accepted German/KMK incremental identity batch:
+Current D2.2 materialization now contains:
 
-- **24 reviewed institution drafts**;
-- **35 reviewed unique source rows** from the original 106-row universe;
+- **26 reviewed institution drafts**;
 - **10 reviewed school-division drafts**;
-- **71 original source rows remain in the explicit identity-review queue**;
+- **37 reviewed source-or-lead memberships**;
+  - 35 memberships from the original 106-row source universe;
+  - 2 memberships from separately qualified British Council discoveries;
+- **71 original source rows** remain in the explicit identity-review queue;
+- **33 British Council discovery leads** remain unqualified at D2.1 and therefore do not enter D2.2;
 - **2 explicit known-distinct pair decisions** protect against reviewed false merges;
 - 0 automatic merges;
 - 0 canonical/runtime database writes;
 - 0 public projection.
 
-Reviewed source coverage currently includes all 11 BSO rows, all 6 CIS rows, all 4 Cognia rows, 9 IB rows participating in reviewed cross-source identities, 1 French homologation row for Misr Language Schools, and all 4 German KMK rows.
+Reviewed original-source coverage includes all 11 BSO rows, all 6 CIS rows, all 4 Cognia rows, 9 IB rows participating in reviewed cross-source identities, 1 French homologation row for Misr Language Schools, and all 4 German KMK rows.
 
 Remaining original-source identity queue:
 
@@ -155,13 +152,20 @@ Remaining original-source identity queue:
 - 9 SCU foreign-university-branch rows;
 - 1 AUC/MSCHE row.
 
-The two newly qualified British Council discoveries have **not yet been promoted into D2.2 canonical identity drafts**. Their identity/campus/provider relationships must enter the same explicit review boundary rather than bypass it.
+The two qualified British Council discoveries now pass the same explicit D2.2 identity boundary:
+
+- King's School The Crown;
+- The International School of Choueifat - Cairo.
+
+Their qualification did not create canonical identities automatically. Explicit checked-in identity decisions produced stable review-draft IDs only after D2.1 eligibility had already been established independently.
+
+`EDU-DATA-2 Discovery Identity Review` run **34909694279** passed with 26 institution drafts and zero automatic merges/database/public writes.
 
 ### Single-source and incremental identity rules
 
 Explicit single-source identities require high-confidence primary/authoritative evidence. Absence of a duplicate proposal is never uniqueness proof.
 
-The accepted base contains 9 cross-source reviewed identities, 10 original explicit single-source identities and the Port Said Schools first-party parent/hierarchy review. The first additive single-source batch resolves all four KMK German-school rows without rewriting the earlier historical decision package.
+The original accepted base contains 9 cross-source reviewed identities, 10 original explicit single-source identities and the Port Said Schools first-party parent/hierarchy review. The first additive original-source batch resolves all four KMK German-school rows without rewriting the earlier historical decision package. Qualified discoveries use a separate identity-review layer so discovery provenance and strong-source provenance remain distinguishable.
 
 `EDU-DATA-2 Incremental Identity Review` run **34908639710** passed.
 
@@ -182,17 +186,26 @@ Curriculum/accreditation evidence scoped to a British, American, French, IB or o
 
 ### Campus review
 
-The first campus pass covers the original 9 cross-source institution identities:
+Current campus evidence now covers **11 of the 26 reviewed institution drafts**:
 
-- 9 current-campus drafts;
-- 9 campus-structure review records;
-- 0 structures declared exhaustive;
-- 0 inferred additional campuses;
-- 0 canonical campus writes.
+- the original 9 cross-source identities;
+- King's School The Crown at The Crown, 6 October City;
+- The International School of Choueifat - Cairo at its current New Cairo / District 5 location.
 
-State: `at_least_one_current_campus_reviewed_structure_not_exhaustive`.
+Current campus-review state:
 
-Additional reviewed identities still need campus review. British Council campus-specific rows may support topology discovery, but Partner School rows may not silently create new campuses or institutions.
+- **11 reviewed current-campus drafts**;
+- **11 campus-structure review records**;
+- **15 reviewed institutions still require current-campus review**;
+- **0 campus structures declared exhaustive/complete**;
+- **0 additional current campuses inferred or ruled out automatically**;
+- **0 canonical campus rows/database writes/public projection**.
+
+Every reviewed current location therefore remains in state `at_least_one_current_campus_reviewed_structure_not_exhaustive`.
+
+`EDU-DATA-2 Incremental Campus Review` run **34909846766** passed.
+
+British Council campus-specific rows may support topology discovery, but Partner School rows may not silently create new campuses or institutions.
 
 ## D2.3 — English/Arabic architecture
 
@@ -246,22 +259,23 @@ It must not require Astro, Instatic or Supabase.
 - Current Campus Review: **34901485863** — green;
 - Incremental Identity Review (German KMK batch): **34908639710** — green;
 - British Council browser discovery batch: **34909183019** — green;
-- British Council primary qualification batch 1: **34909421938** — green.
+- British Council primary qualification batch 1: **34909421938** — green;
+- Qualified Discovery Identity Review: **34909694279** — green;
+- Incremental Campus Review: **34909846766** — green.
 
 ## Immediate next actions
 
 1. Continue D2.1 British Council extraction and primary re-sourcing; keep ambiguous ownership/accreditation cases in candidate state.
 2. Continue controlled gap discovery from Edarabia, operator sites, legacy/V7 and other permitted discovery sources without bulk-copying commercial-directory content.
-3. Bring newly qualified discovery rows through explicit D2.2 identity/campus/provider reconciliation rather than treating qualification as canonicalization.
-4. Extend D2.2 identity review across the remaining 71 original source rows, prioritizing French homologation, standalone IB and higher-education identities.
-5. Extend campus topology review to institution drafts added after the first campus pass and use supporting sources only as topology leads.
-6. Expand D2.3 official Arabic-name evidence; explicitly mark transliteration/editorial Arabic where official forms cannot be sourced.
-7. Expand D2.4 first-party enrichment toward every reviewed eligible identity, including current fees/admissions only from current official sources and with academic-year history preserved.
-8. Reconcile SCU/MOHESR foreign-university identities, parent/branch relationships and lifecycle state.
-9. Expand coordinates/geography with first-party evidence plus permitted Overture/OSM cross-checks.
-10. Continue media-rights review and assign a terminal media state to every reviewed identity.
-11. Produce the first canonicalization-aware EN/AR/factual/media completeness report after substantially broader identity coverage.
-12. Freeze the deterministic portable export only after identity, localization, enrichment, conflict and media gates are satisfied.
+3. Extend D2.2 identity review across the remaining 71 original source rows, prioritizing French homologation, standalone IB and higher-education identities.
+4. Extend campus review to the remaining 15 reviewed institutions; only mark campus topology complete when affirmative evidence is exhaustive enough.
+5. Expand D2.3 official Arabic-name evidence; explicitly mark transliteration/editorial Arabic where official forms cannot be sourced.
+6. Expand D2.4 first-party enrichment toward every reviewed eligible identity, including current fees/admissions only from current official sources and with academic-year history preserved.
+7. Reconcile SCU/MOHESR foreign-university identities, parent/branch relationships and lifecycle state.
+8. Expand coordinates/geography with first-party evidence plus permitted Overture/OSM cross-checks.
+9. Continue media-rights review and assign a terminal media state to every reviewed identity.
+10. Produce the first canonicalization-aware EN/AR/factual/media completeness report after substantially broader identity coverage.
+11. Freeze the deterministic portable export only after identity, localization, enrichment, conflict and media gates are satisfied.
 
 ## Non-negotiable constraints
 
