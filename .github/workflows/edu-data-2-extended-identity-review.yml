@@ -1,0 +1,97 @@
+name: EDU-DATA-2 Extended Identity Review
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'tools/data-acquisition/international/build_authoritative_seed.py'
+      - 'tools/data-acquisition/international/apply_ib_detail_batches.py'
+      - 'tools/data-acquisition/international/apply_bso_scope_review.py'
+      - 'tools/data-acquisition/international/build_accreditor_expansion.py'
+      - 'tools/data-acquisition/international/apply_accreditor_scope_review.py'
+      - 'tools/data-acquisition/international/build_extended_identity_artifacts.py'
+      - 'tools/data-acquisition/international/seeds/ib-detail-evidence-*-batch*.json'
+      - 'tools/data-acquisition/international/seeds/bso-scope-review-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/accreditor-scope-review-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/identity-review-decisions-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/single-source-identity-decisions-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/division-review-decisions-2026-09-15.json'
+      - '.github/workflows/edu-data-2-extended-identity-review.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  identity:
+    name: Validate explicit cross-source and single-source identity drafts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile data tools
+        run: |
+          python -m py_compile tools/data-acquisition/international/build_authoritative_seed.py
+          python -m py_compile tools/data-acquisition/international/apply_ib_detail_batches.py
+          python -m py_compile tools/data-acquisition/international/apply_bso_scope_review.py
+          python -m py_compile tools/data-acquisition/international/build_accreditor_expansion.py
+          python -m py_compile tools/data-acquisition/international/apply_accreditor_scope_review.py
+          python -m py_compile tools/data-acquisition/international/build_extended_identity_artifacts.py
+      - name: Build fully scope-reviewed 106-row source universe
+        run: |
+          python tools/data-acquisition/international/build_authoritative_seed.py --output-dir artifacts/international
+          python tools/data-acquisition/international/apply_ib_detail_batches.py
+          python tools/data-acquisition/international/apply_bso_scope_review.py
+          python tools/data-acquisition/international/build_accreditor_expansion.py \
+            --base artifacts/international/bso-scope-review/authoritative-source-candidates-with-bso-scope-review.jsonl \
+            --output-dir artifacts/international/bso-scope-review/accreditor-expansion
+          python tools/data-acquisition/international/apply_accreditor_scope_review.py
+      - name: Build extended reviewed identity drafts
+        run: python tools/data-acquisition/international/build_extended_identity_artifacts.py
+      - name: Assert explicit identity-review safety contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('artifacts/international/extended-identity-review')
+          summary = json.loads((root/'extended-identity-summary.json').read_text(encoding='utf-8'))
+          institutions = [json.loads(line) for line in (root/'reviewed-institution-drafts.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          memberships = [json.loads(line) for line in (root/'reviewed-source-memberships.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          divisions = [json.loads(line) for line in (root/'reviewed-school-division-drafts.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          queue = [json.loads(line) for line in (root/'unreviewed-source-queue.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+
+          assert summary['source_universe_rows'] == 106
+          assert summary['source_scope_states'] == {'eligible': 103, 'excluded': 3}
+          assert summary['cross_source_reviewed_identities'] == 9
+          assert summary['explicit_single_source_reviewed_identities'] == 10
+          assert summary['reviewed_identity_drafts'] == len(institutions) == 19
+          assert summary['reviewed_source_memberships'] == len(memberships) == 30
+          assert summary['reviewed_division_drafts'] == len(divisions) == 4
+          assert summary['unreviewed_source_rows'] == len(queue) == 76
+          assert summary['full_universe_unique_institution_count_claimed'] is None
+          assert summary['absence_of_match_treated_as_uniqueness_proof'] is False
+          assert summary['automatic_merges_performed'] == 0
+          assert summary['canonical_database_rows_written'] == 0
+          assert summary['runtime_database_mutation_performed'] is False
+          assert summary['public_projection_rows_created'] == 0
+
+          single = [row for row in institutions if row['review_origin'] == 'explicit_single_source_identity_review']
+          cross = [row for row in institutions if row['review_origin'] == 'cross_source_reconciliation']
+          assert len(single) == 10
+          assert len(cross) == 9
+          assert all(row['source_record_count'] == 1 for row in single)
+          assert all(row.get('uniqueness_inferred_from_absence_of_match') is False for row in single)
+          assert len({row['draft_institution_id'] for row in institutions}) == len(institutions)
+          assert len({(row['source_id'], row['source_record_id']) for row in memberships}) == len(memberships)
+
+          print(json.dumps(summary, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-extended-identity-review
+          path: artifacts/international/extended-identity-review/
+          if-no-files-found: error
