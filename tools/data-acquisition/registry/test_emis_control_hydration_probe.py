@@ -26,6 +26,12 @@ HTML = r"""
 <input type="radio" id="r1" name="ctl00$ContentPlaceHolder1$RadioButtonList1" value="1"
  onclick="javascript:setTimeout('__doPostBack(\'ctl00$ContentPlaceHolder1$RadioButtonList1$1\',\'\')', 0)" />
 <label for="r1">تربية فكرية</label>
+<input type="radio" id="r2" name="ctl00$ContentPlaceHolder1$RadioButtonList1" value="2"
+ onclick="javascript:setTimeout('__doPostBack(\'ctl00$ContentPlaceHolder1$RadioButtonList1$2\',\'\')', 0)" />
+<label for="r2">مكفوفين وضعاف بصر</label>
+<input type="radio" id="r3" name="ctl00$ContentPlaceHolder1$RadioButtonList1" value="3"
+ onclick="javascript:setTimeout('__doPostBack(\'ctl00$ContentPlaceHolder1$RadioButtonList1$3\',\'\')', 0)" />
+<label for="r3">صم وضعاف سمع</label>
 <select name="ctl00$ContentPlaceHolder1$DDList_mud" id="ContentPlaceHolder1_DDList_mud"></select>
 <input type="text" name="ctl00$ContentPlaceHolder1$TextBox1" value="do-not-submit" />
 <input type="submit" name="ctl00$ContentPlaceHolder1$Button1" value="بحث" />
@@ -35,29 +41,48 @@ HTML = r"""
 
 
 class EmisControlHydrationProbeTests(unittest.TestCase):
-    def test_selects_first_non_placeholder_whitelisted_postback_control(self):
+    def test_discovers_only_three_non_placeholder_whitelisted_postback_controls(self):
+        from bs4 import BeautifulSoup
+
+        form = BeautifulSoup(HTML, "html.parser").find("form")
+        controls = mod.hydration_controls(form)
+        self.assertEqual([row["value"] for row in controls], ["1", "2", "3"])
+        self.assertEqual(controls[0]["label"], "تربية فكرية")
+        self.assertTrue(
+            all(row["event_target"].startswith(mod.ALLOWED_EVENT_PREFIX) for row in controls)
+        )
+
+    def test_backward_compatible_first_control_helper(self):
         from bs4 import BeautifulSoup
 
         form = BeautifulSoup(HTML, "html.parser").find("form")
         control = mod.hydration_control(form)
         self.assertIsNotNone(control)
         self.assertEqual(control["value"], "1")
-        self.assertEqual(control["label"], "تربية فكرية")
-        self.assertEqual(
-            control["event_target"],
-            "ctl00$ContentPlaceHolder1$RadioButtonList1$1",
-        )
 
     def test_submission_contains_only_hidden_state_event_and_selected_radio(self):
-        action, payload, control = mod.build_hydration_submission(HTML)
+        from bs4 import BeautifulSoup
+
+        form = BeautifulSoup(HTML, "html.parser").find("form")
+        requested = mod.hydration_controls(form)[1]
+        action, payload, control = mod.build_hydration_submission(HTML, requested)
         self.assertEqual(action, "https://search.emis.gov.eg/search_schSpecialEdu.aspx")
         self.assertEqual(payload["__VIEWSTATE"], "STATE")
         self.assertEqual(payload["__EVENTVALIDATION"], "VALID")
         self.assertEqual(payload["__EVENTTARGET"], control["event_target"])
         self.assertEqual(payload["__EVENTARGUMENT"], "")
-        self.assertEqual(payload[control["name"]], "1")
+        self.assertEqual(payload[control["name"]], "2")
         self.assertNotIn("ctl00$ContentPlaceHolder1$TextBox1", payload)
         self.assertNotIn("ctl00$ContentPlaceHolder1$Button1", payload)
+
+    def test_requested_control_must_still_exist_on_fresh_form(self):
+        stale = {
+            "name": "ctl00$ContentPlaceHolder1$RadioButtonList1",
+            "value": "9",
+            "event_target": "ctl00$ContentPlaceHolder1$RadioButtonList1$9",
+        }
+        with self.assertRaises(ValueError):
+            mod.build_hydration_submission(HTML, stale)
 
     def test_off_origin_form_action_is_refused(self):
         bad_html = HTML.replace(
@@ -66,6 +91,10 @@ class EmisControlHydrationProbeTests(unittest.TestCase):
         )
         with self.assertRaises(ValueError):
             mod.build_hydration_submission(bad_html)
+
+    def test_visible_server_error_message_is_captured(self):
+        html = '<span id="ContentPlaceHolder1_Labelerror">خطأ اثناء محاولة تحميل الصفحة</span>'
+        self.assertEqual(mod.visible_error_messages(html), ["خطأ اثناء محاولة تحميل الصفحة"])
 
     def test_source_page_must_be_reachable_navigation_form_with_postback_radio(self):
         report = {
