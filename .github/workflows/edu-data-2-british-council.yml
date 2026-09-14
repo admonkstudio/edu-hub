@@ -1,4 +1,4 @@
-name: EDU-DATA-2 British Council Adapter Contract
+name: EDU-DATA-2 British Council Discovery
 
 on:
   push:
@@ -6,6 +6,17 @@ on:
       - edu-data-2-international-registry
     paths:
       - 'tools/data-acquisition/international/acquire_british_council_partner_schools.py'
+      - 'tools/data-acquisition/international/build_british_council_browser_discovery.py'
+      - 'tools/data-acquisition/international/build_candidate_universe.py'
+      - 'tools/data-acquisition/international/build_authoritative_seed.py'
+      - 'tools/data-acquisition/international/apply_ib_detail_batches.py'
+      - 'tools/data-acquisition/international/apply_bso_scope_review.py'
+      - 'tools/data-acquisition/international/build_accreditor_expansion.py'
+      - 'tools/data-acquisition/international/apply_accreditor_scope_review.py'
+      - 'tools/data-acquisition/international/seeds/british-council-browser-discovery-*.json'
+      - 'tools/data-acquisition/international/seeds/ib-detail-evidence-*-batch*.json'
+      - 'tools/data-acquisition/international/seeds/bso-scope-review-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/accreditor-scope-review-2026-09-15.json'
       - '.github/workflows/edu-data-2-british-council.yml'
   workflow_dispatch:
 
@@ -13,8 +24,8 @@ permissions:
   contents: read
 
 jobs:
-  contract:
-    name: Validate browser/local PDF adapter contract
+  discovery:
+    name: Validate browser-captured Partner Schools discovery batch
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,10 +34,75 @@ jobs:
           python-version: '3.12'
       - name: Install PDF acquisition dependencies
         run: pip install requests pdfplumber
-      - name: Compile adapter
-        run: python -m py_compile tools/data-acquisition/international/acquire_british_council_partner_schools.py
-      - name: Record acquisition boundary
+      - name: Compile discovery tools
         run: |
-          echo "The September 2026 British Council PDF is browser-accessible but currently returns HTTP 403 to GitHub-hosted direct Python requests."
-          echo "Use the adapter with --pdf-path after a browser/local download, or direct mode only in an environment the source permits."
-          echo "Partner School status remains discovery/contact evidence only; this workflow grants zero international eligibility and performs zero database/public mutation."
+          python -m py_compile tools/data-acquisition/international/acquire_british_council_partner_schools.py
+          python -m py_compile tools/data-acquisition/international/build_british_council_browser_discovery.py
+          python -m py_compile tools/data-acquisition/international/build_candidate_universe.py
+          python -m py_compile tools/data-acquisition/international/build_authoritative_seed.py
+          python -m py_compile tools/data-acquisition/international/apply_ib_detail_batches.py
+          python -m py_compile tools/data-acquisition/international/apply_bso_scope_review.py
+          python -m py_compile tools/data-acquisition/international/build_accreditor_expansion.py
+          python -m py_compile tools/data-acquisition/international/apply_accreditor_scope_review.py
+      - name: Rebuild current 106-row scope-reviewed universe
+        run: |
+          python tools/data-acquisition/international/build_authoritative_seed.py --output-dir artifacts/international
+          python tools/data-acquisition/international/apply_ib_detail_batches.py
+          python tools/data-acquisition/international/apply_bso_scope_review.py
+          python tools/data-acquisition/international/build_accreditor_expansion.py \
+            --base artifacts/international/bso-scope-review/authoritative-source-candidates-with-bso-scope-review.jsonl \
+            --output-dir artifacts/international/bso-scope-review/accreditor-expansion
+          python tools/data-acquisition/international/apply_accreditor_scope_review.py
+      - name: Materialize reviewed browser discovery batch
+        run: python tools/data-acquisition/international/build_british_council_browser_discovery.py
+      - name: Build expanded D2.1 discovery universe
+        run: |
+          python tools/data-acquisition/international/build_candidate_universe.py \
+            --authoritative artifacts/international/accreditor-scope-review/reviewed-source-universe.jsonl \
+            --lead-file artifacts/international/british-council-browser-discovery/british-council-browser-leads.jsonl \
+            --output-dir artifacts/international/british-council-candidate-universe
+      - name: Assert discovery-only safety contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          bc_root = Path('artifacts/international/british-council-browser-discovery')
+          bc = json.loads((bc_root/'british-council-browser-summary.json').read_text(encoding='utf-8'))
+          assert bc['reviewed_discovery_batch_rows'] == 35
+          assert bc['rows_with_website_reference'] == 32
+          assert bc['international_eligibility_granted'] == 0
+          assert bc['canonical_institutions_created'] == 0
+          assert bc['automatic_merges_performed'] == 0
+          assert bc['database_mutation_performed'] is False
+          assert bc['public_projection_rows_created'] == 0
+          assert bc['full_pdf_extraction_complete'] is False
+
+          root = Path('artifacts/international/british-council-candidate-universe')
+          summary = json.loads((root/'candidate-universe-summary.json').read_text(encoding='utf-8'))
+          assert summary['source_record_count'] == 141
+          assert summary['source_counts']['british_council_partner_schools_egypt_2026_09'] == 35
+          assert summary['scope_or_lead_state_counts']['eligible'] == 103
+          assert summary['scope_or_lead_state_counts']['excluded'] == 3
+          assert summary['scope_or_lead_state_counts']['supporting_candidate'] == 35
+          assert summary['english_name_present'] == 141
+          assert summary['bilingual_name_gap_count'] == 97
+          assert summary['unique_institutions_claimed'] is None
+          assert summary['canonical_institutions_created'] == 0
+          assert summary['automatic_merges_performed'] == 0
+          assert summary['database_mutation_performed'] is False
+          assert summary['public_projection_rows_created'] == 0
+          print(json.dumps({'british_council': bc, 'candidate_universe': summary}, indent=2))
+          PY
+      - name: Record direct-acquisition boundary
+        run: |
+          echo "The September 2026 British Council PDF is browser-accessible but may return HTTP 403 to GitHub-hosted direct Python requests."
+          echo "The checked-in browser discovery batch is source-page referenced and remains supporting evidence only."
+          echo "Future full-PDF extraction may use acquire_british_council_partner_schools.py --pdf-path after a permitted browser/local download."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-british-council-discovery
+          path: |
+            artifacts/international/british-council-browser-discovery/
+            artifacts/international/british-council-candidate-universe/
+          if-no-files-found: error
