@@ -102,10 +102,10 @@ jobs:
           review_root = Path('artifacts/international/british-council-primary-scope-review')
           review = json.loads((review_root/'british-council-primary-scope-summary.json').read_text(encoding='utf-8'))
           assert review['source_rows'] == 70
-          assert review['review_batches'] == 1
-          assert review['reviewed_rows'] == 2
-          assert review['eligible_rows'] == 2
-          assert review['remaining_supporting_candidates'] == 68
+          assert review['review_batches'] == 2
+          assert review['reviewed_rows'] == 6
+          assert review['eligible_rows'] == 6
+          assert review['remaining_supporting_candidates'] == 64
           assert review['partner_status_treated_as_international_eligibility'] is False
           assert review['automatic_identity_creation_performed'] is False
           assert review['automatic_merges_performed'] == 0
@@ -116,12 +116,10 @@ jobs:
           summary = json.loads((root/'candidate-universe-summary.json').read_text(encoding='utf-8'))
           assert summary['source_record_count'] == 176
           assert summary['source_counts']['british_council_partner_schools_egypt_2026_09'] == 70
-          assert summary['scope_or_lead_state_counts']['eligible'] == 105
+          assert summary['scope_or_lead_state_counts']['eligible'] == 109
           assert summary['scope_or_lead_state_counts']['excluded'] == 3
-          assert summary['scope_or_lead_state_counts']['supporting_candidate'] == 68
+          assert summary['scope_or_lead_state_counts']['supporting_candidate'] == 64
           assert summary['english_name_present'] == 176
-          # This metric intentionally measures only authoritative/primary rows;
-          # supporting British Council discovery rows do not inflate the Arabic-name research queue.
           assert summary['bilingual_name_gap_count'] == 97
           assert summary['unique_institutions_claimed'] is None
           assert summary['canonical_institutions_created'] == 0
@@ -133,6 +131,10 @@ jobs:
           assert {row['source_record_id'] for row in evidence} == {
               'bcps2026:kings-school-the-crown',
               'bcps2026:international-school-choueifat-cairo',
+              'bcps2026:global-paradigm-baccalaureate-school',
+              'bcps2026:capital-international-schools',
+              'bcps2026:mount-international-school-community',
+              'bcps2026:international-school-elite-education',
           }
           print(json.dumps({'browser_discovery': bc, 'primary_review': review, 'reviewed_candidate_universe': summary}, indent=2))
           PY
