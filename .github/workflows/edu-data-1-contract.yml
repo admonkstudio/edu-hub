@@ -63,6 +63,8 @@ jobs:
           python -m py_compile tools/data-acquisition/registry/test_reconcile_higher_ed.py
           python -m py_compile tools/data-acquisition/registry/prepare_official_export.py
           python -m py_compile tools/data-acquisition/registry/test_prepare_official_export.py
+          python -m py_compile tools/data-acquisition/registry/analyze_emis_capture.py
+          python -m py_compile tools/data-acquisition/registry/test_analyze_emis_capture.py
           python -m py_compile tools/data-acquisition/emis_local_capture.py
           python -m py_compile tools/data-acquisition/scrape_mohesr_private.py
           python -m py_compile tools/data-acquisition/scrape_mohesr_technical.py
@@ -74,6 +76,8 @@ jobs:
         run: python tools/data-acquisition/registry/test_reconcile_higher_ed.py
       - name: Enforce official export intake safety rules
         run: python tools/data-acquisition/registry/test_prepare_official_export.py
+      - name: Enforce EMIS capture-analysis safety rules
+        run: python tools/data-acquisition/registry/test_analyze_emis_capture.py
       - uses: actions/upload-artifact@v4
         with:
           name: edu-data-1-contract-report
