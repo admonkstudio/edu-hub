@@ -6,6 +6,8 @@ on:
       - edu-data-2-international-registry
     paths:
       - 'tools/data-acquisition/international/**'
+      - 'infra/owned-data/001_raw_archive.sql'
+      - 'infra/owned-data/004_national_registry_layers.sql'
       - 'infra/owned-data/005_international_registry.sql'
       - 'docs/EDU-DATA-2-INTERNATIONAL-REGISTRY.md'
       - '.github/workflows/edu-data-2-international-registry.yml'
@@ -29,28 +31,44 @@ jobs:
         run: |
           python -m py_compile tools/data-acquisition/international/acquire_ib_egypt.py
           python -m py_compile tools/data-acquisition/international/acquire_scu_foreign_branches.py
+          python -m py_compile tools/data-acquisition/international/build_authoritative_seed.py
           python -m py_compile tools/data-acquisition/international/test_acquisition.py
-      - name: Validate source registry
+      - name: Validate source registry and authoritative snapshots
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          p = Path('tools/data-acquisition/international/source_registry.json')
-          data = json.loads(p.read_text(encoding='utf-8'))
-          assert data['scope'] == 'egypt_international_education'
-          ids = [row['source_id'] for row in data['sources']]
+          registry = json.loads(Path('tools/data-acquisition/international/source_registry.json').read_text(encoding='utf-8'))
+          assert registry['scope'] == 'egypt_international_education'
+          ids = [row['source_id'] for row in registry['sources']]
           assert len(ids) == len(set(ids))
-          assert 'ib_world_schools_egypt' in ids
-          assert 'scu_foreign_university_branches' in ids
-          assert 'legacy_v7_archive' in ids
-          assert all('auto_eligibility' in row for row in data['sources'])
-          print(f'validated {len(ids)} sources')
+          for required in (
+              'ib_world_schools_egypt',
+              'french_homologation_2026_2027',
+              'kmk_german_schools_2026_04',
+              'scu_foreign_university_branches',
+              'legacy_v7_archive',
+          ):
+              assert required in ids
+          assert all('auto_eligibility' in row for row in registry['sources'])
+
+          seed_dir = Path('tools/data-acquisition/international/seeds')
+          ib = json.loads((seed_dir/'ib-egypt-directory-2026-09-14.json').read_text(encoding='utf-8'))
+          fr = json.loads((seed_dir/'french-homologation-egypt-2026-2027.json').read_text(encoding='utf-8'))
+          de = json.loads((seed_dir/'german-kmk-egypt-2026-04.json').read_text(encoding='utf-8'))
+          scu = json.loads((seed_dir/'scu-foreign-university-branches-2026-09-14.json').read_text(encoding='utf-8'))
+          assert len(ib['schools']) == ib['directory_count_observed'] == 54
+          assert ib['count_conflict_requires_review'] is True
+          assert len(fr['records']) == fr['records_count'] == 17
+          assert len(de['records']) == de['records_count'] == 4
+          assert len(scu['records']) == scu['records_count'] == 9
+          print(f"validated {len(ids)} registered sources and 84 source snapshot rows")
           PY
-      - name: Test parsers and scope boundaries
+      - name: Test live-parser and scope boundaries
         run: python tools/data-acquisition/international/test_acquisition.py
 
-  acquire:
-    name: Acquire authoritative international seed
+  build-seed:
+    name: Build authoritative source seed
     needs: contract
     runs-on: ubuntu-latest
     steps:
@@ -58,25 +76,89 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install acquisition dependencies
-        run: pip install requests beautifulsoup4
-      - name: Acquire IB Egypt
-        run: python tools/data-acquisition/international/acquire_ib_egypt.py --output-dir artifacts/international --expected-count 54
-      - name: Acquire SCU foreign university branches
-        run: python tools/data-acquisition/international/acquire_scu_foreign_branches.py --output-dir artifacts/international --expected-count 9
-      - name: Verify zero publication side effects
+      - name: Build deterministic source candidates
+        run: python tools/data-acquisition/international/build_authoritative_seed.py --output-dir artifacts/international
+      - name: Verify seed safety and counts
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          for path in Path('artifacts/international').glob('*summary.json'):
-              data = json.loads(path.read_text(encoding='utf-8'))
-              assert data.get('database_mutation_performed') is False
-              assert data.get('public_promotion_performed') is False
-              print(path.name, data.get('records_acquired'))
+          p = Path('artifacts/international/authoritative-source-summary.json')
+          data = json.loads(p.read_text(encoding='utf-8'))
+          assert data['source_rows'] == 84
+          assert data['eligible_source_rows'] == 30
+          assert data['candidate_source_rows'] == 54
+          assert data['unique_institutions_claimed'] is None
+          assert data['identity_reconciliation_required'] is True
+          assert data['database_mutation_performed'] is False
+          assert data['public_promotion_performed'] is False
+          assert data['ib_directory_country_summary_conflict']['review_required'] is True
+          print(json.dumps(data, indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
           name: edu-data-2-authoritative-seed
           path: artifacts/international/
           if-no-files-found: error
+
+  schema:
+    name: Validate clean international PostgreSQL schema
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:17-3.5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: eduhub_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d eduhub_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: eduhub_test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: sudo apt-get update -qq && sudo apt-get install -y postgresql-client
+      - name: Apply clean registry migrations
+        run: |
+          psql -v ON_ERROR_STOP=1 -f infra/owned-data/001_raw_archive.sql
+          psql -v ON_ERROR_STOP=1 -f infra/owned-data/004_national_registry_layers.sql
+          psql -v ON_ERROR_STOP=1 -f infra/owned-data/005_international_registry.sql
+      - name: Assert international schema contract
+        run: |
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          do $$
+          begin
+            assert to_regclass('edu_raw.raw_records') is not null, 'missing edu_raw.raw_records';
+            assert to_regclass('edu_staging.entity_candidates') is not null, 'missing staging candidates';
+            assert to_regclass('edu_core.institutions') is not null, 'missing institutions';
+            assert to_regclass('edu_core.international_eligibility') is not null, 'missing international eligibility';
+            assert to_regclass('edu_core.campuses') is not null, 'missing campuses';
+            assert to_regclass('edu_core.institution_accreditations') is not null, 'missing accreditations';
+            assert to_regclass('edu_core.fee_schedules') is not null, 'missing fee schedules';
+            assert to_regclass('edu_core.programs') is not null, 'missing programs';
+            assert to_regclass('edu_core.institution_media') is not null, 'missing media links';
+            assert exists(select 1 from pg_extension where extname='postgis'), 'postgis not enabled';
+          end $$;
+          SQL
+          psql -Atc "select code from edu_core.curricula order by code"
+          psql -Atc "select code from edu_core.accreditation_bodies order by code"
+
+  note-live-refresh:
+    name: Record live-refresh boundary
+    needs: contract
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Authoritative snapshots are refreshed through browser-capable/source-appropriate acquisition paths."
+          echo "IB currently returns HTTP 403 to GitHub-hosted direct Python requests, so a 403 is not treated as source absence."
+          echo "Live fetch scripts remain available for suitable environments, but deterministic CI uses dated evidence snapshots."
