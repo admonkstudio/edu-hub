@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "source_id": "ib_world_schools_egypt",
+  "snapshot_date": "2026-09-15",
+  "integration_state": "captured_pending_deterministic_seed_integration",
+  "notes": "Fourth incremental batch of current official IB school-profile checks. PRIVATE classification is taken from the current official IB profile for each exact Egypt directory identity. Evidence is additive; source identity and historical snapshots remain unchanged.",
+  "records": [
+    {
+      "name": "Elite International School",
+      "ib_school_code": "051794",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "onlineelite.net",
+      "phone": "+201093307078",
+      "address": "Airport Road, Behind Elnozha Airport, Abeis 10, Ring Road, Alexandria 21311, Egypt",
+      "source_url": "https://ibo.org/en/school/051794/"
+    },
+    {
+      "name": "Gateway International Montessori School",
+      "ib_school_code": "062174",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.gateway.education",
+      "phone": "+2001001103913",
+      "address": "Katameya Gardens, Fifth Settlement, New Cairo, Cairo, Egypt",
+      "source_url": "https://ibo.org/school/062174/"
+    },
+    {
+      "name": "GEMS ACADEMIE D'ALEXANDRIE",
+      "ib_school_code": "051805",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "gemsacademyalex.com",
+      "phone": "+201000505331",
+      "address": "13km from the coast on the Cairo Alexandria Agricultural Road, Alexandria, Egypt",
+      "source_url": "https://ibo.org/fr/school/051805/"
+    },
+    {
+      "name": "GEMS International School Cairo",
+      "ib_school_code": "062134",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.gis-cairo.com",
+      "phone": "+2000201061618302",
+      "address": "Al Rehab 2 extension, New Cairo, Cairo, Egypt",
+      "source_url": "https://ibo.org/en/school/062134"
+    },
+    {
+      "name": "Global Paradigm Baccalaureate School",
+      "ib_school_code": "062168",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "gp-baccalaureateschool.com",
+      "phone": "+201002657616",
+      "address": "ASR2 Mostakbal City, New Cairo, Cairo 11477, Egypt",
+      "source_url": "https://ibo.org/fr/programmes/find-an-ib-school/ibaem2/g/global-paradigm-baccalaureate-school/"
+    }
+  ],
+  "records_count": 5,
+  "eligible_private": 5,
+  "excluded_state": 0
+}
