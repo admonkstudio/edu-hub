@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.2_institution_division_hierarchy_review",
+  "review_method": "first_party_hierarchy_review_no_runtime_mutation",
+  "new_parent_institutions_count": 1,
+  "division_extensions_count": 6,
+  "new_parent_institutions": [
+    {
+      "review_identity_key": "port-said-schools",
+      "provisional_canonical_name_en": "Port Said Schools",
+      "decision": "confirmed_parent_institution_from_first_party_evidence",
+      "decision_confidence": "high",
+      "source_memberships": [],
+      "evidence_urls": [
+        "https://portsaidschools.org/",
+        "https://portsaidschools.org/contact-us",
+        "https://portsaidschools.org/national-section",
+        "https://portsaidschools.org/american-section",
+        "https://portsaidschools.org/british-section"
+      ],
+      "review_note": "The current first-party site uses Port Said Schools as the umbrella identity and exposes National, American and British sections. The Cognia source row names Port Said American School and is therefore division-scoped evidence rather than the parent institution identity."
+    }
+  ],
+  "division_extensions": [
+    {
+      "review_identity_key": "modern-education-schools",
+      "division_key": "national",
+      "canonical_name_en": "Modern Education Schools - National Division",
+      "division_type": "curriculum_stream",
+      "curriculum_codes": ["egyptian_national"],
+      "source_memberships": [],
+      "evidence_urls": [
+        "https://www.mes.edu.eg/about-us/"
+      ],
+      "review_note": "Current first-party MES evidence explicitly lists the National Division as one of three educational systems within the same institution."
+    },
+    {
+      "review_identity_key": "modern-education-schools",
+      "division_key": "british",
+      "canonical_name_en": "Modern Education Schools - British Division",
+      "division_type": "curriculum_stream",
+      "curriculum_codes": ["british"],
+      "source_memberships": [],
+      "evidence_urls": [
+        "https://www.mes.edu.eg/about-us/"
+      ],
+      "review_note": "Current first-party MES evidence explicitly lists the British Division and describes its Foundation Stage through IG III range."
+    },
+    {
+      "review_identity_key": "modern-education-schools",
+      "division_key": "american",
+      "canonical_name_en": "Modern Education American School",
+      "division_type": "curriculum_stream",
+      "curriculum_codes": ["american"],
+      "source_memberships": [
+        {
+          "source_id": "cognia_member_milestones_egypt_2026_2027",
+          "source_record_id": "cognia_member_milestones_egypt_2026_2027:bba887d2d0c7f11d4902",
+          "source_scope": "american"
+        }
+      ],
+      "evidence_urls": [
+        "https://www.mes.edu.eg/about-us/",
+        "https://www.cognia.org/member-milestones/"
+      ],
+      "review_note": "MES first-party evidence identifies the American Division and specifically names Modern Education American School in its Cognia School of Distinction evidence. The Cognia milestone row is therefore retained with American-division scope rather than generalized to every MES division."
+    },
+    {
+      "review_identity_key": "port-said-schools",
+      "division_key": "national",
+      "canonical_name_en": "Port Said Schools - National Section",
+      "division_type": "curriculum_stream",
+      "curriculum_codes": ["egyptian_national"],
+      "source_memberships": [],
+      "evidence_urls": [
+        "https://portsaidschools.org/national-section",
+        "https://portsaidschools.org/contact-us"
+      ],
+      "review_note": "The current Port Said Schools first-party site exposes a distinct National Section under the common Port Said Schools umbrella."
+    },
+    {
+      "review_identity_key": "port-said-schools",
+      "division_key": "british",
+      "canonical_name_en": "Port Said British School",
+      "division_type": "curriculum_stream",
+      "curriculum_codes": ["british"],
+      "source_memberships": [],
+      "evidence_urls": [
+        "https://portsaidschools.org/british-section",
+        "https://portsaidschools.org/contact-us"
+      ],
+      "review_note": "The current first-party British Section page explicitly identifies Port Said British School as the British-curriculum stream within the Port Said Schools umbrella."
+    },
+    {
+      "review_identity_key": "port-said-schools",
+      "division_key": "american",
+      "canonical_name_en": "Port Said American School",
+      "division_type": "curriculum_stream",
+      "curriculum_codes": ["american"],
+      "source_memberships": [
+        {
+          "source_id": "cognia_member_milestones_egypt_2026_2027",
+          "source_record_id": "cognia_member_milestones_egypt_2026_2027:04bead0527606cd5e1b7",
+          "source_scope": "american"
+        }
+      ],
+      "evidence_urls": [
+        "https://portsaidschools.org/american-section",
+        "https://portsaidschools.org/contact-us",
+        "https://www.cognia.org/member-milestones/"
+      ],
+      "review_note": "The Cognia source row names Port Said American School. Current first-party evidence proves that PSAS is the American section under Port Said Schools, so the source membership belongs at division scope rather than creating a separate parent institution."
+    }
+  ],
+  "safety": {
+    "automatic_hierarchy_inference_performed": false,
+    "new_parent_created_from_absence_of_source_match": false,
+    "source_row_forced_to_institution_level": false,
+    "canonical_database_rows_written": 0,
+    "runtime_database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
