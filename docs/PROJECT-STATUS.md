@@ -99,14 +99,19 @@ The goal is identity coverage before profile completeness. Missing fees, contact
 
 - Official 2025/26 target remains 62,690 schools.
 - The official Egyptian Schools Directory remains the required primary identity source.
-- GitHub-hosted/web acquisition environments still time out against the directory, but an Egypt-local run on 2026-09-14 proved `https://search.emis.gov.eg/` is healthy from an Egypt network: HTTP 200 in approximately 0.08 seconds with ASP.NET state fields present.
-- In the same local capture, direct GET requests to `search_schgov.aspx`, `search_schpriv.aspx` and `sch_data.aspx` returned repeated HTTP 500 responses.
-- The live root exposes no school-category anchor links. Instead it exposes six ASP.NET submit buttons for government, private, special-education, sports, military and experimental schools.
-- Current school-category navigation is therefore server-side POST navigation through the root form using live `__VIEWSTATE`, `__VIEWSTATEGENERATOR` and `__EVENTVALIDATION`, not direct GET navigation.
-- `emis_navigation_probe.py` now performs only these bounded top-level category-button submissions. Each click starts from a fresh root GET, preserves current hidden state, POSTs exactly one whitelisted category button, captures the resulting form contract and stops before selecting any school-search filters.
-- `run_emis_local_capture.py` invokes the navigation probe before offline contract analysis and emits redacted shareable evidence while keeping raw ASP.NET state local.
-- A dedicated CI contract verifies that only `ctl00$ContentPlaceHolder1$Button*` root navigation controls are eligible and that each submission contains only hidden state plus the single clicked button.
-- The navigation probe performs no school search, no result pagination, no school-row enumeration, no `edu_core` mutation and no public promotion.
+- GitHub-hosted/web acquisition environments still time out against the directory, but an Egypt-local run on 2026-09-14 proved `https://search.emis.gov.eg/` is healthy from an Egypt network with ASP.NET state fields present.
+- The first local diagnostic established that direct GETs to `search_schgov.aspx`, `search_schpriv.aspx` and `sch_data.aspx` return HTTP 500 rather than exposing a usable search contract.
+- The root page exposes six ASP.NET submit buttons for government, private, special-education, sports, military and experimental schools. Category navigation therefore depends on root-form POST state rather than ordinary anchor navigation.
+- A second Egypt-local bundle proved all six category buttons can be submitted through the live root contract. Exactly one category currently reaches a healthy search page: **Special Education** at `search_schSpecialEdu.aspx`.
+- Government, private, sports, military and experimental category navigations currently end at server-side HTTP 500 responses. These failures are now treated as source availability failures, not as missing scraper logic.
+- The accessible Special Education page exposes the expected ASP.NET search architecture and two dependent selects: governorate (`DDList_mud`) and stage (`DDList_stage`). Both are initially empty and the page explicitly requires a school-type radio postback first.
+- The analyzer now ranks this navigated search form above the root launcher, identifies its scope as `special_education`, and explicitly prevents that evidence from unblocking government-school enumeration.
+- `emis_control_hydration_probe.py` now performs at most one whitelisted, non-placeholder radio-button `__doPostBack` on an already-reached search form in order to hydrate dependent selects. It does not submit the school-search button.
+- The one-command local wrapper now runs GET capture -> category navigation -> optional dependent-control hydration -> offline analysis -> redacted shareable ZIP.
+- Navigation diagnostics no longer retry away HTTP 500 statuses, so current category-route failures remain explicit evidence in `capture-report.json`.
+- Escaped ASP.NET `__doPostBack` handlers are now recognized in captured field contracts.
+- Dedicated CI enforces the navigation, hydration and category-scope safety boundaries. A healthy Special Education contract may be used to validate reusable ASP.NET mechanics, but it can never be relabelled as government-school coverage.
+- No school search, result pagination, school-row enumeration, `edu_core` mutation or public promotion is authorized by the current EMIS tools.
 - Secondary directories must not be relabelled as complete MOE coverage.
 
 ### MOSS nurseries — D1.4 blocker
@@ -124,11 +129,11 @@ The goal is identity coverage before profile completeness. Missing fees, contact
 ## Immediate next actions
 
 1. Treat D1.2 higher-education acquisition/reconciliation plumbing as implemented and keep unresolved identity decisions review-only.
-2. Pull the current D1.3 branch and rerun `python tools/data-acquisition/run_emis_local_capture.py` from the proven Egypt-reachable machine so the new bounded root-button navigation probe captures the actual government/private/etc. search forms.
-3. Upload/use the resulting `emis-local-capture-bundle.zip`; the analyzer may now unblock bounded pilot design if the navigated pages expose multi-option school-search controls.
-4. Implement only a small governorate/administration pilot when `enumerator-contract.json` reports `adapter_design_unblocked=true`.
-5. Validate native source IDs, ASP.NET postback dependencies, pagination, failed combinations and duplicate IDs before any national run.
-6. Validate unique official school-source coverage against the 62,690-school 2025/26 target without substituting secondary-directory counts.
+2. Pull the current D1.3 branch and rerun `python tools/data-acquisition/run_emis_local_capture.py` from the proven Egypt-reachable machine. The wrapper will now attempt exactly one safe Special Education control-hydration postback after category navigation.
+3. Review the regenerated `emis-local-capture-bundle.zip`. If the Special Education governorate/stage selects populate, use that evidence only to finalize a reusable ASP.NET state/postback engine; keep government national enumeration blocked.
+4. Re-test the government category on every local capture. Only a healthy government search form may unlock the bounded government-school pilot.
+5. Once government form access returns, implement only a small governorate/administration pilot and validate native source IDs, ASP.NET dependencies, pagination, failed combinations and duplicate IDs before any national run.
+6. Validate unique official school-source coverage against the 62,690-school 2025/26 target without substituting Special Education or secondary-directory counts.
 7. Continue D1.4 MOSS official data-request/public-map track for the 48,225-nursery universe.
 8. Provision a dedicated Edu Hub PostgreSQL/Supabase environment before importing the national registry into an operational hosted database.
 9. Only after identity coverage stabilizes, begin D1.5 broad enrichment and completeness improvement.
