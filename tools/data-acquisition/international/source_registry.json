@@ -17,6 +17,19 @@
       "active": true
     },
     {
+      "source_id": "uk_dfe_bso_egypt_2026_08",
+      "name": "UK Department for Education - Accredited British Schools Overseas in Egypt",
+      "url": "https://www.gov.uk/government/publications/british-schools-overseas-inspection-reports/british-schools-overseas-accredited-schools-inspection-reports",
+      "publisher": "UK Department for Education",
+      "authority_class": "foreign_government",
+      "role": ["identity", "eligibility_support", "british_school_model", "inspection_status"],
+      "auto_eligibility": false,
+      "scope_condition": "current_bso_accredited_and_private_or_independent",
+      "expected_current_count": 11,
+      "acquisition_mode": "official_html_list_and_gias_detail",
+      "active": true
+    },
+    {
       "source_id": "british_council_partner_schools_egypt_2026_09",
       "name": "British Council Partner Schools in Egypt - September 2026",
       "url": "https://www.britishcouncil.org.eg/en/exam/igcse-school/choosing/find-british-council-attached-centre",
