@@ -98,15 +98,19 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 ## 2026-09-14 — Edarabia source policy
 
-**Decision:** Edarabia is an approved supporting/commercial directory source for discovery and enrichment leads.
+**Decision:** Edarabia remains useful as a **reference-only discovery index**, not as a bulk acquisition source.
 
-**Decision:** Edarabia may contribute candidate names, addresses, websites, curriculum leads, fee leads, profile completeness hints and media discovery leads.
+**Decision:** The current published Edarabia terms prohibit systematic storage/reproduction/commercial reuse of Edarabia content without prior written permission. Therefore Edu Hub must not bulk scrape, systematically store, reproduce or publish Edarabia page content unless written permission/license is obtained.
 
-**Decision:** Edarabia does not establish international eligibility, accreditation, regulatory status or canonical fees by itself. Important Edarabia-derived facts must be corroborated by a regulator, accreditor or official institution source before canonical promotion.
+**Decision:** An Edarabia listing may identify a school or a potentially missing field, but the actual fact must be re-sourced from an official institution website, regulator, accreditor, awarding body or another permitted source before it enters canonical data.
 
-**Decision:** Edarabia ratings/reviews are user-generated/editorial signals, not canonical factual evidence.
+**Decision:** Edarabia does not establish international eligibility, accreditation, regulatory status or canonical fees.
 
-**Decision:** Edarabia images are discovery/provenance candidates only. They must not be republished unless an independent reuse right is established.
+**Decision:** Edarabia ratings/reviews are not imported into canonical data.
+
+**Decision:** Edarabia images are not copied or published unless independent reuse rights are established.
+
+**Canonical source-use policy:** `docs/SOURCE-USAGE-POLICY.md`.
 
 ## 2026-09-14 — Higher-education boundary
 
@@ -159,6 +163,10 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 **Decision:** Every eligible institution must have an explicit media status even when no publishable image exists. `placeholder_required` is a valid completed media state.
 
 **Decision:** The database-completion gate ends with a deterministic, presentation-neutral export containing canonical identities, EN/AR localization, source references, historical/time-sensitive facts, media manifest/rights, conflict state and completeness metrics.
+
+**Decision:** Provenance is not limited to institution-level fields. Campuses, programmes, facilities, admission requirements, fee items and media/localized fields must be able to retain source evidence and review state.
+
+**Decision:** Name matching performed during candidate discovery produces review hints only; it never authorizes a canonical merge.
 
 **Canonical plan:** `docs/DATABASE-COMPLETION-PLAN.md`.
 
