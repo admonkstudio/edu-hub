@@ -1,0 +1,59 @@
+name: EDU-DATA-2 British Council Discovery
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'tools/data-acquisition/international/acquire_british_council_partner_schools.py'
+      - '.github/workflows/edu-data-2-british-council.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acquire:
+    name: Acquire September 2026 Partner Schools list
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install PDF acquisition dependencies
+        run: pip install requests pdfplumber
+      - name: Compile adapter
+        run: python -m py_compile tools/data-acquisition/international/acquire_british_council_partner_schools.py
+      - name: Acquire and extract supporting source
+        run: python tools/data-acquisition/international/acquire_british_council_partner_schools.py
+      - name: Validate discovery-only safety contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          summary = json.loads(Path('artifacts/international/british-council/british-council-summary.json').read_text(encoding='utf-8'))
+          rows = [json.loads(line) for line in Path('artifacts/international/british-council/british-council-partner-schools.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+
+          assert summary['pdf_page_count'] == 19
+          assert summary['source_rows'] == len(rows)
+          assert summary['source_rows'] >= 150, summary
+          assert summary['pages_with_tables'] >= 15, summary
+          assert summary['international_eligibility_granted'] == 0
+          assert summary['canonical_institutions_created'] == 0
+          assert summary['automatic_merges_performed'] == 0
+          assert summary['public_projection_rows_created'] == 0
+          assert summary['database_mutation_performed'] is False
+          assert all(row['scope_state'] == 'candidate' for row in rows)
+          assert all(row['auto_eligibility'] is False for row in rows)
+          assert all(row['canonical_identity_created'] is False for row in rows)
+          assert any(row['name_en'] == 'New Cairo British International School' for row in rows)
+          assert any('Misr Language Schools' in row['name_en'] for row in rows)
+          print(json.dumps(summary, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-british-council-discovery
+          path: artifacts/international/british-council/
+          if-no-files-found: error
