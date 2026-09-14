@@ -200,13 +200,43 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 **Decision:** Identity review and eligibility selection remain separate. Grouping source records into one reviewed identity does not automatically select a final institution-wide eligibility state when evidence is division-scoped or otherwise unresolved.
 
-**Decision:** A reviewed institution identity does not imply a reviewed campus structure. Until campus count/relationships are explicitly sourced and reviewed, the canonical draft must record `campus_structure_state=not_yet_reviewed` and create zero canonical campus records.
+**Decision:** A reviewed institution identity does not imply a reviewed campus structure. Until campus count/relationships are explicitly sourced and reviewed, the canonical draft must record an unresolved campus-structure state and create zero canonical campus rows.
 
 **Decision:** Unreviewed source rows remain in an explicit D2.2 review queue; they are not silently treated as unique institutions merely because no duplicate has yet been found.
 
-**Decision:** The current D2.2 materialization boundary permits reviewed institution drafts, reviewed division drafts, unresolved campus review states and review queues, while still requiring zero automatic merges, zero runtime database mutation and zero public projection.
+**Decision:** The current D2.2 materialization boundary permits reviewed institution drafts, reviewed division drafts, campus review states and review queues, while still requiring zero automatic merges, zero runtime database mutation and zero public projection.
 
 **Reference builder:** `tools/data-acquisition/international/build_reviewed_canonical_artifacts.py`.
+
+## 2026-09-15 — Incremental authoritative evidence overlays preserve the foundational snapshot
+
+**Decision:** A dated foundational source build remains independently reproducible even after newer authoritative detail evidence is acquired. New verified source details may be accepted through deterministic overlays rather than destructively rewriting the older evidence snapshot.
+
+**Decision:** An incremental overlay may update only an exact already-known source identity. It must not create a new institution identity, fuzzy-match a target, reorder source identities or change an existing `source_record_id`.
+
+**Decision:** The same source identity may not silently appear in multiple incremental evidence batches. Duplicate target identities across batches are treated as a contract error requiring review.
+
+**Decision:** Incremental evidence batches retain their own source date and provenance. Current accepted state is computed from the foundational snapshot plus all accepted overlays, while the historical foundational state remains reproducible.
+
+**Decision:** Historical source discrepancies are preserved. A later source count or corrected current observation does not erase what a source reported on an earlier snapshot date.
+
+**Decision:** Incremental overlays remain research/staging transformations only: zero automatic identity merges, zero canonical database creation and zero public projection.
+
+**Reference builder:** `tools/data-acquisition/international/apply_ib_detail_batches.py`.
+
+## 2026-09-15 — Current-campus evidence is not the same as campus-structure completeness
+
+**Decision:** Source-backed evidence that an institution currently operates at a particular campus/location may be materialized as a reviewed current-campus draft even when the complete campus topology remains unknown.
+
+**Decision:** `current campus evidenced` and `campus structure complete` are separate review states. One known current address must never be used to assert that an institution has only one campus.
+
+**Decision:** The first campus review package uses the state `at_least_one_current_campus_reviewed_structure_not_exhaustive`. It explicitly leaves `campus_structure_complete=false` and `additional_current_campuses_ruled_out=false` until stronger source review establishes otherwise.
+
+**Decision:** Historical locations remain historical evidence. A former site is not represented as a current campus unless current official evidence supports that status. This rule currently prevents El Alsson's pre-2017 operating site from being silently modeled as a present El Alsson campus.
+
+**Decision:** Campus draft IDs may be deterministic and linked to reviewed institution draft IDs, but materialization remains portable review output only: zero canonical campus rows, zero runtime database mutation and zero public projection.
+
+**Reference builder:** `tools/data-acquisition/international/build_reviewed_campus_artifacts.py`.
 
 ## Deferred decisions until database completion
 
