@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "source_id": "cis_international_accreditation_egypt",
+  "publisher": "Council of International Schools",
+  "authority_class": "recognized_accreditor",
+  "snapshot_date": "2026-09-15",
+  "source_role": "international_school_model_and_accreditation_evidence",
+  "records_count": 6,
+  "records": [
+    {
+      "name": "Evolution International School",
+      "country": "Egypt",
+      "accreditation_event": "re_accredited",
+      "accreditation_event_date": "2026-06-10",
+      "source_url": "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/re-accredited-evolution-international-school-egypt",
+      "scope_state": "candidate",
+      "scope_class": "international_school",
+      "eligibility_pending": "private_or_independent_ownership_check"
+    },
+    {
+      "name": "Cairo English School",
+      "country": "Egypt",
+      "accreditation_event": "re_accredited",
+      "accreditation_event_date": "2025-12-08",
+      "source_url": "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/re-accredited-cairo-english-school-egypt",
+      "scope_state": "candidate",
+      "scope_class": "international_school",
+      "eligibility_pending": "private_or_independent_ownership_check"
+    },
+    {
+      "name": "NCBIS - New Cairo British International School",
+      "country": "Egypt",
+      "accreditation_event": "re_accredited",
+      "accreditation_event_date": "2024-05-10",
+      "source_url": "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/re-accredited-ncbis-new-cairo-british-international-school-egypt",
+      "scope_state": "candidate",
+      "scope_class": "international_school",
+      "eligibility_pending": "private_or_independent_ownership_check"
+    },
+    {
+      "name": "The British School Al Rehab",
+      "country": "Egypt",
+      "accreditation_event": "newly_accredited",
+      "accreditation_event_date": "2023-12-19",
+      "source_url": "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/newly-accredited-the-british-school-al-rehab-egypt",
+      "scope_state": "candidate",
+      "scope_class": "international_school",
+      "eligibility_pending": "private_or_independent_ownership_check"
+    },
+    {
+      "name": "The British School Madinaty",
+      "country": "Egypt",
+      "accreditation_event": "newly_accredited",
+      "accreditation_event_date": "2023-12-14",
+      "source_url": "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/newly-accredited-the-british-school-madinaty-egypt",
+      "scope_state": "candidate",
+      "scope_class": "international_school",
+      "eligibility_pending": "private_or_independent_ownership_check"
+    },
+    {
+      "name": "Cairo American College",
+      "country": "Egypt",
+      "accreditation_event": "re_accredited",
+      "accreditation_event_date": "2022-01-07",
+      "source_url": "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/re-accredited-cairo-american-college-egypt",
+      "scope_state": "candidate",
+      "scope_class": "international_school",
+      "eligibility_pending": "private_or_independent_ownership_check_and_current_status_review"
+    }
+  ],
+  "notes": "CIS accreditation is strong international-school-model evidence. Edu Hub still applies the active private/independent ownership scope gate separately and does not auto-create canonical institutions. Older CIS announcements without recent revalidation are not included in this current-evidence seed."
+}
