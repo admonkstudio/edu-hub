@@ -254,6 +254,22 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 **Accepted validation:** `EDU-DATA-2 Incremental Identity Review` run `34908639710`.
 
+## 2026-09-15 — Supporting discovery qualification is additive and evidence-separated
+
+**Decision:** A supporting discovery source such as the British Council Partner Schools directory may expand the D2.1 research universe without changing the accepted historical strong-source universe. Discovery rows remain supporting candidates until a separate explicit review supplies qualifying primary/regulatory/accreditation evidence.
+
+**Decision:** A discovery row may receive `eligible` scope only when an exact checked-in decision establishes high-confidence international-model evidence and private/independent ownership/scope from sources other than the discovery status itself. The discovery source remains provenance for how the lead was found, not the eligibility basis.
+
+**Decision:** Primary re-sourcing is an additive review layer. The original 106-row classified universe remains independently reproducible even when newly discovered institutions later qualify. Current expanded counts must always distinguish strong-source rows, supporting candidates and reviewed discoveries instead of rewriting history.
+
+**Decision:** Eligibility review is still not canonical identity creation. Newly qualified discovery rows must pass D2.2 identity/provider/campus/division reconciliation before they become reviewed canonical drafts or contribute to a unique-institution count.
+
+**Decision:** The first accepted British Council discovery review batch captures 35 supporting leads; the first primary qualification batch promotes only King's School The Crown and The International School of Choueifat, Cairo, leaving the other 33 leads unresolved. No Partner School shortcut, automatic identity creation, merge, database write or public projection is permitted.
+
+**Reference builders:** `tools/data-acquisition/international/build_british_council_browser_discovery.py` and `tools/data-acquisition/international/apply_british_council_primary_scope_review.py`.
+
+**Accepted validations:** British Council browser discovery run `34909183019`; primary qualification batch 1 run `34909421938`.
+
 ## Deferred decisions until database completion
 
 - Astro-first vs Instatic-first final implementation choice;
