@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "source_id": "ib_world_schools_egypt",
+  "snapshot_date": "2026-09-15",
+  "integration_state": "captured_pending_deterministic_seed_integration",
+  "notes": "Seventh incremental batch of current official IB school-profile checks. PRIVATE classification is taken from the current official IB profile for each exact Egypt directory identity. Evidence is additive and source identities remain unchanged.",
+  "records": [
+    {
+      "name": "Lycée Européen International",
+      "ib_school_code": "061783",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.euroschoolsalex.com",
+      "phone": "+2001011017774",
+      "address": "International School Street, Mandara Kebly, Alexandria 0022, Egypt",
+      "source_url": "https://ibo.org/school/061783/"
+    },
+    {
+      "name": "Malvern College Egypt",
+      "ib_school_code": "060054",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.malverncollege.edu.eg/",
+      "phone": null,
+      "address": "B2-B3 South Ring Road, Investment Zone Kattameya, Cairo 11771, Egypt",
+      "source_url": "https://ibo.org/programmes/find-an-ib-school/ibaem/m/malvern-college-egypt/"
+    },
+    {
+      "name": "Manaret Heliopolis International School",
+      "ib_school_code": "052562",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "mhischool.net/",
+      "phone": "+2001270604011",
+      "address": "Hazem Salah Street, Nasr City, Cairo 11659, Egypt",
+      "source_url": "https://ibo.org/fr/programmes/find-an-ib-school/ibaem/m/manaret-heliopolis-international-school/"
+    },
+    {
+      "name": "Modern English School Cairo",
+      "ib_school_code": "002857",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.mescairo.com",
+      "phone": "+2001144060603",
+      "address": "New Cairo, South of Police Academy, PO Box 5, New Cairo, Tagamoa Khamis, Cairo 11835, Egypt",
+      "source_url": "https://ibo.org/en/school/002857/"
+    },
+    {
+      "name": "Mount International School Community",
+      "ib_school_code": "063147",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "misc-edu.com",
+      "phone": "+2001101101153",
+      "address": "New Capital, Cairo, Egypt",
+      "source_url": "https://ibo.org/programmes/find-an-ib-school/ibaem2/m/mount-international-school-community/"
+    }
+  ],
+  "records_count": 5,
+  "eligible_private": 5,
+  "excluded_state": 0
+}
