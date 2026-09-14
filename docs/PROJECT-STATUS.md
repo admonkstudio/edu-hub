@@ -75,43 +75,45 @@ These are **source records, not unique institutions**.
 
 The current British Council Partner Schools PDF is a **19-page discovery/contact source**. Partner School or attached-centre status does **not** establish international eligibility.
 
-A first browser-reviewed discovery batch adds **35 supporting leads** that were not part of the 106-row strong-source universe. The batch preserves PDF page references and available website references while performing zero automatic eligibility, canonical identity creation, merges, database writes or public projection.
+Two browser-reviewed discovery batches now contain **70 British Council source rows** beyond the 106-row strong-source universe. They preserve PDF page references and available website references while performing zero automatic eligibility, canonical identity creation, merges, database writes or public projection.
 
-The raw expanded D2.1 discovery universe is therefore:
+The raw expanded D2.1 research universe is therefore:
 
-- **141 source/lead rows** total;
+- **176 source/lead rows** total;
 - 103 eligible strong-source rows;
 - 3 excluded strong-source rows;
-- 35 British Council supporting candidates.
+- 70 British Council supporting candidates.
 
-This is **not** a claim of 141 institutions and is not yet a complete extraction of every row in the 19-page PDF.
+The 70 British Council rows are **evidence/discovery records, not a claim of 70 additional unique institutions**. A row may later resolve to a distinct institution, a campus, a curriculum division, a duplicate/overlap, or an out-of-scope entity. The PDF extraction is still incomplete.
 
-`EDU-DATA-2 British Council Discovery` run **34909183019** passed the browser-discovery safety contract.
+The second discovery batch expands coverage across Cairo, New Cairo/New Capital, Badr/Obour and 6th of October and includes both institution-shaped and obvious division/campus-shaped records. D2.2, not discovery naming, determines canonical topology.
+
+`EDU-DATA-2 British Council Discovery` run **34910562436** passed the current 70-row browser-discovery and primary-review safety contract.
 
 ### British Council primary re-sourcing — batch 1
 
-The first primary/recognized-evidence review qualifies only two exact British Council leads:
+The first primary/recognized-evidence review still qualifies only two exact British Council leads:
 
 - **King's School The Crown** — current first-party private-school identity, Egyptian Ministry license to operate and teach the British National Curriculum, plus a current Independent Schools Inspectorate BSO institution record;
 - **The International School of Choueifat, Cairo** — current first-party independent international-school identity plus a current five-year Cognia re-accreditation record published by the school following Cognia review.
 
-After that explicit review, the expanded discovery universe is:
+After that explicit review, the expanded research universe is:
 
 - **105 eligible source/lead rows**;
-- **33 supporting candidates** still requiring primary/recognized qualification;
+- **68 supporting candidates** still requiring primary/recognized qualification;
 - **3 excluded rows**;
-- **141 total source/lead rows**.
+- **176 total source/lead rows**.
 
 The historical 106-row classified universe remains independently reproducible and unchanged. Eligibility for the two new rows comes from separately recorded primary/recognized evidence, never from British Council Partner School status.
 
-`EDU-DATA-2 British Council Discovery` run **34909421938** passed the primary re-sourcing and reviewed-candidate-universe safety contract.
+The authoritative/primary Arabic-name research queue remains **97 rows**. Supporting British Council discovery rows do not inflate that metric until they become appropriately qualified evidence/canonical identities.
 
 ### D2.1 remains open
 
 Remaining discovery work includes:
 
-- continue extracting/reviewing the September 2026 British Council PDF beyond the first 35-lead batch;
-- primary-source qualification of the remaining British Council candidates;
+- continue extracting/reviewing the September 2026 British Council PDF beyond the current 70-row browser snapshot;
+- primary-source qualification of the remaining 68 British Council candidates;
 - controlled Edarabia reference-only gap discovery followed by primary re-sourcing;
 - additional operator/institution/regulator/accreditor discovery;
 - relevant legacy/V7 leads only when re-sourced to current permitted evidence;
@@ -129,7 +131,7 @@ Current accepted chain:
 
 ### Current reviewed identity state
 
-Current D2.2 materialization now contains:
+Current D2.2 materialization contains:
 
 - **26 reviewed institution drafts**;
 - **10 reviewed school-division drafts**;
@@ -137,7 +139,8 @@ Current D2.2 materialization now contains:
   - 35 memberships from the original 106-row source universe;
   - 2 memberships from separately qualified British Council discoveries;
 - **71 original source rows** remain in the explicit identity-review queue;
-- **33 British Council discovery leads** remain unqualified at D2.1 and therefore do not enter D2.2;
+- **68 British Council discovery rows** remain unqualified at D2.1 and therefore stay outside D2.2;
+- **0 qualified British Council discoveries are waiting for an identity decision** — both currently qualified discoveries already have explicit D2.2 identity decisions;
 - **2 explicit known-distinct pair decisions** protect against reviewed false merges;
 - 0 automatic merges;
 - 0 canonical/runtime database writes;
@@ -152,20 +155,22 @@ Remaining original-source identity queue:
 - 9 SCU foreign-university-branch rows;
 - 1 AUC/MSCHE row.
 
-The two qualified British Council discoveries now pass the same explicit D2.2 identity boundary:
+The two qualified British Council discoveries pass the same explicit D2.2 identity boundary:
 
 - King's School The Crown;
 - The International School of Choueifat - Cairo.
 
 Their qualification did not create canonical identities automatically. Explicit checked-in identity decisions produced stable review-draft IDs only after D2.1 eligibility had already been established independently.
 
-`EDU-DATA-2 Discovery Identity Review` run **34909694279** passed with 26 institution drafts and zero automatic merges/database/public writes.
+`EDU-DATA-2 Discovery Identity Review` run **34910472592** passed against the expanded 70-row discovery layer while preserving 26 institution drafts, 10 divisions and 37 reviewed memberships.
 
 ### Single-source and incremental identity rules
 
 Explicit single-source identities require high-confidence primary/authoritative evidence. Absence of a duplicate proposal is never uniqueness proof.
 
 The original accepted base contains 9 cross-source reviewed identities, 10 original explicit single-source identities and the Port Said Schools first-party parent/hierarchy review. The first additive original-source batch resolves all four KMK German-school rows without rewriting the earlier historical decision package. Qualified discoveries use a separate identity-review layer so discovery provenance and strong-source provenance remain distinguishable.
+
+A newly qualified discovery may remain in a dedicated qualified-identity queue until an explicit D2.2 decision establishes whether it is an institution, campus/division relationship or overlap. Eligibility alone never forces canonicalization.
 
 `EDU-DATA-2 Incremental Identity Review` run **34908639710** passed.
 
@@ -186,7 +191,7 @@ Curriculum/accreditation evidence scoped to a British, American, French, IB or o
 
 ### Campus review
 
-Current campus evidence now covers **11 of the 26 reviewed institution drafts**:
+Current campus evidence covers **11 of the 26 reviewed institution drafts**:
 
 - the original 9 cross-source identities;
 - King's School The Crown at The Crown, 6 October City;
@@ -258,24 +263,27 @@ It must not require Astro, Instatic or Supabase.
 - Identity Review + reviewed canonical draft materialization: **34900009375** — green;
 - Current Campus Review: **34901485863** — green;
 - Incremental Identity Review (German KMK batch): **34908639710** — green;
-- British Council browser discovery batch: **34909183019** — green;
+- British Council initial browser discovery: **34909183019** — green;
 - British Council primary qualification batch 1: **34909421938** — green;
 - Qualified Discovery Identity Review: **34909694279** — green;
-- Incremental Campus Review: **34909846766** — green.
+- Incremental Campus Review: **34909846766** — green;
+- British Council 70-row discovery expansion: **34910562436** — green;
+- Expanded Discovery Identity Queues: **34910472592** — green.
 
 ## Immediate next actions
 
-1. Continue D2.1 British Council extraction and primary re-sourcing; keep ambiguous ownership/accreditation cases in candidate state.
-2. Continue controlled gap discovery from Edarabia, operator sites, legacy/V7 and other permitted discovery sources without bulk-copying commercial-directory content.
-3. Extend D2.2 identity review across the remaining 71 original source rows, prioritizing French homologation, standalone IB and higher-education identities.
-4. Extend campus review to the remaining 15 reviewed institutions; only mark campus topology complete when affirmative evidence is exhaustive enough.
-5. Expand D2.3 official Arabic-name evidence; explicitly mark transliteration/editorial Arabic where official forms cannot be sourced.
-6. Expand D2.4 first-party enrichment toward every reviewed eligible identity, including current fees/admissions only from current official sources and with academic-year history preserved.
-7. Reconcile SCU/MOHESR foreign-university identities, parent/branch relationships and lifecycle state.
-8. Expand coordinates/geography with first-party evidence plus permitted Overture/OSM cross-checks.
-9. Continue media-rights review and assign a terminal media state to every reviewed identity.
-10. Produce the first canonicalization-aware EN/AR/factual/media completeness report after substantially broader identity coverage.
-11. Freeze the deterministic portable export only after identity, localization, enrichment, conflict and media gates are satisfied.
+1. Continue D2.1 British Council extraction beyond the current 70 source rows and continue primary re-sourcing; keep ambiguous ownership/accreditation cases in candidate state.
+2. Prioritize primary/recognized qualification of high-signal British Council discoveries before treating discovery volume as progress.
+3. Continue controlled gap discovery from Edarabia, operator sites, legacy/V7 and other permitted discovery sources without bulk-copying commercial-directory content.
+4. Extend D2.2 identity review across the remaining 71 original source rows, prioritizing French homologation, standalone IB and higher-education identities.
+5. Extend campus review to the remaining 15 reviewed institutions; only mark campus topology complete when affirmative evidence is exhaustive enough.
+6. Expand D2.3 official Arabic-name evidence; explicitly mark transliteration/editorial Arabic where official forms cannot be sourced.
+7. Expand D2.4 first-party enrichment toward every reviewed eligible identity, including current fees/admissions only from current official sources and with academic-year history preserved.
+8. Reconcile SCU/MOHESR foreign-university identities, parent/branch relationships and lifecycle state.
+9. Expand coordinates/geography with first-party evidence plus permitted Overture/OSM cross-checks.
+10. Continue media-rights review and assign a terminal media state to every reviewed identity.
+11. Produce the first canonicalization-aware EN/AR/factual/media completeness report after substantially broader identity coverage.
+12. Freeze the deterministic portable export only after identity, localization, enrichment, conflict and media gates are satisfied.
 
 ## Non-negotiable constraints
 
