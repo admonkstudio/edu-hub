@@ -39,6 +39,18 @@ ALLOWED_BUTTON_PREFIX = "ctl00$ContentPlaceHolder1$Button"
 MAX_ROOT_BUTTONS = 8
 
 
+def navigation_session() -> requests.Session:
+    """Use no status-code retries so live EMIS 500s remain explicit evidence."""
+    s = requests.Session()
+    s.headers.update(
+        {
+            "User-Agent": capture.USER_AGENT,
+            "Accept-Language": "ar-EG,ar;q=0.9,en;q=0.7",
+        }
+    )
+    return s
+
+
 def root_navigation_buttons(html_text: str) -> list[dict[str, str]]:
     soup = BeautifulSoup(html_text, "html.parser")
     form = soup.find("form")
@@ -169,7 +181,7 @@ def probe(output_dir: Path, timeout: float = 45.0, max_buttons: int = 6) -> dict
         raise FileNotFoundError(f"Missing capture report: {report_path}")
     report = json.loads(report_path.read_text(encoding="utf-8"))
 
-    discovery_session = capture.session()
+    discovery_session = navigation_session()
     root = discovery_session.get(ROOT_URL, timeout=timeout, allow_redirects=True)
     root.raise_for_status()
     buttons = root_navigation_buttons(root.text)[: max(1, min(max_buttons, MAX_ROOT_BUTTONS))]
@@ -178,15 +190,20 @@ def probe(output_dir: Path, timeout: float = 45.0, max_buttons: int = 6) -> dict
 
     navigation_pages: list[dict] = []
     for button in buttons:
-        # Fresh GET per click avoids reusing stale EVENTVALIDATION/VIEWSTATE.
-        session = capture.session()
+        session = navigation_session()
         started = time.monotonic()
         try:
             fresh_root = session.get(ROOT_URL, timeout=timeout, allow_redirects=True)
             fresh_root.raise_for_status()
             action, payload, live_value = build_button_submission(fresh_root.text, button["name"])
             live_button = {**button, "value": live_value}
-            response = session.post(action, data=payload, timeout=timeout, allow_redirects=True)
+            response = session.post(
+                action,
+                data=payload,
+                timeout=timeout,
+                allow_redirects=True,
+                headers={"Referer": ROOT_URL},
+            )
             navigation_pages.append(response_manifest(response, output_dir, started, live_button))
         except Exception as exc:
             navigation_pages.append({
@@ -201,7 +218,6 @@ def probe(output_dir: Path, timeout: float = 45.0, max_buttons: int = 6) -> dict
                 "error": repr(exc),
             })
 
-    # Replace previous navigation-probe pages so reruns remain deterministic.
     base_pages = [page for page in report.get("pages") or [] if page.get("request_kind") != "root_button_navigation"]
     report["pages"] = base_pages + navigation_pages
     report["reachable_pages"] = sum(1 for page in report["pages"] if page.get("ok"))
