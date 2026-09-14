@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "source_id": "uk_dfe_bso_egypt_2026_08",
+  "snapshot_date": "2026-09-14",
+  "list_updated": "2026-08-26",
+  "source_url": "https://www.gov.uk/government/publications/british-schools-overseas-inspection-reports/british-schools-overseas-accredited-schools-inspection-reports",
+  "publisher": "UK Department for Education",
+  "records_count": 11,
+  "removed_from_current_list_note": "Cairo English School was removed from the accredited list in the 26 August 2026 update and is therefore not included in these current rows.",
+  "records": [
+    {"name": "British School of Alexandria", "inspection_date": "2024-10-15"},
+    {"name": "El Alsson British International School", "inspection_date": "2024-11-26"},
+    {"name": "Egypt British International School", "inspection_date": "2026-05-19"},
+    {"name": "Gulf English School", "inspection_date": "2025-02-13"},
+    {"name": "Maadi British International School", "inspection_date": "2025-01-14"},
+    {"name": "Modern English School Cairo", "inspection_date": "2025-02-11"},
+    {"name": "British International School, Cairo", "inspection_date": "2024-04-30"},
+    {"name": "New Cairo British International School", "inspection_date": "2025-04-08"},
+    {"name": "Repton School Cairo", "inspection_date": "2026-01-28"},
+    {"name": "The Royal British International School", "inspection_date": "2026-02-10"},
+    {"name": "Uppingham Cairo", "inspection_date": "2025-06-01"}
+  ]
+}
