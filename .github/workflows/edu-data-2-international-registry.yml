@@ -32,6 +32,8 @@ jobs:
           python -m py_compile tools/data-acquisition/international/acquire_ib_egypt.py
           python -m py_compile tools/data-acquisition/international/acquire_scu_foreign_branches.py
           python -m py_compile tools/data-acquisition/international/build_authoritative_seed.py
+          python -m py_compile tools/data-acquisition/international/prepare_import_package.py
+          python -m py_compile tools/data-acquisition/international/discover_wikimedia_media.py
           python -m py_compile tools/data-acquisition/international/test_acquisition.py
       - name: Validate source registry and authoritative snapshots
         run: |
@@ -48,6 +50,7 @@ jobs:
               'kmk_german_schools_2026_04',
               'scu_foreign_university_branches',
               'msche_auc',
+              'wikimedia_commons',
               'legacy_v7_archive',
           ):
               assert required in ids
@@ -59,19 +62,24 @@ jobs:
           de = json.loads((seed_dir/'german-kmk-egypt-2026-04.json').read_text(encoding='utf-8'))
           scu = json.loads((seed_dir/'scu-foreign-university-branches-2026-09-14.json').read_text(encoding='utf-8'))
           auc = json.loads((seed_dir/'auc-international-evidence-2026-09-14.json').read_text(encoding='utf-8'))
+          media = json.loads((seed_dir/'wikimedia-media-verified-2026-09-14.json').read_text(encoding='utf-8'))
           assert len(ib['schools']) == ib['directory_count_observed'] == 54
           assert ib['count_conflict_requires_review'] is True
           assert len(fr['records']) == fr['records_count'] == 17
           assert len(de['records']) == de['records_count'] == 4
           assert len(scu['records']) == scu['records_count'] == 9
           assert auc['institution']['scope_state'] == 'eligible'
-          print(f"validated {len(ids)} registered sources and 85 source snapshot rows")
+          assert len(media['assets']) == media['assets_count'] == 5
+          assert all(row['public_use_allowed'] is True for row in media['assets'])
+          assert all(row['rights_basis'] for row in media['assets'])
+          assert all(row['identity_match_state'] == 'verified_by_file_description' for row in media['assets'])
+          print(f"validated {len(ids)} registered sources, 85 source snapshot rows and 5 reviewed media assets")
           PY
       - name: Test live-parser and scope boundaries
         run: python tools/data-acquisition/international/test_acquisition.py
 
   build-seed:
-    name: Build authoritative source seed
+    name: Build authoritative source seed and import package
     needs: contract
     runs-on: ubuntu-latest
     steps:
@@ -81,6 +89,8 @@ jobs:
           python-version: '3.12'
       - name: Build deterministic source candidates
         run: python tools/data-acquisition/international/build_authoritative_seed.py --output-dir artifacts/international
+      - name: Prepare provenance-safe import package
+        run: python tools/data-acquisition/international/prepare_import_package.py --output-dir artifacts/international/import-package
       - name: Verify seed safety and counts
         run: |
           python - <<'PY'
@@ -96,7 +106,17 @@ jobs:
           assert data['database_mutation_performed'] is False
           assert data['public_promotion_performed'] is False
           assert data['ib_directory_country_summary_conflict']['review_required'] is True
-          print(json.dumps(data, indent=2))
+
+          manifest = json.loads(Path('artifacts/international/import-package/manifest.json').read_text(encoding='utf-8'))
+          assert manifest['sources'] == 5
+          assert manifest['raw_records'] == 85
+          assert manifest['staging_candidates'] == 85
+          assert manifest['reviewed_media_assets'] == 5
+          assert manifest['canonical_institutions_created'] == 0
+          assert manifest['identity_merges_performed'] == 0
+          assert manifest['public_projection_rows_created'] == 0
+          assert len(manifest['checksums']) == 4
+          print(json.dumps({'source_summary': data, 'import_manifest': manifest}, indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
