@@ -6,9 +6,13 @@ on:
       - edu-data-1-national-registry
     paths:
       - 'tools/data-acquisition/emis_navigation_probe.py'
+      - 'tools/data-acquisition/emis_control_hydration_probe.py'
       - 'tools/data-acquisition/emis_local_capture.py'
       - 'tools/data-acquisition/run_emis_local_capture.py'
+      - 'tools/data-acquisition/registry/analyze_emis_capture.py'
       - 'tools/data-acquisition/registry/test_emis_navigation_probe.py'
+      - 'tools/data-acquisition/registry/test_emis_control_hydration_probe.py'
+      - 'tools/data-acquisition/registry/test_analyze_emis_scope.py'
       - '.github/workflows/edu-data-1-emis-navigation.yml'
   workflow_dispatch:
 
@@ -30,7 +34,15 @@ jobs:
         run: |
           python -m py_compile tools/data-acquisition/emis_local_capture.py
           python -m py_compile tools/data-acquisition/emis_navigation_probe.py
+          python -m py_compile tools/data-acquisition/emis_control_hydration_probe.py
           python -m py_compile tools/data-acquisition/run_emis_local_capture.py
+          python -m py_compile tools/data-acquisition/registry/analyze_emis_capture.py
           python -m py_compile tools/data-acquisition/registry/test_emis_navigation_probe.py
+          python -m py_compile tools/data-acquisition/registry/test_emis_control_hydration_probe.py
+          python -m py_compile tools/data-acquisition/registry/test_analyze_emis_scope.py
       - name: Enforce bounded root-navigation safety contract
         run: python tools/data-acquisition/registry/test_emis_navigation_probe.py
+      - name: Enforce bounded control-hydration safety contract
+        run: python tools/data-acquisition/registry/test_emis_control_hydration_probe.py
+      - name: Enforce category-scope analysis safety contract
+        run: python tools/data-acquisition/registry/test_analyze_emis_scope.py
