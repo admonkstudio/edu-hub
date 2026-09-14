@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+# Safety contract for the bounded root-button navigation probe.
 import importlib.util
 import sys
 import unittest
