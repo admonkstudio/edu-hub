@@ -7,148 +7,187 @@ Last updated: 2026-09-14
 ```text
 00 Open                  APPROVED
 01 Discover              APPROVED
-02 Align + Audit         APPROVED FOR CURRENT SCOPE
-03 Define                APPROVED
-04 Content + Structure   IN PROGRESS — NATIONAL DATA CONTRACT
+02 Align + Audit         REOPENED / APPROVED FOR NEW SCOPE
+03 Define                APPROVED — INTERNATIONAL EDUCATION ONLY
+04 Content + Structure   IN PROGRESS — INTERNATIONAL REGISTRY
 05 Creative Direction    DEFERRED DURING DATA FOUNDATION
 06 Design + Systemize    DEFERRED DURING DATA FOUNDATION
-07 Build + Connect       IN PROGRESS — EDU-DATA-1
-08 Verify + Optimize     CONTINUOUS FOR DATA PIPELINE
+07 Build + Connect       IN PROGRESS — EDU-DATA-2
+08 Verify + Optimize     CONTINUOUS
 09 Review + Launch       NOT STARTED
 10 Handoff + Learn       NOT STARTED
 ```
 
-## Current project state
+## Current product state
 
-Edu Hub is an Admonk-owned independent education discovery and knowledge platform.
-
-Initial market: Egypt.
+Edu Hub is an Admonk-owned independent education discovery and knowledge platform for Egypt.
 
 Primary audience:
 
 1. Parents
 2. Students
 
-The active priority is no longer broad public-directory expansion. The project is building the **Egypt National Education Registry** first so every legitimate institution can be represented once with source-backed identity, explicit provenance and measurable completeness.
+The product scope changed materially on 2026-09-14. **Edu Hub is no longer attempting to build Egypt's complete public education registry.** The active product now focuses on high-quality international education in Egypt.
 
-Phase 1 still combines:
+### Active Phase 1 institution scope
 
-- structured education-provider directory
-- bilingual public experience
-- editorial/knowledge platform
-- internal research/admin system
-- source provenance and freshness workflows
-- technical SEO and AI-search discoverability foundation
+- private/independent international schools;
+- private/independent IB World Schools;
+- recognized British, American, French, German, Canadian and comparable international-school models;
+- foreign university branch campuses recognized in Egypt;
+- internationally chartered/accredited independent institutions such as AUC when international status is substantively evidenced;
+- campuses and early-years sections belonging to eligible institutions.
 
-Phase 2 commercial functionality remains intentionally deferred.
+### Explicitly out of active scope
 
-## Approved architecture direction
+- Egyptian public schools;
+- Egyptian public universities;
+- the 62,690-school national EMIS coverage objective;
+- the 48,225-nursery MOSS coverage objective;
+- ordinary Egyptian private/language schools without sufficient international-status evidence;
+- Egyptian universities that only have foreign partnerships/dual degrees/exchanges;
+- commercial-directory-only identities.
 
-- Astro + TypeScript remains the approved code-native application direction
-- PostgreSQL is the operational source of truth
-- Supabase is the approved initial database/auth/storage platform direction
-- PostGIS for geographic capability
-- Arabic + English from launch
-- country-aware locales beginning with `ar-EG` and `en-EG`
-- official-source-first data collection
-- explicit source/evidence model
-- deterministic indexability rules
-- curated programmatic SEO only
-- PostgreSQL search first; dedicated search infrastructure only after evidence justifies it
-- national data path: `external source -> edu_raw -> edu_staging -> edu_core -> public projection -> website/CMS`
+The old national-registry work is preserved as historical evidence and optional future expansion material. It is not deleted, but it is no longer allowed to drive the current roadmap.
 
-## Current implementation milestone
+## Active milestone
 
-**EDU-DATA-1 — Egypt National Education Registry**
+**EDU-DATA-2 — Egypt International Education Registry**
 
 Status: **ACTIVE**
 
-Branch: `edu-data-1-national-registry`
+Branch: `edu-data-2-international-registry`
 
-The milestone contract is defined in `docs/EDU-DATA-1-NATIONAL-REGISTRY.md`.
+Canonical contract: `docs/EDU-DATA-2-INTERNATIONAL-REGISTRY.md`
 
-The goal is identity coverage before profile completeness. Missing fees, contacts, websites or media do not invalidate a legitimate institution. No missing factual field may be invented.
+Architecture remains:
 
-## Verified national-registry progress
+`external source -> edu_raw -> edu_staging -> edu_core -> public projection`
 
-### Owned raw archive
+No source is read live at page-render time after acquisition.
 
-- V7 remains the complete portable owned acquisition archive from the pre-registry phase: 24,916 raw records across 13 sources.
-- V7 preserves 2,101 media provenance references and 453 unique content-addressed media binaries.
-- Media publication remains disabled by default until rights/public-use eligibility is established.
-- The archive/import package remains independently restorable and checksum-verifiable.
+## Work completed for the scope reset
 
-### Registry/staging safety foundation
+### Clean branch / source-of-truth reset
 
-- `edu_raw`, `edu_staging`, `edu_core` and later public-projection boundaries are explicitly defined.
-- Current/historical/no-coverage source aliases are machine-readable and validated.
-- The verified base-v3 recovery seed produces 13,192 staging candidates.
-- 8,001 rows receive current official-source coverage credit before identity resolution: 7,674 Al-Azhar + 327 SCU.
-- Canonical planning remains proposal-only: zero automatic identity acceptances and zero public promotion.
+- Created `edu-data-2-international-registry` from the completed national-registry evidence branch.
+- The old `edu-data-1-national-registry` branch remains available as historical work.
+- EDU-DATA-2 eligibility rules now distinguish `candidate`, `eligible`, `excluded`, and `needs_review` institutions.
+- International eligibility is based on source evidence rather than institution naming or marketing language.
 
-### Higher education — D1.2
+### Clean relational database foundation
 
-- SCU live acquisition is verified at 327/327 expected category entries.
-- Al-Azhar full official evidence remains 7,674 source records; the live adapter continues to pass bounded smoke checks.
-- MOHESR private-institute sector acquisition is active and reconciled against SCU as review-only identity proposals.
-- MOHESR technical hierarchy acquisition is verified at **8 technological-college parents and 44 technical institutes**.
-- The 44 technical institute parent links now flow into the reconciliation layer as source-backed relationship proposals.
-- CI enforces zero automatic identity acceptance, zero automatic hierarchy acceptance, zero `edu_core` mutation and zero public promotion.
+`infra/owned-data/005_international_registry.sql` now extends the existing evidence architecture with explicit international-registry structures for:
 
-### MOE / EMIS — D1.3 live contract state
+- provider/group identity;
+- bilingual institution localizations;
+- international eligibility and eligibility evidence;
+- geography and campuses with PostGIS;
+- curricula and certificates;
+- languages of instruction;
+- accreditation/authorization bodies and institution accreditations;
+- contacts;
+- academic-year fee schedules and fee items;
+- admissions cycles;
+- higher-education academic units and programmes;
+- media rights/license metadata.
 
-- Official 2025/26 target remains 62,690 schools.
-- The official Egyptian Schools Directory remains the required primary identity source.
-- GitHub-hosted/web acquisition environments still time out against the directory, but Egypt-local runs on 2026-09-14 proved `https://search.emis.gov.eg/` is reachable with valid ASP.NET state fields.
-- Direct GETs to `search_schgov.aspx`, `search_schpriv.aspx` and `sch_data.aspx` do not expose a usable contract.
-- The root page exposes six ASP.NET submit buttons for government, private, special-education, sports, military and experimental/language schools; category navigation therefore depends on root-form POST state.
-- Fresh root state was used before every category submission. Government, private, sports, military and experimental/language category navigations currently end in HTTP 500 responses.
-- Special Education is the only category that currently reaches a search-form page, at `search_schSpecialEdu.aspx`.
-- That form exposes dependent governorate (`DDList_mud`) and stage (`DDList_stage`) selects plus exactly three non-placeholder school-type radio postbacks.
-- A final bounded Egypt-local diagnostic submitted **all three** observed school-type postbacks independently with fresh sessions and fresh ASP.NET state: `تربية فكرية`, `مكفوفين وضعاف بصر`, and `صم وضعاف سمع`.
-- All three postbacks were technically accepted and returned HTTP 200 with the selected radio state preserved, but all three left governorate/stage empty and displayed the ministry-side message `خطأ اثناء محاولة تحميل الصفحة`.
-- Final hydration result: 3 controls discovered, 3 submitted, 3 HTTP-success responses, 0 pages with populated selects, 0 populated selects, and 3 pages with visible EMIS load errors.
-- This exhausts the current safe client-side contract diagnostic. The blocker is classified as a live source/application data-loading failure, not an unresolved postback-format issue.
-- `docs/EMIS-LIVE-FAILURE-EVIDENCE-2026-09-14.md` is the canonical evidence note for this state.
-- Do not repeat the same Special Education hydration diagnostic unless the source changes materially.
-- `emis_health_recheck.py` is now the lightweight recovery detector. It checks only the root and top-level category routes and can recommend a fresh contract capture if the government route returns cleanly; it never authorizes enumeration itself.
-- Government-school enumeration remains blocked. A healthy government route must first be freshly recaptured and reviewed before any small pilot can be implemented.
-- The official machine-readable MOE/EMIS export request is now the primary D1.3 acquisition path while the live route is unhealthy.
-- No school search, result pagination, school-row enumeration, `edu_core` mutation or public promotion was performed during these diagnostics.
-- Secondary directories must not be relabelled as complete MOE coverage.
+The schema preserves field/source evidence instead of overwriting facts without provenance.
 
-### MOSS nurseries — D1.4
+### Authoritative source registry
 
-- Official national target remains 48,225 nurseries.
-- MOSS continues to publish the 48,225 national count from the comprehensive nursery census.
-- Official ministry material states that a digital early-childhood platform/nursery map is being developed from the census database and is intended to expose family-facing fields including nearest nursery, licensing status, capacity and fees.
-- That row-level public map/export is not yet present in the current acquisition pipeline, so D1.4 remains an official data-sharing/export track rather than a secondary-directory substitution.
-- `docs/requests/MOSS-NURSERY-DATA-REQUEST-AR.md` remains the prepared official request for the row-level registry and associated code/data dictionary.
+`tools/data-acquisition/international/source_registry.json` defines the active acquisition universe and whether each source is strong eligibility evidence or supporting evidence.
+
+Current priority sources include:
+
+- International Baccalaureate (IB);
+- SCU foreign university branches;
+- MOHESR international/foreign branches;
+- French Ministry homologation list;
+- German KMK/ZfA recognized schools;
+- Cognia and MSCHE where applicable;
+- British Council Partner Schools as discovery/support evidence;
+- official institution websites;
+- Overture/OSM for geography;
+- Wikimedia Commons for licensed media;
+- V7 only as retained supporting/discovery evidence for matching eligible entities.
+
+### Initial repeatable acquisition
+
+New tools:
+
+- `tools/data-acquisition/international/acquire_ib_egypt.py`
+  - acquires the complete current Egypt IB World School set;
+  - current official source count is expected to be 54;
+  - private schools become strong international-scope candidates;
+  - public/state IB schools are retained as excluded evidence, not deleted;
+  - stores programme/language/contact/source metadata and source hashes;
+  - performs no database/public mutation.
+
+- `tools/data-acquisition/international/acquire_scu_foreign_branches.py`
+  - acquires the current SCU foreign-university branch set;
+  - current SCU count is expected to be 9;
+  - treats SCU recognition as strong eligibility evidence;
+  - performs no database/public mutation.
+
+- `.github/workflows/edu-data-2-international-registry.yml`
+  - validates the source registry and parser safety contract;
+  - acquires the IB and SCU authoritative seed;
+  - uploads the resulting JSONL/summary artifact;
+  - explicitly verifies zero database mutation and zero public promotion during acquisition.
+
+## Data/media policy
+
+### Facts
+
+- Missing information remains unknown/null.
+- Fees/admissions are versioned by academic year rather than overwritten.
+- Curriculum/accreditation status must retain source and validity evidence.
+- British Council Partner School status alone does not prove that a school belongs in the active international registry.
+
+### Media
+
+Publication-safe media priority:
+
+1. institution-supplied media with permission;
+2. Wikimedia Commons/openly licensed media with license/creator/attribution stored;
+3. verified institution-claim uploads in a later phase;
+4. original Edu Hub/Admonk media.
+
+Institution website/social images can be retained as media candidates/provenance, but public reuse remains disabled until rights are established.
+
+If no safe photo exists, the public interface uses the institution's English name on a designed placeholder instead of copyrighted hotlinks or scraped images.
 
 ## Infrastructure state
 
-- No dedicated Edu Hub Supabase project is currently visible in the connected Supabase organization.
-- The two visible Supabase projects belong to Ask Kalam and must not receive Edu Hub data.
-- Database provisioning is therefore still required before the national registry can become an operational hosted PostgreSQL dataset; this does not block source acquisition and contract work in Git/GitHub Actions.
+A dedicated Edu Hub PostgreSQL/Supabase project still does **not** exist in the connected Supabase organization.
+
+The two connected projects are Ask Kalam projects and must not receive Edu Hub data.
+
+All EDU-DATA-2 migrations/acquisition contracts are therefore being prepared and validated in Git first. Creating the dedicated project requires explicit organization/cost confirmation before provisioning.
 
 ## Immediate next actions
 
-1. Treat D1.2 higher-education acquisition/reconciliation plumbing as implemented and keep unresolved identity decisions review-only.
-2. Stop repeating the exhausted Special Education hydration diagnostic. Use `python tools/data-acquisition/emis_health_recheck.py` only as a lightweight periodic recovery check.
-3. Pursue the official machine-readable MOE/EMIS export using `docs/requests/MOE-EMIS-DATA-REQUEST-AR.md`; preserve any received file unchanged with provenance and checksum before staging.
-4. If the government EMIS route becomes cleanly reachable, perform a fresh contract capture and review it before implementing only a small governorate/administration pilot.
-5. Validate unique official school-source coverage against the 62,690-school 2025/26 target; do not substitute Special Education or secondary-directory counts.
-6. Advance D1.4 through the prepared MOSS request while monitoring the announced official nursery-map platform for row-level access.
-7. Validate any future MOSS row-level source against the 48,225-nursery national target and preserve licensing/location provenance.
-8. Provision a dedicated Edu Hub PostgreSQL/Supabase environment before importing the national registry into an operational hosted database.
-9. Only after identity coverage stabilizes, begin D1.5 broad enrichment and completeness improvement.
+1. Validate the new EDU-DATA-2 CI run and inspect the first authoritative IB + SCU artifact.
+2. Add/reconcile MOHESR foreign-university branch evidence with the SCU set.
+3. Acquire the Egypt subset of the French 2026–2027 homologation list.
+4. Acquire the current German KMK/ZfA Egypt school set.
+5. Add Cognia/US accreditation evidence for American/international schools where available.
+6. Ingest the September 2026 British Council Partner Schools PDF as discovery/contact evidence, but do not automatically promote every attached centre.
+7. Match the resulting authoritative candidates against V7/Overture/OSM to fill coordinates, alternate names and known websites without allowing those supporting sources to establish eligibility alone.
+8. Enrich each eligible institution from its official website: campuses, contacts, curricula, grades/ages, admissions, fees, programmes and official media candidates.
+9. Discover publication-safe media from Wikimedia Commons/open licenses; retain other institution-site media only as rights-unreviewed candidates.
+10. Provision a dedicated Edu Hub Supabase/PostgreSQL project, apply migrations `001` through `005`, and import only EDU-DATA-2 evidence/candidates into the clean operational environment.
+11. Deduplicate institution vs campus identities and review `needs_review` records before generating the first public projection.
 
-## Non-negotiable project constraints
+## Non-negotiable constraints
 
-- Do not build monetization during Phase 1 foundation work.
-- Do not equate paid status with verification.
-- Do not auto-index every database entity or filter combination.
-- Do not allow AI to silently overwrite or invent verified factual data.
-- Do not commit secrets.
+- Do not reintroduce full Egyptian public-school/university coverage without a new owner decision.
+- Do not confuse exam-centre/partner status with international-school eligibility.
+- Do not infer international status from a name containing `International`, `British`, `American`, etc.
+- Do not silently turn foreign partnerships into international-university identities.
+- Do not invent institution facts, fees, rankings, accreditations or admission details.
+- Do not publish media without a recorded rights basis.
+- Do not import Edu Hub data into Ask Kalam infrastructure.
 - Do not publish directly from `edu_raw` or `edu_staging`.
-- Keep Arabic/RTL, provenance, data portability and performance requirements active from the beginning.
+- Keep Arabic/RTL, provenance, portability, performance and SEO requirements active.
