@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "source_id": "ib_world_schools_egypt",
+  "snapshot_date": "2026-09-15",
+  "integration_state": "captured_pending_deterministic_seed_integration",
+  "notes": "Fifth incremental batch of current official IB school-profile checks. PRIVATE classification is taken from the current official IB profile for each exact Egypt directory identity. Evidence is additive and source identities remain unchanged.",
+  "records": [
+    {
+      "name": "Green Land Pré Vert International Schools- GPIS Giza/Zayed",
+      "ib_school_code": "002158",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.greenlandschool.org/",
+      "phone": null,
+      "address": "20 El Thawrah Street, Dokki Giza, Cairo, Giza 12311, Egypt",
+      "source_url": "https://ibo.org/school/002158/"
+    },
+    {
+      "name": "Hayah International Academy",
+      "ib_school_code": "004453",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.hayahacademy.com/",
+      "phone": "+2025373333",
+      "address": "South of Police Academy, 5th District, New Cairo, Heliopolis, Cairo 11835, Egypt",
+      "source_url": "https://ibo.org/fr/programmes/find-an-ib-school/ibaem/h/hayah-international-academy/"
+    },
+    {
+      "name": "Hayah International School West",
+      "ib_school_code": "063174",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.hayahwest.com",
+      "phone": "+201001063105",
+      "address": "iCity Mountain View, 6th of October, Cairo 12573, Egypt",
+      "source_url": "https://ibo.org/school/063174/"
+    },
+    {
+      "name": "International College of Benha",
+      "ib_school_code": "063629",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.icb-eg.com/",
+      "phone": "+2001017077093",
+      "address": "Abo Hashesh, Qism Banha, El Villal, Banha, Al Qalyubia Governorate 13511, Egypt",
+      "source_url": "https://ibo.org/school/063629/"
+    },
+    {
+      "name": "International Nermien Ismail School (2)",
+      "ib_school_code": "052290",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.nis-egypt.com",
+      "phone": "+201142888004",
+      "address": "End Of Zaker Hussien Street, in front of gate 5 Police Academy, Tagammoe El-Awwal, New Cairo 11835, Egypt",
+      "source_url": "https://ibo.org/en/school/052290/"
+    }
+  ],
+  "records_count": 5,
+  "eligible_private": 5,
+  "excluded_state": 0
+}
