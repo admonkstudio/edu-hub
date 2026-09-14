@@ -34,33 +34,63 @@ def normalize_space(value: object) -> str:
     return " ".join(str(value or "").split())
 
 
-def ib_records(data: dict) -> list[dict]:
+def ib_records(data: dict, detail_data: dict) -> list[dict]:
     source_id = data["source_id"]
     snapshot_date = data["snapshot_date"]
-    source_url = data["source_urls"][0]
+    directory_source_url = data["source_urls"][0]
+    detail_by_name = {
+        normalize_space(row["name"]).casefold(): row
+        for row in detail_data.get("records", [])
+    }
     out = []
     for school in data["schools"]:
         name = normalize_space(school["name"])
-        out.append(
-            {
-                "source_id": source_id,
-                "source_record_id": stable_id(source_id, name),
-                "source_snapshot_date": snapshot_date,
-                "source_url": source_url,
-                "entity_family": "pre_university",
-                "institution_type": "international_school",
-                "name_en": name,
-                "scope_state": "candidate",
-                "scope_class": "international_school",
-                "strong_evidence": "ib_world_school_directory",
-                "eligibility_pending": "private_or_independent_type_detail_check",
-                "curriculum_codes": ["ib"],
-                "programmes": {key: bool(school.get(key)) for key in ("pyp", "myp", "dp", "cp")},
-                "languages": list(school.get("languages") or []),
-                "detail_enrichment_pending": True,
-                "source_count_conflict": bool(data.get("count_conflict_requires_review")),
-            }
-        )
+        detail = detail_by_name.get(name.casefold())
+        row = {
+            "source_id": source_id,
+            "source_record_id": stable_id(source_id, name),
+            "source_snapshot_date": snapshot_date,
+            "source_url": directory_source_url,
+            "directory_source_url": directory_source_url,
+            "entity_family": "pre_university",
+            "institution_type": "international_school",
+            "name_en": name,
+            "scope_state": "candidate",
+            "scope_class": "international_school",
+            "strong_evidence": "ib_world_school_directory",
+            "eligibility_pending": "private_or_independent_type_detail_check",
+            "curriculum_codes": ["ib"],
+            "programmes": {key: bool(school.get(key)) for key in ("pyp", "myp", "dp", "cp")},
+            "languages": list(school.get("languages") or []),
+            "detail_enrichment_pending": True,
+            "source_count_conflict": bool(data.get("count_conflict_requires_review")),
+        }
+        if detail:
+            row.update(
+                {
+                    "source_url": detail["source_url"],
+                    "detail_source_url": detail["source_url"],
+                    "ib_school_code": detail.get("ib_school_code"),
+                    "ib_school_type": detail.get("type"),
+                    "scope_state": detail["scope_state"],
+                    "ownership_scope": (
+                        "private_independent" if detail.get("type") == "PRIVATE"
+                        else "public" if detail.get("type") == "STATE"
+                        else "unknown"
+                    ),
+                    "website": detail.get("website"),
+                    "phone": detail.get("phone"),
+                    "address": detail.get("address"),
+                    "detail_enrichment_pending": False,
+                    "eligibility_pending": None,
+                    "strong_evidence": (
+                        "ib_world_school_private_detail"
+                        if detail["scope_state"] == "eligible"
+                        else "ib_world_school_state_detail"
+                    ),
+                }
+            )
+        out.append(row)
     return out
 
 
@@ -158,8 +188,18 @@ def auc_records(data: dict) -> list[dict]:
     ]
 
 
-def validate_inputs(ib: dict, french: dict, german: dict, scu: dict, auc: dict) -> None:
+def validate_inputs(
+    ib: dict,
+    ib_detail: dict,
+    french: dict,
+    german: dict,
+    scu: dict,
+    auc: dict,
+) -> None:
     assert ib["directory_count_observed"] == len(ib["schools"]) == 54
+    assert ib_detail["records_count"] == len(ib_detail["records"]) == 7
+    assert ib_detail["eligible_private"] == 4
+    assert ib_detail["excluded_state"] == 3
     assert french["records_count"] == len(french["records"]) == 17
     assert german["records_count"] == len(german["records"]) == 4
     assert scu["records_count"] == len(scu["records"]) == 9
@@ -168,6 +208,10 @@ def validate_inputs(ib: dict, french: dict, german: dict, scu: dict, auc: dict) 
 
     ib_names = [normalize_space(row["name"]).casefold() for row in ib["schools"]]
     assert len(ib_names) == len(set(ib_names)), "duplicate IB directory rows"
+    detail_names = [normalize_space(row["name"]).casefold() for row in ib_detail["records"]]
+    assert len(detail_names) == len(set(detail_names)), "duplicate IB detail rows"
+    missing_details = sorted(set(detail_names) - set(ib_names))
+    assert not missing_details, f"IB detail rows not present in directory snapshot: {missing_details}"
     uais = [row["uai"] for row in french["records"]]
     assert len(uais) == len(set(uais)), "duplicate French UAI"
     german_names = [normalize_space(row["name"]).casefold() for row in german["records"]]
@@ -176,14 +220,15 @@ def validate_inputs(ib: dict, french: dict, german: dict, scu: dict, auc: dict) 
 
 def build(seed_dir: Path, output_dir: Path) -> dict:
     ib = load_json(seed_dir / "ib-egypt-directory-2026-09-14.json")
+    ib_detail = load_json(seed_dir / "ib-detail-evidence-2026-09-14.json")
     french = load_json(seed_dir / "french-homologation-egypt-2026-2027.json")
     german = load_json(seed_dir / "german-kmk-egypt-2026-04.json")
     scu = load_json(seed_dir / "scu-foreign-university-branches-2026-09-14.json")
     auc = load_json(seed_dir / "auc-international-evidence-2026-09-14.json")
-    validate_inputs(ib, french, german, scu, auc)
+    validate_inputs(ib, ib_detail, french, german, scu, auc)
 
     rows = (
-        ib_records(ib)
+        ib_records(ib, ib_detail)
         + french_records(french)
         + german_records(german)
         + scu_records(scu)
@@ -206,6 +251,8 @@ def build(seed_dir: Path, output_dir: Path) -> dict:
         "source_counts": source_counts,
         "eligible_source_rows": sum(1 for row in rows if row["scope_state"] == "eligible"),
         "candidate_source_rows": sum(1 for row in rows if row["scope_state"] == "candidate"),
+        "excluded_source_rows": sum(1 for row in rows if row["scope_state"] == "excluded"),
+        "ib_detail_rows_applied": len(ib_detail["records"]),
         "unique_institutions_claimed": None,
         "identity_reconciliation_required": True,
         "ib_directory_country_summary_conflict": {
