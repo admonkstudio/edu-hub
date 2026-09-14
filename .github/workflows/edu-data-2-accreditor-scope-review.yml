@@ -1,0 +1,131 @@
+name: EDU-DATA-2 Accreditor Scope Review
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'tools/data-acquisition/international/build_authoritative_seed.py'
+      - 'tools/data-acquisition/international/apply_ib_detail_batches.py'
+      - 'tools/data-acquisition/international/apply_bso_scope_review.py'
+      - 'tools/data-acquisition/international/build_accreditor_expansion.py'
+      - 'tools/data-acquisition/international/apply_accreditor_scope_review.py'
+      - 'tools/data-acquisition/international/build_candidate_universe.py'
+      - 'tools/data-acquisition/international/validate_identity_review_decisions.py'
+      - 'tools/data-acquisition/international/build_reviewed_canonical_artifacts.py'
+      - 'tools/data-acquisition/international/seeds/ib-detail-evidence-*-batch*.json'
+      - 'tools/data-acquisition/international/seeds/bso-scope-review-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/accreditor-scope-review-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/identity-review-decisions-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/division-review-decisions-2026-09-15.json'
+      - '.github/workflows/edu-data-2-accreditor-scope-review.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  review:
+    name: Validate all current source-scope decisions and downstream contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile data tools
+        run: |
+          python -m py_compile tools/data-acquisition/international/build_authoritative_seed.py
+          python -m py_compile tools/data-acquisition/international/apply_ib_detail_batches.py
+          python -m py_compile tools/data-acquisition/international/apply_bso_scope_review.py
+          python -m py_compile tools/data-acquisition/international/build_accreditor_expansion.py
+          python -m py_compile tools/data-acquisition/international/apply_accreditor_scope_review.py
+          python -m py_compile tools/data-acquisition/international/build_candidate_universe.py
+          python -m py_compile tools/data-acquisition/international/validate_identity_review_decisions.py
+          python -m py_compile tools/data-acquisition/international/build_reviewed_canonical_artifacts.py
+      - name: Build foundational source universe
+        run: python tools/data-acquisition/international/build_authoritative_seed.py --output-dir artifacts/international
+      - name: Apply complete direct IB ownership review
+        run: python tools/data-acquisition/international/apply_ib_detail_batches.py
+      - name: Apply reviewed BSO ownership scope
+        run: python tools/data-acquisition/international/apply_bso_scope_review.py
+      - name: Build CIS and Cognia expansion
+        run: |
+          python tools/data-acquisition/international/build_accreditor_expansion.py \
+            --base artifacts/international/bso-scope-review/authoritative-source-candidates-with-bso-scope-review.jsonl \
+            --output-dir artifacts/international/bso-scope-review/accreditor-expansion
+      - name: Apply reviewed CIS and Cognia scope
+        run: python tools/data-acquisition/international/apply_accreditor_scope_review.py
+      - name: Build fully scope-reviewed current candidate universe
+        run: |
+          python tools/data-acquisition/international/build_candidate_universe.py \
+            --authoritative artifacts/international/accreditor-scope-review/reviewed-source-universe.jsonl \
+            --output-dir artifacts/international/accreditor-scope-review/candidate-universe
+      - name: Revalidate D2.2 identities and reviewed drafts
+        run: |
+          python tools/data-acquisition/international/validate_identity_review_decisions.py \
+            --universe artifacts/international/accreditor-scope-review/reviewed-source-universe.jsonl \
+            --output-dir artifacts/international/accreditor-scope-review/identity-review
+          python tools/data-acquisition/international/build_reviewed_canonical_artifacts.py \
+            --universe artifacts/international/accreditor-scope-review/reviewed-source-universe.jsonl \
+            --output-dir artifacts/international/accreditor-scope-review/reviewed-canonical-draft
+      - name: Assert current scope-review and safety contracts
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('artifacts/international/accreditor-scope-review')
+          scope = json.loads((root/'accreditor-scope-review-summary.json').read_text(encoding='utf-8'))
+          applied = [json.loads(line) for line in (root/'accreditor-scope-review-applied.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+
+          assert scope['source_rows'] == 106
+          assert scope['reviewed_accreditor_rows'] == scope['applied_rows'] == len(applied) == 10
+          assert scope['source_record_ids_changed'] == 0
+          assert scope['before_scope_states'] == {'eligible': 93, 'candidate': 10, 'excluded': 3}
+          assert scope['after_scope_states'] == {'eligible': 103, 'excluded': 3}
+          assert scope['remaining_scope_candidates_in_current_106_row_universe'] == 0
+          assert scope['identity_merges_performed'] == 0
+          assert scope['canonical_database_rows_written'] == 0
+          assert scope['runtime_database_mutation_performed'] is False
+          assert scope['public_projection_rows_created'] == 0
+          assert all(row['previous_scope_state'] == 'candidate' for row in applied)
+          assert all(row['new_scope_state'] == 'eligible' for row in applied)
+
+          universe = json.loads((root/'candidate-universe/candidate-universe-summary.json').read_text(encoding='utf-8'))
+          assert universe['source_record_count'] == 106
+          assert universe['scope_or_lead_state_counts']['eligible'] == 103
+          assert universe['scope_or_lead_state_counts'].get('candidate', 0) == 0
+          assert universe['scope_or_lead_state_counts']['excluded'] == 3
+          assert universe['english_name_present'] == 106
+          assert universe['arabic_name_present'] == 9
+          assert universe['bilingual_name_gap_count'] == 97
+          assert universe['canonical_institutions_created'] == 0
+          assert universe['automatic_merges_performed'] == 0
+          assert universe['public_projection_rows_created'] == 0
+
+          review = json.loads((root/'identity-review/identity-review-summary.json').read_text(encoding='utf-8'))
+          assert review['source_universe_rows'] == 106
+          assert review['review_groups'] == 9
+          assert review['reviewed_source_rows'] == 20
+          assert review['missing_source_rows'] == 0
+          assert review['name_drift_rows'] == 0
+          assert review['canonical_merges_performed'] == 0
+
+          draft = json.loads((root/'reviewed-canonical-draft/reviewed-canonical-draft-summary.json').read_text(encoding='utf-8'))
+          assert draft['source_universe_rows'] == 106
+          assert draft['reviewed_identity_groups'] == 9
+          assert draft['reviewed_source_memberships'] == 20
+          assert draft['draft_school_division_records'] == 4
+          assert draft['unreviewed_source_rows'] == 86
+          assert draft['canonical_database_rows_written'] == 0
+          assert draft['runtime_database_mutation_performed'] is False
+          assert draft['public_projection_rows_created'] == 0
+
+          print(json.dumps({'accreditor_scope': scope, 'candidate_universe': universe, 'identity_review': review, 'reviewed_draft': draft}, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-accreditor-scope-review
+          path: artifacts/international/accreditor-scope-review/
+          if-no-files-found: error
