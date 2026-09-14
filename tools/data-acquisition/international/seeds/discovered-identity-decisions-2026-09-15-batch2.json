@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.2_explicit_discovered_identity_review",
+  "batch_id": "batch2-qualified-british-council-to-ib-overlaps",
+  "review_method": "explicit_cross_source_identity_review_after_separate_d2_1_eligibility_qualification",
+  "records_count": 4,
+  "records": [
+    {
+      "review_identity_key": "global-paradigm-baccalaureate-school",
+      "source_id": "british_council_partner_schools_egypt_2026_09",
+      "source_record_id": "bcps2026:global-paradigm-baccalaureate-school",
+      "source_name": "Global Paradigm Baccalaureate School",
+      "original_source_id": "ib_world_schools_egypt",
+      "original_source_record_id": "ib_world_schools_egypt:0ff4760c2a47f3cef051",
+      "original_source_name": "Global Paradigm Baccalaureate School",
+      "provisional_canonical_name_en": "Global Paradigm Baccalaureate School",
+      "decision": "confirmed_discovery_overlap_with_original_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://ibo.org/fr/programmes/find-an-ib-school/ibaem2/g/global-paradigm-baccalaureate-school/",
+        "https://globalparadigmschools-baccalaureate.com/",
+        "https://globalparadigmschools-baccalaureate.com/who-we-are/"
+      ],
+      "review_note": "The British Council and IB rows use the same school name and resolve to the same current Mostakbal City school in first-party evidence. The IB row establishes PRIVATE status and authorization; the British Council row contributes exam-partner/contact provenance. The school's internal IB/British section structure remains a separate division-scope modeling question and is not flattened by this identity relationship."
+    },
+    {
+      "review_identity_key": "capital-international-schools",
+      "source_id": "british_council_partner_schools_egypt_2026_09",
+      "source_record_id": "bcps2026:capital-international-schools",
+      "source_name": "Capital International Schools",
+      "original_source_id": "ib_world_schools_egypt",
+      "original_source_record_id": "ib_world_schools_egypt:b19314d6ae42777ba71c",
+      "original_source_name": "Capital International Schools",
+      "provisional_canonical_name_en": "Capital International Schools",
+      "decision": "confirmed_discovery_overlap_with_original_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://ibo.org/school/061877/",
+        "https://www.capitalschools.edu.eg/"
+      ],
+      "review_note": "The exact British Council and IB school names resolve to the same current Capital International Schools identity. The official site documents British, American and IBDP pathways and multiple current campus labels; campus topology and curriculum divisions remain separate review work rather than new institution identities."
+    },
+    {
+      "review_identity_key": "mount-international-school-community",
+      "source_id": "british_council_partner_schools_egypt_2026_09",
+      "source_record_id": "bcps2026:mount-international-school-community",
+      "source_name": "Mount International School Community",
+      "original_source_id": "ib_world_schools_egypt",
+      "original_source_record_id": "ib_world_schools_egypt:8a70e648b91908ddc9a7",
+      "original_source_name": "Mount International School Community",
+      "provisional_canonical_name_en": "Mount International School Community",
+      "decision": "confirmed_discovery_overlap_with_original_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://ibo.org/programmes/find-an-ib-school/ibaem2/m/mount-international-school-community/",
+        "https://misc-edu.com/"
+      ],
+      "review_note": "The British Council discovery row and current PRIVATE IB World School profile resolve to the same Mount International School Community in the New Administrative Capital. This relationship adds a second source membership to one reviewed institution identity and does not create a duplicate school."
+    },
+    {
+      "review_identity_key": "international-school-elite-education",
+      "source_id": "british_council_partner_schools_egypt_2026_09",
+      "source_record_id": "bcps2026:international-school-elite-education",
+      "source_name": "The International School of Elite Education",
+      "original_source_id": "ib_world_schools_egypt",
+      "original_source_record_id": "ib_world_schools_egypt:7bcde4481ce8b78cbfdd",
+      "original_source_name": "The International School of Elite Education",
+      "provisional_canonical_name_en": "The International School of Elite Education",
+      "decision": "confirmed_discovery_overlap_with_original_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://ibo.org/school/051954/",
+        "https://isee-eg.com/",
+        "https://isee-eg.com/who-we-are-2/"
+      ],
+      "review_note": "The British Council and current PRIVATE IB records resolve to the same New Cairo institution, and current first-party evidence explicitly identifies one private international school containing American, British and IB schools/streams. Those internal streams must remain division-scoped where appropriate rather than becoming duplicate institutions."
+    }
+  ],
+  "safety": {
+    "absence_of_match_treated_as_uniqueness_proof": false,
+    "unqualified_discovery_rows_entered_identity_review": false,
+    "automatic_identity_creation_performed": false,
+    "automatic_merges_performed": 0,
+    "canonical_database_rows_written": 0,
+    "runtime_database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
