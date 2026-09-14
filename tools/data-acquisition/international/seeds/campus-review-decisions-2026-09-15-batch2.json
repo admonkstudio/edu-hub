@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.2_incremental_campus_evidence_review",
+  "batch_id": "batch2-qualified-discoveries",
+  "review_method": "current_first_party_location_evidence_structure_not_assumed_exhaustive",
+  "records_count": 2,
+  "records": [
+    {
+      "review_identity_key": "kings-school-the-crown",
+      "campus_key": "the-crown-current-campus",
+      "campus_type": "main",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": "The Crown",
+      "address_en": "The Crown, 6 October City, Cairo, Egypt",
+      "source_urls": [
+        "https://www.kingsschoolegypt.com/about-us/our-school",
+        "https://www.kingsschoolegypt.com/"
+      ],
+      "evidence_note": "Current first-party school evidence says King's School The Crown opened in The Crown, 6 October City in September 2023 and describes its purpose-built campus of more than 40,000 square metres there. This establishes a current campus but does not prove the complete long-term campus topology of the institution or wider school group.",
+      "campus_structure_complete": false
+    },
+    {
+      "review_identity_key": "international-school-choueifat-cairo",
+      "campus_key": "new-cairo-current-campus",
+      "campus_type": "main",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": null,
+      "address_en": "P.O. Box 2760, Fifth Urban Community, New Cairo, Al Horreya, Heliopolis, Cairo, Egypt",
+      "source_urls": [
+        "https://isccairo.sabis.net/contact-us",
+        "https://isccairo.sabis.net/our-school/Letter-from-the-Director"
+      ],
+      "evidence_note": "Current first-party ISC-Cairo contact and school-director pages identify the operating school in New Cairo / District 5 and publish the same contact address. This establishes at least one current campus for ISC-Cairo and does not rule out historical or future additional campuses.",
+      "campus_structure_complete": false
+    }
+  ],
+  "safety": {
+    "reviewed_current_campus_evidence_records": 2,
+    "campus_structure_complete_records": 0,
+    "automatic_additional_campus_inference_performed": false,
+    "canonical_database_rows_written": 0,
+    "runtime_database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
