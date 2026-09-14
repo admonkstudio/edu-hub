@@ -40,14 +40,18 @@ The one-command handoff performs only two safe operations:
 
 It does **not** enumerate schools or submit search forms.
 
-Expected output folder:
+Expected outputs:
 
 ```text
 artifacts/emis-local-capture/
   capture-report.json
   enumerator-contract.json
   *.html
+
+artifacts/emis-local-capture-bundle.zip
 ```
+
+The ZIP is the complete handoff artifact for the next development step. It can be moved or uploaded as one file without manually copying individual HTML/report files.
 
 The capture currently probes:
 
