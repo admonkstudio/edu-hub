@@ -154,14 +154,16 @@
       "source_id": "edarabia_egypt",
       "name": "Edarabia - Egypt Education Directory",
       "url": "https://www.edarabia.com/schools/egypt/",
+      "terms_url": "https://www.edarabia.com/privacy-policy/",
       "publisher": "Edarabia",
       "authority_class": "commercial_directory_supporting_source",
-      "role": ["discovery", "identity_support", "fee_lead", "curriculum_lead", "address_lead", "website_lead", "media_discovery"],
+      "role": ["discovery_reference"],
       "auto_eligibility": false,
-      "scope_condition": "supporting_leads_only_primary_or_regulatory_confirmation_required",
-      "acquisition_mode": "public_directory_pages",
+      "scope_condition": "reference_only_then_resource_from_permitted_primary_source",
+      "acquisition_mode": "manual_reference_only_due_terms",
+      "storage_policy": "do_not_systematically_copy_or_store_edarabia_content_without_written_permission",
       "active": true,
-      "notes": "Useful for discovering candidate institutions and missing profile fields such as fees, curriculum, location, photos and reviews. Edarabia-derived factual values remain secondary assertions until corroborated by a regulator, accreditor or official institution source. Images are discovery-only and are not publication-safe by default. Ratings/reviews are not treated as canonical factual evidence."
+      "notes": "Use as a research index to discover institutions or possible missing fields. Do not bulk scrape, systematically store, reproduce, publish, or use Edarabia page content as canonical database content without written permission. Re-source facts from official institutions/regulators/accreditors. Ratings/reviews are not canonical. Images are not publication-safe by default."
     },
     {
       "source_id": "legacy_v7_archive",
