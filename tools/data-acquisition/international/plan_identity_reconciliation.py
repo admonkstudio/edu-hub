@@ -4,6 +4,13 @@
 This deliberately never auto-accepts a merge. It finds plausible duplicate
 source rows so a human can decide whether they represent the same institution,
 a campus of the same institution, or unrelated entities with similar names.
+
+Version 2 deliberately treats curriculum/model words such as British, English,
+American and International as non-distinctive. A fuzzy proposal now needs at
+least one distinctive shared token unless the full normalized name, an official
+identifier or a normalized domain is an exact match. This prevents clusters of
+unrelated international schools from being proposed merely because they share
+model words.
 """
 from __future__ import annotations
 
@@ -16,7 +23,8 @@ from pathlib import Path
 STOP = {
     "school", "schools", "international", "college", "university", "the",
     "of", "in", "egypt", "branch", "lycee", "ecole", "de", "du", "la",
-    "le", "mlf", "cairo", "alexandria",
+    "le", "mlf", "cairo", "alexandria", "british", "english", "american",
+    "german", "french", "bilingual", "academy", "education",
 }
 
 
@@ -39,27 +47,47 @@ def display_name(row: dict) -> str:
 def similarity(left: dict, right: dict) -> tuple[float, dict]:
     a = norm(display_name(left))
     b = norm(display_name(right))
+    exact_name = bool(a and b and a == b)
     seq = SequenceMatcher(None, a, b).ratio() if a and b else 0.0
     ta, tb = tokens(a), tokens(b)
-    jaccard = len(ta & tb) / len(ta | tb) if ta or tb else 0.0
+    shared = ta & tb
+    jaccard = len(shared) / len(ta | tb) if ta or tb else 0.0
 
     exact_official_id = bool(
         left.get("official_identifier")
         and right.get("official_identifier")
-        and left.get("official_identifier") == right.get("official_identifier")
+        and str(left.get("official_identifier")).casefold() == str(right.get("official_identifier")).casefold()
     )
     same_domain = bool(
         left.get("normalized_domain")
         and right.get("normalized_domain")
         and left.get("normalized_domain") == right.get("normalized_domain")
     )
-    score = max(seq * 0.55 + jaccard * 0.45, 0.99 if exact_official_id else 0.0, 0.96 if same_domain else 0.0)
+
+    # Generic international-school vocabulary is not enough to create a review
+    # proposal. Exact full names, official IDs and domains remain strong signals.
+    distinctive_overlap = bool(shared)
+    if not (exact_name or exact_official_id or same_domain or distinctive_overlap):
+        score = 0.0
+        generic_only_rejected = True
+    else:
+        lexical_score = seq * 0.45 + jaccard * 0.55
+        score = max(
+            lexical_score,
+            0.995 if exact_name else 0.0,
+            0.99 if exact_official_id else 0.0,
+            0.96 if same_domain else 0.0,
+        )
+        generic_only_rejected = False
+
     return min(score, 1.0), {
         "sequence_ratio": round(seq, 5),
         "token_jaccard": round(jaccard, 5),
-        "shared_tokens": sorted(ta & tb),
+        "shared_distinctive_tokens": sorted(shared),
+        "exact_normalized_name": exact_name,
         "exact_official_identifier": exact_official_id,
         "same_normalized_domain": same_domain,
+        "generic_only_rejected": generic_only_rejected,
     }
 
 
@@ -86,7 +114,7 @@ def plan(input_jsonl: Path, output_jsonl: Path, threshold: float) -> dict:
                 "decision": "needs_review",
                 "possible_relationships": ["same_institution", "same_group_different_campus", "unrelated"],
                 "evidence": evidence,
-                "matcher_version": "edu-data-2-name-v1",
+                "matcher_version": "edu-data-2-name-v2",
             })
 
     proposals.sort(key=lambda row: (-row["score"], row["left_name"], row["right_name"]))
@@ -99,6 +127,7 @@ def plan(input_jsonl: Path, output_jsonl: Path, threshold: float) -> dict:
         "source_rows_compared": len(rows),
         "proposal_count": len(proposals),
         "threshold": threshold,
+        "matcher_version": "edu-data-2-name-v2",
         "auto_accept_count": 0,
         "accepted_count": 0,
         "canonical_merges_performed": 0,
