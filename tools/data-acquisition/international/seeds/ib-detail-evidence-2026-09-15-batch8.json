@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "source_id": "ib_world_schools_egypt",
+  "snapshot_date": "2026-09-15",
+  "integration_state": "captured_pending_deterministic_seed_integration",
+  "notes": "Eighth incremental batch of current official IB school-profile checks. PRIVATE classification is taken from the current official IB profile for each exact Egypt directory identity. Evidence is additive and source identities remain unchanged.",
+  "records": [
+    {
+      "name": "Nefertari International School",
+      "ib_school_code": "050772",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.niscl.com",
+      "phone": null,
+      "address": "Km 22 Cairo Ismailia Desert Road, Nefertari Street, Building 7&11, Cairo 3033, Egypt",
+      "source_url": "https://ibo.org/school/050772/"
+    },
+    {
+      "name": "Nermien Ismail International",
+      "ib_school_code": "062460",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "nis-eg.com/website/",
+      "phone": "+2001030674445",
+      "address": "Nermien Ismail International School, Shuhada Road, Shorouk City, Cairo 11837, Egypt",
+      "source_url": "https://ibo.org/school/062460/"
+    },
+    {
+      "name": "New Future International School",
+      "ib_school_code": "062921",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.futureschools-egypt.com/",
+      "phone": "+2001024066693",
+      "address": "El Prince St. Off Moustafa Kamel, Alexandria, Egypt",
+      "source_url": "https://ibo.org/en/school/062921"
+    },
+    {
+      "name": "New Vision International School Giza",
+      "ib_school_code": "004515",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.nviseg.com/",
+      "phone": null,
+      "address": "S1-14 Beverly Hills, Sheikh Zayed, Giza 12588, Egypt",
+      "source_url": "https://ibo.org/school/004515/"
+    },
+    {
+      "name": "Nile International College",
+      "ib_school_code": "050045",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "nileinternational-schools.com/",
+      "phone": "+2001000998156",
+      "address": "Street 40, 5th Zone, 5th District, 5th Settlement, New Cairo, Cairo 11835, Egypt",
+      "source_url": "https://ibo.org/school/050045/"
+    }
+  ],
+  "records_count": 5,
+  "eligible_private": 5,
+  "excluded_state": 0
+}
