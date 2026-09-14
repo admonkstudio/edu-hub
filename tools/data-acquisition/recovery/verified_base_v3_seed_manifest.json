@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "artifact_role": "verified_base_v3_seed",
+  "is_exact_historical_v7": false,
+  "workflow_run_id": 34001581311,
+  "artifact_id": 9980930620,
+  "artifact_name": "edu-hub-egypt-base-v3.zip",
+  "artifact_sha256": "9276729ab0c64b49fe54d5d8f15135607cde16bb1aae383e6c119943224e2504",
+  "sqlite_path_in_artifact": "artifacts/edu_hub_egypt_raw.sqlite",
+  "sqlite_sha256": "f5e419bdf935c619d67018edf27d92058f8e4b6b707d7fef7237beb839c2aea3",
+  "raw_record_count": 13192,
+  "raw_source_counts": {
+    "azhar_official_institute_guide": 7674,
+    "egyptschools_github_excel": 805,
+    "egyptschools_public_directory": 807,
+    "emis_getdata_2022": 13,
+    "masrschools_public_directory": 462,
+    "osm_geofabrik_egypt": 3104,
+    "scu_official_snapshot": 327
+  },
+  "current_official_seed_rows_before_identity_resolution": 8001,
+  "current_official_seed_breakdown": {
+    "azhar_institute_guide": 7674,
+    "scu_institutions": 327
+  },
+  "historical_only_evidence": {
+    "moe_emis_school_directory": {
+      "rows": 13,
+      "raw_source_id": "emis_getdata_2022",
+      "coverage_credit": "historical_only",
+      "counts_toward_current_62690_target": false
+    }
+  },
+  "recovery_notes": [
+    "The GitHub Actions artifact digest matches the downloaded ZIP digest.",
+    "Raw row count is evidence volume, not a canonical institution count.",
+    "The 13 historical EMIS rows do not count toward current MOE national coverage.",
+    "Secondary directories and OSM do not satisfy official national coverage targets.",
+    "The documented 13192 to 13452 historical transition remains unresolved at row-level and does not block current national acquisition.",
+    "If the exact V7 archive is not recovered, any successor reconstruction must be labeled reconstructed/equivalent rather than exact V7."
+  ],
+  "promotion_policy": {
+    "edu_raw_import_allowed": true,
+    "edu_staging_generation_allowed": true,
+    "automatic_identity_acceptance": false,
+    "edu_core_automatic_promotion": false,
+    "public_live_promotion": false
+  }
+}

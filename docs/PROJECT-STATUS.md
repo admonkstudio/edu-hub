@@ -1,6 +1,6 @@
 # Edu Hub Project Status
 
-Last updated: 2026-09-09
+Last updated: 2026-09-14
 
 ## Current lifecycle
 
@@ -9,11 +9,11 @@ Last updated: 2026-09-09
 01 Discover              APPROVED
 02 Align + Audit         APPROVED FOR CURRENT SCOPE
 03 Define                APPROVED
-04 Content + Structure   IN PROGRESS
-05 Creative Direction    NOT STARTED
-06 Design + Systemize    NOT STARTED
-07 Build + Connect       READY FOR MILESTONE 0
-08 Verify + Optimize     NOT STARTED
+04 Content + Structure   IN PROGRESS — NATIONAL DATA CONTRACT
+05 Creative Direction    DEFERRED DURING DATA FOUNDATION
+06 Design + Systemize    DEFERRED DURING DATA FOUNDATION
+07 Build + Connect       IN PROGRESS — EDU-DATA-1
+08 Verify + Optimize     CONTINUOUS FOR DATA PIPELINE
 09 Review + Launch       NOT STARTED
 10 Handoff + Learn       NOT STARTED
 ```
@@ -29,7 +29,9 @@ Primary audience:
 1. Parents
 2. Students
 
-Phase 1 combines:
+The active priority is no longer broad public-directory expansion. The project is building the **Egypt National Education Registry** first so every legitimate institution can be represented once with source-backed identity, explicit provenance and measurable completeness.
+
+Phase 1 still combines:
 
 - structured education-provider directory
 - bilingual public experience
@@ -38,14 +40,13 @@ Phase 1 combines:
 - source provenance and freshness workflows
 - technical SEO and AI-search discoverability foundation
 
-Phase 2 commercial functionality is intentionally deferred.
+Phase 2 commercial functionality remains intentionally deferred.
 
 ## Approved architecture direction
 
-- Astro + TypeScript
-- monorepo with public app and control/admin app
-- PostgreSQL as source of truth
-- Supabase as initial database/auth/storage platform
+- Astro + TypeScript remains the approved code-native application direction
+- PostgreSQL is the operational source of truth
+- Supabase is the approved initial database/auth/storage platform direction
 - PostGIS for geographic capability
 - Arabic + English from launch
 - country-aware locales beginning with `ar-EG` and `en-EG`
@@ -54,63 +55,100 @@ Phase 2 commercial functionality is intentionally deferred.
 - deterministic indexability rules
 - curated programmatic SEO only
 - PostgreSQL search first; dedicated search infrastructure only after evidence justifies it
+- national data path: `external source -> edu_raw -> edu_staging -> edu_core -> public projection -> website/CMS`
 
 ## Current implementation milestone
 
-**Milestone 0 — Foundation**
+**EDU-DATA-1 — Egypt National Education Registry**
 
-Milestone 0 should create the trustworthy engineering foundation only. It must not implement the canonical institution data model from Milestone 1 beyond minimal connectivity/schema tooling required to prove the stack.
+Status: **ACTIVE**
 
-Milestone 1 begins only after Milestone 0 acceptance criteria pass.
+Branch: `edu-data-1-national-registry`
 
-## Data acquisition status — 2026-09-06
+The milestone contract is defined in `docs/EDU-DATA-1-NATIONAL-REGISTRY.md`.
 
-- Egypt raw acquisition remains active; canonical modelling, cross-source deduplication and public projections remain gated by acquisition audits.
-- MadaresEgypt bounded acquisition repair is complete: all 180 remaining page gaps were recovered and the source-level merge now holds 11,339 named source records with zero unresolved crawl pages.
-- The V6 owned archive contains 11,464 raw records: 11,339 MadaresEgypt records plus 125 Alexandria records. Alexandria media includes 2,101 mirrored references covering all 125 records.
-- Content-addressed media deduplication produced 453 independently stored binary files; all file hashes and the SQLite database checksum were verified.
-- Media publication remains disabled by default: rights status is unknown and public-use eligibility is false until reviewed.
-- Successful proof artifact: [edu-hub-owned-alexschools-proof](https://github.com/admonkstudio/edu-hub/actions/runs/34054413762/artifacts/9995593260).
-- MadaresEgypt profile viability pilot sampled 50 record IDs across the full 11,339-record range. With retries disabled and a five-second ceiling, all 50 requests timed out; zero factual profiles or fields were accepted.
-- MadaresEgypt is therefore classified as listing-level-only for the current acquisition phase. Its 11,339 owned listing records remain usable, but profile/media crawling will not be scaled unless a materially different endpoint or access path is validated.
-- Pilot evidence: [MadaresEgypt factual profile pilot run 34070572537](https://github.com/admonkstudio/edu-hub/actions/runs/34070572537), artifact `10000387395`, SHA-256 `1bd354284ae6a00fbcd10d14da62b7446dd514c837d4c1390b114df779cbe1ed`.
-- V7 consolidation is complete: 24,916 owned raw records across 13 sources, with an ownership row for every record.
-- V7 retains 2,101 AlexSchools media provenance references and 453 unique content-addressed binaries. All 453 file hashes pass; public-use eligibility remains false for every asset.
-- V7 has zero duplicate `(source_id, raw_hash)` groups, zero duplicate non-empty `(source_id, source_record_id)` groups, zero foreign-key errors, and SQLite `integrity_check=ok`.
-- The earlier local V6 tarball was found truncated during an independent archive read. V7 was rebuilt from the complete extracted V6 database/media tree plus V5, and its new 38 MB archive passes gzip, archive traversal, and 455 internal checksum checks.
-- V7 archive SHA-256: `fb4e6c332bdf1c0c9505ee78ad2d720d6d96d67241431a6a21ffc79ef8f6408a`.
-- The secure PostgreSQL/Supabase V7 import package is complete: private `edu_raw` hardening, explicit access revocation, RLS defense in depth, ownership/import-ledger tables, an idempotent resumable importer, and read-only verification SQL.
-- The V7 import dry-run passes all record/media counts, SQLite integrity, ownership payload hashes, source hash uniqueness, media foreign references, and media-rights gating.
-- No Edu Hub Supabase project currently exists in the connected organization. The two visible projects belong to Ask Kalam and must not receive Edu Hub data.
+The goal is identity coverage before profile completeness. Missing fees, contacts, websites or media do not invalidate a legitimate institution. No missing factual field may be invented.
+
+## Verified national-registry progress
+
+### Owned raw archive
+
+- V7 remains the complete portable owned acquisition archive from the pre-registry phase: 24,916 raw records across 13 sources.
+- V7 preserves 2,101 media provenance references and 453 unique content-addressed media binaries.
+- Media publication remains disabled by default until rights/public-use eligibility is established.
+- The archive/import package remains independently restorable and checksum-verifiable.
+
+### Registry/staging safety foundation
+
+- `edu_raw`, `edu_staging`, `edu_core` and later public-projection boundaries are explicitly defined.
+- Current/historical/no-coverage source aliases are machine-readable and validated.
+- The verified base-v3 recovery seed produces 13,192 staging candidates.
+- 8,001 rows receive current official-source coverage credit before identity resolution: 7,674 Al-Azhar + 327 SCU.
+- Canonical planning remains proposal-only: zero automatic identity acceptances and zero public promotion.
+
+### Higher education — D1.2
+
+- SCU live acquisition is verified at 327/327 expected category entries.
+- Al-Azhar full official evidence remains 7,674 source records; the live adapter continues to pass bounded smoke checks.
+- MOHESR private-institute sector acquisition is active and reconciled against SCU as review-only identity proposals.
+- MOHESR technical hierarchy acquisition is verified at **8 technological-college parents and 44 technical institutes**.
+- The 44 technical institute parent links now flow into the reconciliation layer as source-backed relationship proposals.
+- CI enforces zero automatic identity acceptance, zero automatic hierarchy acceptance, zero `edu_core` mutation and zero public promotion.
+
+### MOE / EMIS — D1.3 live contract state
+
+- Official 2025/26 target remains 62,690 schools.
+- The official Egyptian Schools Directory remains the required primary identity source.
+- GitHub-hosted/web acquisition environments still time out against the directory, but Egypt-local runs on 2026-09-14 proved `https://search.emis.gov.eg/` is reachable with valid ASP.NET state fields.
+- Direct GETs to `search_schgov.aspx`, `search_schpriv.aspx` and `sch_data.aspx` do not expose a usable contract.
+- The root page exposes six ASP.NET submit buttons for government, private, special-education, sports, military and experimental/language schools; category navigation therefore depends on root-form POST state.
+- Fresh root state was used before every category submission. Government, private, sports, military and experimental/language category navigations currently end in HTTP 500 responses.
+- Special Education is the only category that currently reaches a search-form page, at `search_schSpecialEdu.aspx`.
+- That form exposes dependent governorate (`DDList_mud`) and stage (`DDList_stage`) selects plus exactly three non-placeholder school-type radio postbacks.
+- A final bounded Egypt-local diagnostic submitted **all three** observed school-type postbacks independently with fresh sessions and fresh ASP.NET state: `تربية فكرية`, `مكفوفين وضعاف بصر`, and `صم وضعاف سمع`.
+- All three postbacks were technically accepted and returned HTTP 200 with the selected radio state preserved, but all three left governorate/stage empty and displayed the ministry-side message `خطأ اثناء محاولة تحميل الصفحة`.
+- Final hydration result: 3 controls discovered, 3 submitted, 3 HTTP-success responses, 0 pages with populated selects, 0 populated selects, and 3 pages with visible EMIS load errors.
+- This exhausts the current safe client-side contract diagnostic. The blocker is classified as a live source/application data-loading failure, not an unresolved postback-format issue.
+- `docs/EMIS-LIVE-FAILURE-EVIDENCE-2026-09-14.md` is the canonical evidence note for this state.
+- Do not repeat the same Special Education hydration diagnostic unless the source changes materially.
+- `emis_health_recheck.py` is now the lightweight recovery detector. It checks only the root and top-level category routes and can recommend a fresh contract capture if the government route returns cleanly; it never authorizes enumeration itself.
+- Government-school enumeration remains blocked. A healthy government route must first be freshly recaptured and reviewed before any small pilot can be implemented.
+- The official machine-readable MOE/EMIS export request is now the primary D1.3 acquisition path while the live route is unhealthy.
+- No school search, result pagination, school-row enumeration, `edu_core` mutation or public promotion was performed during these diagnostics.
+- Secondary directories must not be relabelled as complete MOE coverage.
+
+### MOSS nurseries — D1.4
+
+- Official national target remains 48,225 nurseries.
+- MOSS continues to publish the 48,225 national count from the comprehensive nursery census.
+- Official ministry material states that a digital early-childhood platform/nursery map is being developed from the census database and is intended to expose family-facing fields including nearest nursery, licensing status, capacity and fees.
+- That row-level public map/export is not yet present in the current acquisition pipeline, so D1.4 remains an official data-sharing/export track rather than a secondary-directory substitution.
+- `docs/requests/MOSS-NURSERY-DATA-REQUEST-AR.md` remains the prepared official request for the row-level registry and associated code/data dictionary.
+
+## Infrastructure state
+
+- No dedicated Edu Hub Supabase project is currently visible in the connected Supabase organization.
+- The two visible Supabase projects belong to Ask Kalam and must not receive Edu Hub data.
+- Database provisioning is therefore still required before the national registry can become an operational hosted PostgreSQL dataset; this does not block source acquisition and contract work in Git/GitHub Actions.
 
 ## Immediate next actions
 
-1. Create/connect a dedicated Edu Hub Supabase project, then apply the prepared schema and execute the verified V7 importer against that project only.
-2. Implement GitHub Issue #1 — Milestone 0 foundation.
-3. Verify lint, typecheck, tests/configuration, production builds and rendered app shells.
-4. Record actual deployment/runtime decisions in `docs/PLATFORM.md` and `docs/PROJECT-DECISIONS.md`.
-5. Then implement Issue #2 — canonical data foundation.
-6. Build a representative 20–30 institution test cohort after the core schema exists.
-
-## Blockers / unresolved decisions
-
-These do not block Milestone 0:
-
-- final public brand name and domain
-- final hosting/adapter selection
-- final visual identity
-- final production design system
-- final map provider
-- final analytics implementation
-- exact initial search-demand prioritization by location/curriculum
-
-They must be resolved before the relevant downstream milestone.
+1. Treat D1.2 higher-education acquisition/reconciliation plumbing as implemented and keep unresolved identity decisions review-only.
+2. Stop repeating the exhausted Special Education hydration diagnostic. Use `python tools/data-acquisition/emis_health_recheck.py` only as a lightweight periodic recovery check.
+3. Pursue the official machine-readable MOE/EMIS export using `docs/requests/MOE-EMIS-DATA-REQUEST-AR.md`; preserve any received file unchanged with provenance and checksum before staging.
+4. If the government EMIS route becomes cleanly reachable, perform a fresh contract capture and review it before implementing only a small governorate/administration pilot.
+5. Validate unique official school-source coverage against the 62,690-school 2025/26 target; do not substitute Special Education or secondary-directory counts.
+6. Advance D1.4 through the prepared MOSS request while monitoring the announced official nursery-map platform for row-level access.
+7. Validate any future MOSS row-level source against the 48,225-nursery national target and preserve licensing/location provenance.
+8. Provision a dedicated Edu Hub PostgreSQL/Supabase environment before importing the national registry into an operational hosted database.
+9. Only after identity coverage stabilizes, begin D1.5 broad enrichment and completeness improvement.
 
 ## Non-negotiable project constraints
 
 - Do not build monetization during Phase 1 foundation work.
 - Do not equate paid status with verification.
 - Do not auto-index every database entity or filter combination.
-- Do not allow AI to silently overwrite verified factual data.
+- Do not allow AI to silently overwrite or invent verified factual data.
 - Do not commit secrets.
-- Keep Arabic/RTL and performance requirements active from the beginning.
+- Do not publish directly from `edu_raw` or `edu_staging`.
+- Keep Arabic/RTL, provenance, data portability and performance requirements active from the beginning.
