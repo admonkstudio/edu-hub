@@ -55,6 +55,9 @@ jobs:
               'uk_dfe_bso_egypt_2026_08',
               'french_homologation_2026_2027',
               'kmk_german_schools_2026_04',
+              'cis_international_accreditation_egypt',
+              'cognia_accredited_egypt',
+              'cognia_member_milestones_egypt_2026_2027',
               'scu_foreign_university_branches',
               'msche_auc',
               'wikimedia_commons',
@@ -71,6 +74,12 @@ jobs:
           assert bso_source['authority_class'] == 'foreign_government'
           assert bso_source['expected_current_count'] == 11
           assert bso_source['auto_eligibility'] is False
+          cis_source = next(row for row in registry['sources'] if row['source_id'] == 'cis_international_accreditation_egypt')
+          assert cis_source['authority_class'] == 'recognized_accreditor'
+          assert cis_source['auto_eligibility'] is False
+          cognia_milestones = next(row for row in registry['sources'] if row['source_id'] == 'cognia_member_milestones_egypt_2026_2027')
+          assert cognia_milestones['expected_current_count'] == 4
+          assert cognia_milestones['auto_eligibility'] is False
 
           seed_dir = Path('tools/data-acquisition/international/seeds')
           ib = json.loads((seed_dir/'ib-egypt-directory-2026-09-14.json').read_text(encoding='utf-8'))
@@ -88,12 +97,18 @@ jobs:
           assert len(ib_detail['records']) == ib_detail['records_count'] == 7
           assert ib_detail['eligible_private'] == 4
           assert ib_detail['excluded_state'] == 3
-          assert len(ib_detail_incremental['records']) == ib_detail_incremental['records_count'] == 1
-          assert ib_detail_incremental['eligible_private'] == 1
+          assert len(ib_detail_incremental['records']) == ib_detail_incremental['records_count'] == 5
+          assert ib_detail_incremental['eligible_private'] == 5
           assert ib_detail_incremental['excluded_state'] == 0
-          assert ib_detail_incremental['records'][0]['name'] == 'Evolution International School - NewGiza'
-          assert ib_detail_incremental['records'][0]['type'] == 'PRIVATE'
-          assert ib_detail_incremental['records'][0]['scope_state'] == 'eligible'
+          assert {row['name'] for row in ib_detail_incremental['records']} == {
+              'Evolution International School - NewGiza',
+              'Narmer American College',
+              'Cairo American College',
+              'Cairo English School',
+              'New Cairo British International School',
+          }
+          assert all(row['type'] == 'PRIVATE' for row in ib_detail_incremental['records'])
+          assert all(row['scope_state'] == 'eligible' for row in ib_detail_incremental['records'])
           assert len(bso['records']) == bso['records_count'] == 11
           assert bso['list_updated'] == '2026-08-26'
           assert len(bso_detail['records']) == bso_detail['records_count'] == 11
@@ -107,7 +122,7 @@ jobs:
           assert all(row['public_use_allowed'] is True for row in media['assets'])
           assert all(row['rights_basis'] for row in media['assets'])
           assert all(row['identity_match_state'] == 'verified_by_file_description' for row in media['assets'])
-          print(f"validated {len(ids)} registered sources, 96 source rows, 11 BSO/GIAS detail rows, 8 IB detail decisions and 5 reviewed media assets")
+          print(f"validated {len(ids)} registered sources, 96 source rows, 11 BSO/GIAS detail rows, 12 IB detail decisions and 5 reviewed media assets")
           PY
       - name: Test live-parser and scope boundaries
         run: python tools/data-acquisition/international/test_acquisition.py
@@ -140,11 +155,11 @@ jobs:
           data = json.loads(p.read_text(encoding='utf-8'))
           assert data['source_rows'] == 96
           assert data['source_counts']['uk_dfe_bso_egypt_2026_08'] == 11
-          assert data['eligible_source_rows'] == 36
-          assert data['candidate_source_rows'] == 57
+          assert data['eligible_source_rows'] == 40
+          assert data['candidate_source_rows'] == 53
           assert data['excluded_source_rows'] == 3
-          assert data['ib_detail_rows_applied'] == 8
-          assert data['ib_detail_snapshot_counts'] == {'2026-09-14': 7, '2026-09-15': 1}
+          assert data['ib_detail_rows_applied'] == 12
+          assert data['ib_detail_snapshot_counts'] == {'2026-09-14': 7, '2026-09-15': 5}
           assert data['bso_detail_rows_applied'] == 11
           assert data['unique_institutions_claimed'] is None
           assert data['identity_reconciliation_required'] is True
@@ -155,8 +170,8 @@ jobs:
           universe = json.loads(Path('artifacts/international/candidate-universe/candidate-universe-summary.json').read_text(encoding='utf-8'))
           assert universe['source_record_count'] == 96
           assert universe['source_counts']['uk_dfe_bso_egypt_2026_08'] == 11
-          assert universe['scope_or_lead_state_counts']['eligible'] == 36
-          assert universe['scope_or_lead_state_counts']['candidate'] == 57
+          assert universe['scope_or_lead_state_counts']['eligible'] == 40
+          assert universe['scope_or_lead_state_counts']['candidate'] == 53
           assert universe['scope_or_lead_state_counts']['excluded'] == 3
           assert universe['english_name_present'] == 96
           assert universe['arabic_name_present'] == 9
