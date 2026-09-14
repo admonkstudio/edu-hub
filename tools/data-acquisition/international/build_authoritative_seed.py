@@ -3,8 +3,8 @@
 
 This builder intentionally consumes checked-in, source-dated evidence snapshots.
 Several authoritative sites (notably IB) block GitHub-hosted direct HTTP clients,
-so CI must validate the evidence we captured through a browser-capable path rather
-than pretending a 403 means the source is unavailable.
+so CI validates evidence captured through browser-capable/source-appropriate paths
+rather than pretending a hosted-runner 403 means the source is unavailable.
 
 The output remains source-shaped evidence/candidates; it performs no canonical
 merge, database mutation or public promotion.
@@ -14,7 +14,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -56,10 +55,7 @@ def ib_records(data: dict) -> list[dict]:
                 "strong_evidence": "ib_world_school_directory",
                 "eligibility_pending": "private_or_independent_type_detail_check",
                 "curriculum_codes": ["ib"],
-                "programmes": {
-                    key: bool(school.get(key))
-                    for key in ("pyp", "myp", "dp", "cp")
-                },
+                "programmes": {key: bool(school.get(key)) for key in ("pyp", "myp", "dp", "cp")},
                 "languages": list(school.get("languages") or []),
                 "detail_enrichment_pending": True,
                 "source_count_conflict": bool(data.get("count_conflict_requires_review")),
@@ -70,83 +66,105 @@ def ib_records(data: dict) -> list[dict]:
 
 def french_records(data: dict) -> list[dict]:
     source_id = data["source_id"]
-    out = []
-    for row in data["records"]:
-        out.append(
-            {
-                "source_id": source_id,
-                "source_record_id": row["uai"],
-                "source_snapshot_date": data["snapshot_date"],
-                "source_url": data["source_url"],
-                "entity_family": "pre_university",
-                "institution_type": "international_school",
-                "name_en": row["name"],
-                "city": row["city"],
-                "official_identifier": row["uai"],
-                "scope_state": "eligible",
-                "scope_class": "international_school",
-                "strong_evidence": "french_ministry_homologation",
-                "curriculum_codes": ["french"],
-                "education_levels": row["levels"],
-                "homologated_classes": row["homologated_classes"],
-                "source_limitation": row.get("remark"),
-            }
-        )
-    return out
+    return [
+        {
+            "source_id": source_id,
+            "source_record_id": row["uai"],
+            "source_snapshot_date": data["snapshot_date"],
+            "source_url": data["source_url"],
+            "entity_family": "pre_university",
+            "institution_type": "international_school",
+            "name_en": row["name"],
+            "city": row["city"],
+            "official_identifier": row["uai"],
+            "scope_state": "eligible",
+            "scope_class": "international_school",
+            "strong_evidence": "french_ministry_homologation",
+            "curriculum_codes": ["french"],
+            "education_levels": row["levels"],
+            "homologated_classes": row["homologated_classes"],
+            "source_limitation": row.get("remark"),
+        }
+        for row in data["records"]
+    ]
 
 
 def german_records(data: dict) -> list[dict]:
     source_id = data["source_id"]
-    out = []
-    for row in data["records"]:
-        out.append(
-            {
-                "source_id": source_id,
-                "source_record_id": stable_id(source_id, row["name"]),
-                "source_snapshot_date": data["snapshot_date"],
-                "source_url": data["source_url"],
-                "entity_family": "pre_university",
-                "institution_type": "international_school",
-                "name_en": row["name"],
-                "city": row["city"],
-                "scope_state": row["scope_state"],
-                "scope_class": row["scope_class"],
-                "strong_evidence": "kmk_recognized_german_school_abroad",
-                "curriculum_codes": ["german"],
-                "recognition_decision_date": row["recognition_decision_date"],
-            }
-        )
-    return out
+    return [
+        {
+            "source_id": source_id,
+            "source_record_id": stable_id(source_id, row["name"]),
+            "source_snapshot_date": data["snapshot_date"],
+            "source_url": data["source_url"],
+            "entity_family": "pre_university",
+            "institution_type": "international_school",
+            "name_en": row["name"],
+            "city": row["city"],
+            "scope_state": row["scope_state"],
+            "scope_class": row["scope_class"],
+            "strong_evidence": "kmk_recognized_german_school_abroad",
+            "curriculum_codes": ["german"],
+            "recognition_decision_date": row["recognition_decision_date"],
+        }
+        for row in data["records"]
+    ]
 
 
 def scu_records(data: dict) -> list[dict]:
     source_id = data["source_id"]
-    out = []
-    for row in data["records"]:
-        out.append(
-            {
-                "source_id": source_id,
-                "source_record_id": stable_id(source_id, row["name_ar"]),
-                "source_snapshot_date": data["snapshot_date"],
-                "source_url": data["source_url"],
-                "entity_family": "higher_education",
-                "institution_type": "foreign_university_branch",
-                "name_ar": row["name_ar"],
-                "parent_university_en": row["parent_university_en"],
-                "parent_country_code": row["country_code"],
-                "scope_state": row["scope_state"],
-                "scope_class": row["scope_class"],
-                "strong_evidence": "scu_recognized_foreign_university_branch",
-            }
-        )
-    return out
+    return [
+        {
+            "source_id": source_id,
+            "source_record_id": stable_id(source_id, row["name_ar"]),
+            "source_snapshot_date": data["snapshot_date"],
+            "source_url": data["source_url"],
+            "entity_family": "higher_education",
+            "institution_type": "foreign_university_branch",
+            "name_ar": row["name_ar"],
+            "parent_university_en": row["parent_university_en"],
+            "parent_country_code": row["country_code"],
+            "scope_state": row["scope_state"],
+            "scope_class": row["scope_class"],
+            "strong_evidence": "scu_recognized_foreign_university_branch",
+        }
+        for row in data["records"]
+    ]
 
 
-def validate_inputs(ib: dict, french: dict, german: dict, scu: dict) -> None:
+def auc_records(data: dict) -> list[dict]:
+    source_id = data["source_id"]
+    row = data["institution"]
+    return [
+        {
+            "source_id": source_id,
+            "source_record_id": "msche-0637",
+            "source_snapshot_date": data["snapshot_date"],
+            "source_url": row["international_evidence"][0]["source_url"],
+            "entity_family": "higher_education",
+            "institution_type": "international_independent_university",
+            "name_en": row["name_en"],
+            "short_name": row["short_name"],
+            "city": row["city"],
+            "address": row["address"],
+            "phone": row["phone"],
+            "website": row["website"],
+            "scope_state": row["scope_state"],
+            "scope_class": row["scope_class"],
+            "ownership_scope": row["ownership_scope"],
+            "strong_evidence": "msche_institutional_accreditation_plus_egypt_us_framework",
+            "international_evidence": row["international_evidence"],
+        }
+    ]
+
+
+def validate_inputs(ib: dict, french: dict, german: dict, scu: dict, auc: dict) -> None:
     assert ib["directory_count_observed"] == len(ib["schools"]) == 54
     assert french["records_count"] == len(french["records"]) == 17
     assert german["records_count"] == len(german["records"]) == 4
     assert scu["records_count"] == len(scu["records"]) == 9
+    assert auc["institution"]["scope_state"] == "eligible"
+    assert auc["institution"]["scope_class"] == "international_independent_university"
 
     ib_names = [normalize_space(row["name"]).casefold() for row in ib["schools"]]
     assert len(ib_names) == len(set(ib_names)), "duplicate IB directory rows"
@@ -161,9 +179,16 @@ def build(seed_dir: Path, output_dir: Path) -> dict:
     french = load_json(seed_dir / "french-homologation-egypt-2026-2027.json")
     german = load_json(seed_dir / "german-kmk-egypt-2026-04.json")
     scu = load_json(seed_dir / "scu-foreign-university-branches-2026-09-14.json")
-    validate_inputs(ib, french, german, scu)
+    auc = load_json(seed_dir / "auc-international-evidence-2026-09-14.json")
+    validate_inputs(ib, french, german, scu, auc)
 
-    rows = ib_records(ib) + french_records(french) + german_records(german) + scu_records(scu)
+    rows = (
+        ib_records(ib)
+        + french_records(french)
+        + german_records(german)
+        + scu_records(scu)
+        + auc_records(auc)
+    )
     output_dir.mkdir(parents=True, exist_ok=True)
     jsonl_path = output_dir / "authoritative-source-candidates.jsonl"
     with jsonl_path.open("w", encoding="utf-8") as handle:
@@ -174,9 +199,6 @@ def build(seed_dir: Path, output_dir: Path) -> dict:
     for row in rows:
         source_counts[row["source_id"]] = source_counts.get(row["source_id"], 0) + 1
 
-    # This is a source-row count, NOT a unique-institution count. Cross-source
-    # duplicates (e.g. IB + French/German recognition) are intentionally retained
-    # until staging identity reconciliation.
     summary = {
         "schema_version": 1,
         "built_at": datetime.now(timezone.utc).isoformat(),
