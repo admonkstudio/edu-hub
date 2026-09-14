@@ -1,0 +1,82 @@
+name: EDU-DATA-2 International Registry
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'tools/data-acquisition/international/**'
+      - 'infra/owned-data/005_international_registry.sql'
+      - 'docs/EDU-DATA-2-INTERNATIONAL-REGISTRY.md'
+      - '.github/workflows/edu-data-2-international-registry.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    name: Validate international registry contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install acquisition dependencies
+        run: pip install requests beautifulsoup4
+      - name: Compile acquisition tools
+        run: |
+          python -m py_compile tools/data-acquisition/international/acquire_ib_egypt.py
+          python -m py_compile tools/data-acquisition/international/acquire_scu_foreign_branches.py
+          python -m py_compile tools/data-acquisition/international/test_acquisition.py
+      - name: Validate source registry
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('tools/data-acquisition/international/source_registry.json')
+          data = json.loads(p.read_text(encoding='utf-8'))
+          assert data['scope'] == 'egypt_international_education'
+          ids = [row['source_id'] for row in data['sources']]
+          assert len(ids) == len(set(ids))
+          assert 'ib_world_schools_egypt' in ids
+          assert 'scu_foreign_university_branches' in ids
+          assert 'legacy_v7_archive' in ids
+          assert all('auto_eligibility' in row for row in data['sources'])
+          print(f'validated {len(ids)} sources')
+          PY
+      - name: Test parsers and scope boundaries
+        run: python tools/data-acquisition/international/test_acquisition.py
+
+  acquire:
+    name: Acquire authoritative international seed
+    needs: contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install acquisition dependencies
+        run: pip install requests beautifulsoup4
+      - name: Acquire IB Egypt
+        run: python tools/data-acquisition/international/acquire_ib_egypt.py --output-dir artifacts/international --expected-count 54
+      - name: Acquire SCU foreign university branches
+        run: python tools/data-acquisition/international/acquire_scu_foreign_branches.py --output-dir artifacts/international --expected-count 9
+      - name: Verify zero publication side effects
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for path in Path('artifacts/international').glob('*summary.json'):
+              data = json.loads(path.read_text(encoding='utf-8'))
+              assert data.get('database_mutation_performed') is False
+              assert data.get('public_promotion_performed') is False
+              print(path.name, data.get('records_acquired'))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-authoritative-seed
+          path: artifacts/international/
+          if-no-files-found: error
