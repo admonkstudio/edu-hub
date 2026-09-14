@@ -58,8 +58,12 @@ def build(identities_dir: Path, base_campus_dir: Path, output_dir: Path, batch_p
     campuses = load_jsonl(base_campus_dir / "reviewed-current-campus-drafts.jsonl")
     structures = load_jsonl(base_campus_dir / "campus-structure-review.jsonl")
 
-    if identity_summary.get("reviewed_institution_drafts") != len(institutions) or len(institutions) != 26:
-        raise AssertionError("incremental campus review requires the accepted 26-institution D2.2 identity artifact")
+    expected_identity_count = identity_summary.get("reviewed_institution_drafts")
+    if expected_identity_count != len(institutions) or len(institutions) < 26:
+        raise AssertionError(
+            "incremental campus review requires the current accepted D2.2 identity artifact "
+            f"(summary={expected_identity_count}, rows={len(institutions)})"
+        )
     if base_summary.get("reviewed_current_campus_records") != len(campuses) or len(campuses) != 9:
         raise AssertionError("incremental campus review requires the accepted 9-campus base artifact")
     if len(structures) != 9:
@@ -202,7 +206,7 @@ def build(identities_dir: Path, base_campus_dir: Path, output_dir: Path, batch_p
     write_jsonl(pending_path, pending)
 
     summary = {
-        "schema_version": 1,
+        "schema_version": 2,
         "built_at": datetime.now(timezone.utc).isoformat(),
         "work_package": "D2.2_incremental_current_campus_materialization",
         "deterministic_id_namespace": str(DRAFT_NAMESPACE),
