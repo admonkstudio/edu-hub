@@ -95,12 +95,15 @@ The goal is identity coverage before profile completeness. Missing fees, contact
 - The 44 technical institute parent links now flow into the reconciliation layer as source-backed relationship proposals.
 - CI enforces zero automatic identity acceptance, zero automatic hierarchy acceptance, zero `edu_core` mutation and zero public promotion.
 
-### MOE / EMIS — D1.3 blocker
+### MOE / EMIS — D1.3 blocker and tooling state
 
 - Official 2025/26 target remains 62,690 schools.
 - The official Egyptian Schools Directory is still the required primary identity source.
 - The directory remains unreachable from current GitHub-hosted/web acquisition environments due to timeout/network reachability.
-- A prepared local capture/export intake path exists for an Egypt-reachable environment or an official machine-readable export.
+- The local D1.3 handoff is now self-contained: `run_emis_local_capture.py` performs public contract capture, offline contract analysis and emits one ZIP handoff bundle without enumerating schools.
+- `emis_local_capture.py` records form labels, public select options, ASP.NET state-field names, postback behavior, candidate endpoints and raw HTML evidence while keeping hidden form-state values out of the JSON manifest.
+- `registry/analyze_emis_capture.py` ranks candidate forms and determines whether bounded pilot-adapter design is unblocked; it performs no network requests or form submissions.
+- CI tests enforce that capture analysis cannot authorize bulk enumeration, cannot mutate `edu_core`, and cannot promote public data.
 - Secondary directories must not be relabelled as complete MOE coverage.
 
 ### MOSS nurseries — D1.4 blocker
@@ -118,11 +121,13 @@ The goal is identity coverage before profile completeness. Missing fees, contact
 ## Immediate next actions
 
 1. Treat D1.2 higher-education acquisition/reconciliation plumbing as implemented and keep unresolved identity decisions review-only.
-2. Execute D1.3 MOE/EMIS acquisition from an Egypt-reachable environment using `tools/data-acquisition/emis_local_capture.py`, or intake a current official machine-readable export through the prepared official-export path.
-3. Validate unique official school-source coverage against the 62,690-school 2025/26 target without substituting secondary-directory counts.
-4. Continue D1.4 MOSS official data-request/public-map track for the 48,225-nursery universe.
-5. Provision a dedicated Edu Hub PostgreSQL/Supabase environment before importing the national registry into an operational hosted database.
-6. Only after identity coverage stabilizes, begin D1.5 broad enrichment and completeness improvement.
+2. Run the one-command D1.3 EMIS capture from an Egypt-reachable network: `python tools/data-acquisition/run_emis_local_capture.py`, or intake a current official machine-readable export through the prepared official-export path.
+3. Use the produced `enumerator-contract.json` and `emis-local-capture-bundle.zip` to implement a bounded governorate/administration pilot only when `adapter_design_unblocked=true`.
+4. Validate native source IDs, postback state, pagination, failed combinations and duplicate IDs before any national run.
+5. Validate unique official school-source coverage against the 62,690-school 2025/26 target without substituting secondary-directory counts.
+6. Continue D1.4 MOSS official data-request/public-map track for the 48,225-nursery universe.
+7. Provision a dedicated Edu Hub PostgreSQL/Supabase environment before importing the national registry into an operational hosted database.
+8. Only after identity coverage stabilizes, begin D1.5 broad enrichment and completeness improvement.
 
 ## Non-negotiable project constraints
 
