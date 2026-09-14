@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.2_campus_evidence_review",
+  "review_method": "current_first_party_location_evidence_structure_not_assumed_exhaustive",
+  "records_count": 9,
+  "records": [
+    {
+      "review_group_id": "narmer-american-college",
+      "campus_key": "new-cairo-current-campus",
+      "campus_type": "main",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": null,
+      "address_en": "20 El-Narguis Service Area, El-Tagamoa El Khames, New Cairo City, Cairo, Egypt 11477",
+      "source_urls": ["https://www.nac.edu.eg/college/"],
+      "evidence_note": "Current official NAC pages consistently publish this New Cairo school address for the institutional divisions.",
+      "campus_structure_complete": false
+    },
+    {
+      "review_group_id": "british-international-school-cairo",
+      "campus_key": "beverly-hills-current-campus",
+      "campus_type": "main",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": null,
+      "address_en": "Km 38, Cairo-Alexandria Desert Road, Beverly Hills, 6th of October City, Egypt 12451",
+      "source_urls": [
+        "https://www.bisc.edu.eg/contact.html",
+        "https://www.bisc.edu.eg/about-bisc-208330-809872-987860-353538.html"
+      ],
+      "evidence_note": "Current official BISC contact/history pages identify the operating school location at the Beverly Hills campus opened in 2008.",
+      "campus_structure_complete": false
+    },
+    {
+      "review_group_id": "cairo-american-college",
+      "campus_key": "maadi-current-campus",
+      "campus_type": "main",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": null,
+      "address_en": "1 Midan Digla, Maadi, Cairo, Egypt",
+      "source_urls": ["https://www.cacegypt.org/"],
+      "evidence_note": "Current official CAC home/contact content identifies the school campus at 1 Midan Digla, Maadi.",
+      "campus_structure_complete": false
+    },
+    {
+      "review_group_id": "cairo-english-school",
+      "campus_key": "mirage-city-current-campus",
+      "campus_type": "main",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": null,
+      "address_en": "Mirage City, New Cairo, Egypt",
+      "source_urls": [
+        "https://www.cesegypt.com/about/contact-information",
+        "https://www.cesegypt.com/"
+      ],
+      "evidence_note": "Current official CES pages identify one operating campus/location in Mirage City and describe the campus facilities there.",
+      "campus_structure_complete": false
+    },
+    {
+      "review_group_id": "modern-english-school-cairo",
+      "campus_key": "new-cairo-current-campus",
+      "campus_type": "main",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": null,
+      "address_en": "New Cairo, South of Police Academy, Cairo, Egypt",
+      "source_urls": [
+        "https://www.mescairo.com/",
+        "https://www.mescairo.com/MissionStatement.asp"
+      ],
+      "evidence_note": "Current official MES Cairo pages publish the New Cairo / South of Police Academy school location.",
+      "campus_structure_complete": false
+    },
+    {
+      "review_group_id": "new-cairo-british-international-school",
+      "campus_key": "new-cairo-current-campus",
+      "campus_type": "main",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": null,
+      "address_en": "Road 17, 1st District, 3rd Zone, 5th Settlement, New Cairo, Egypt",
+      "source_urls": [
+        "https://ncbis.co.uk/contact/",
+        "https://ncbis.co.uk/wp-content/uploads/2025/06/NCBIS-BSO-Report-2025-05-12.pdf"
+      ],
+      "evidence_note": "Current official NCBIS contact information and the 2025 BSO inspection report identify the same New Cairo location.",
+      "campus_structure_complete": false
+    },
+    {
+      "review_group_id": "evolution-international-school-newgiza",
+      "campus_key": "newgiza-current-campus",
+      "campus_type": "main",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": "New Giza Campus",
+      "address_en": "New Giza Campus, km 22, Cairo/Alex Desert Road, 6 October City, Egypt 12588",
+      "source_urls": ["https://eisng.lvng.net/"],
+      "evidence_note": "Current institution site explicitly labels and publishes the New Giza Campus address.",
+      "campus_structure_complete": false
+    },
+    {
+      "review_group_id": "el-alsson-newgiza",
+      "campus_key": "newgiza-current-campus",
+      "campus_type": "main",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": "El Alsson NewGiza",
+      "address_en": "KM 22 Cairo-Alex Road, NewGiza, Cairo, Egypt 12577",
+      "source_urls": [
+        "https://www.alsson.com/contact/",
+        "https://www.alsson.com/about/the-story-of-el-alsson"
+      ],
+      "evidence_note": "Official El Alsson evidence says the school moved to the NEWGIZA campus in 2017 and that this campus contains the British School and American School. The pre-2017 site is historical and is not represented as a current El Alsson campus by this decision.",
+      "campus_structure_complete": false
+    },
+    {
+      "review_group_id": "misr-language-schools",
+      "campus_key": "fayoum-desert-road-current-campus",
+      "campus_type": "main",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": null,
+      "address_en": "Cairo - El Fayoum Desert Road, Giza, Egypt",
+      "source_urls": [
+        "https://frenchdivision.mls-egypt.org/index.php/qui-sommes-nous/",
+        "https://mls-egypt.org/index.php/portfolio/misr-language-schools-receives-ambassador-of-hungary-to-egypt/"
+      ],
+      "evidence_note": "Official MLS material describes a shared MLS campus hosting the National, American, British, French and Inclusive Education divisions and publishes the Cairo-El Fayoum Desert Road location.",
+      "campus_structure_complete": false
+    }
+  ],
+  "safety": {
+    "reviewed_current_campus_evidence_records": 9,
+    "campus_structure_complete_records": 0,
+    "automatic_additional_campus_inference_performed": false,
+    "canonical_database_rows_written": 0,
+    "public_projection_rows_created": 0,
+    "database_mutation_performed": false
+  }
+}
