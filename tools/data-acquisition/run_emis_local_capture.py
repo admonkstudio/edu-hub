@@ -5,11 +5,13 @@ This wrapper performs only the two safe D1.3 preparation gates:
 1. capture public EMIS page/form evidence;
 2. analyze that evidence offline into an enumerator design contract.
 
-It does not enumerate schools or submit search forms.
+It then packages the evidence folder into one ZIP for handoff/review. It does
+not enumerate schools or submit search forms.
 """
 from __future__ import annotations
 
 import argparse
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -63,9 +65,20 @@ def main() -> int:
         )
         return analyze_rc
 
+    archive_base = output_dir.parent / "emis-local-capture-bundle"
+    archive_path = Path(
+        shutil.make_archive(
+            str(archive_base),
+            "zip",
+            root_dir=output_dir.parent,
+            base_dir=output_dir.name,
+        )
+    )
+
     print("EMIS D1.3 contract capture is ready for pilot-adapter implementation.")
     print(f"Capture report: {output_dir / 'capture-report.json'}")
     print(f"Enumerator contract: {output_dir / 'enumerator-contract.json'}")
+    print(f"Handoff bundle: {archive_path}")
     print("No school enumeration was performed.")
     return 0
 
