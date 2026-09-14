@@ -15,6 +15,7 @@ on:
       - 'tools/data-acquisition/scrape_scu.py'
       - 'tools/data-acquisition/scrape_azhar.py'
       - 'tools/data-acquisition/scrape_mohesr_private.py'
+      - 'tools/data-acquisition/scrape_mohesr_technical.py'
       - '.github/workflows/edu-data-1-contract.yml'
   pull_request:
     branches:
@@ -30,6 +31,7 @@ on:
       - 'tools/data-acquisition/scrape_scu.py'
       - 'tools/data-acquisition/scrape_azhar.py'
       - 'tools/data-acquisition/scrape_mohesr_private.py'
+      - 'tools/data-acquisition/scrape_mohesr_technical.py'
       - '.github/workflows/edu-data-1-contract.yml'
   workflow_dispatch:
 
@@ -63,6 +65,7 @@ jobs:
           python -m py_compile tools/data-acquisition/registry/test_prepare_official_export.py
           python -m py_compile tools/data-acquisition/emis_local_capture.py
           python -m py_compile tools/data-acquisition/scrape_mohesr_private.py
+          python -m py_compile tools/data-acquisition/scrape_mohesr_technical.py
       - name: Enforce staging coverage safety rules
         run: python tools/data-acquisition/registry/test_build_staging_seed.py
       - name: Enforce core identity planning safety rules
@@ -138,6 +141,12 @@ jobs:
           if data.get('public_promotion_performed') is not False:
               raise SystemExit('Reconciliation must not promote public data')
           PY
+      - name: Acquire current MOHESR technical hierarchy
+        run: |
+          python tools/data-acquisition/scrape_mohesr_technical.py \
+            --parents-output artifacts/edu-data-1/mohesr_technological_colleges.jsonl \
+            --institutes-output artifacts/edu-data-1/mohesr_technical_institutes.jsonl \
+            --report artifacts/edu-data-1/mohesr_technical_report.json
       - name: Probe Al-Azhar live adapter with a bounded sample
         run: |
           python tools/data-acquisition/scrape_azhar.py \
