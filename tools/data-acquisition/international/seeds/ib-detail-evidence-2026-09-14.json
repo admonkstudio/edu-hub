@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "source_id": "ib_world_schools_egypt",
+  "snapshot_date": "2026-09-14",
+  "notes": "Detail evidence captured from current IB school profile pages. STATE schools are explicitly excluded by EDU-DATA-2 scope; PRIVATE schools may be promoted to eligible when their directory identity matches exactly.",
+  "records": [
+    {
+      "name":"Egyptian International School Fifth Settlement",
+      "ib_school_code":"061691",
+      "type":"STATE",
+      "scope_state":"excluded",
+      "website":"www.eis-tagamo3.org",
+      "phone":"+201223454519",
+      "address":"Cairo - Fifth settlement, Cairo 11835, Egypt",
+      "source_url":"https://ibo.org/en/school/061691"
+    },
+    {
+      "name":"Egyptian International School-Zayed (EIS-Zayed)",
+      "ib_school_code":"051800",
+      "type":"STATE",
+      "scope_state":"excluded",
+      "website":"www.eis-zayed.com",
+      "phone":"+2001155664712",
+      "address":"13th Neighbourhood, 2nd district, Zayed, Giza, Egypt",
+      "source_url":"https://ibo.org/en/school/051800/"
+    },
+    {
+      "name":"The Egyptian International School in El Marag",
+      "ib_school_code":"051630",
+      "type":"STATE",
+      "scope_state":"excluded",
+      "website":"m-eis.com",
+      "phone":null,
+      "address":"Mogawra 2 Bloc G, Elmarag City Elmaadi, Cairo 11435, Egypt",
+      "source_url":"https://ibo.org/programmes/find-an-ib-school/ibaem/t/the-egyptian-international-school-in-el-marag/"
+    },
+    {
+      "name":"Misr Language Schools",
+      "ib_school_code":"051897",
+      "type":"PRIVATE",
+      "scope_state":"eligible",
+      "website":"mls-egypt.org",
+      "phone":"+201001412203",
+      "address":"Beginning of Fayoum Highway, Pyramids, Giza, Egypt",
+      "source_url":"https://ibo.org/en/school/051897"
+    },
+    {
+      "name":"The International School of Egypt",
+      "ib_school_code":"062370",
+      "type":"PRIVATE",
+      "scope_state":"eligible",
+      "website":"isegypt.org",
+      "phone":"+201055500792",
+      "address":"El Tessen Rd., 5th Settlement, District 6, New Cairo 11835, Egypt",
+      "source_url":"https://ibo.org/fr/programmes/find-an-ib-school/ibaem2/t/the-international-school-of-egypt/"
+    },
+    {
+      "name":"The International School of Elite Education",
+      "ib_school_code":"051954",
+      "type":"PRIVATE",
+      "scope_state":"eligible",
+      "website":"eliteeducation-eg.com",
+      "phone":"+201091974089",
+      "address":"Off Road 90, Behind El Masraweya Compound, Fifth Settlement, New Cairo 11835, Egypt",
+      "source_url":"https://ibo.org/en/school/051954/"
+    },
+    {
+      "name":"Europa Schule Neu Kairo",
+      "ib_school_code":"063788",
+      "type":"PRIVATE",
+      "scope_state":"eligible",
+      "website":"www.esnk.org",
+      "phone":"+201207777914",
+      "address":"Mivida Compound, Gate 7, New Cairo, Cairo, Egypt",
+      "source_url":"https://ibo.org/es/programmes/find-an-ib-school/ibaem2/e/europa-schule-neu-kairo/"
+    }
+  ],
+  "records_count":7,
+  "eligible_private":4,
+  "excluded_state":3
+}
