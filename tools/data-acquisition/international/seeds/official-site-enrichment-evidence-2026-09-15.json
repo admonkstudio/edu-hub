@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "purpose": "D2.4 first-party profile enrichment evidence for high-priority overlap/accreditor candidates",
+  "records_count": 8,
+  "records": [
+    {
+      "name_en": "Evolution International School - NewGiza",
+      "official_website": "https://eisng.lvng.net/",
+      "facts": {
+        "address_en": "New Giza Campus, km 22, Cairo/Alex Desert Road, 6 October City, Egypt, 12588",
+        "admissions_url": "https://eisng.lvng.net/admission-procedure",
+        "admissions_phone": "+20 1003566688",
+        "general_phone": "+20 1003666223",
+        "general_email": "evong@lvng.net",
+        "application_2026_2027_link_present": true
+      },
+      "source_urls": [
+        "https://eisng.lvng.net/admission-procedure",
+        "https://www-prod.ibo.org/school/061134/"
+      ]
+    },
+    {
+      "name_en": "New Cairo British International School",
+      "official_website": "https://ncbis.co.uk/",
+      "facts": {
+        "address_en": "Road 17, 1st District, 3rd Zone, 5th Settlement, New Cairo, Egypt",
+        "admissions_url": "https://ncbis.co.uk/admissions/welcome-from-admissions/",
+        "admissions_phone": "+201229596953",
+        "admissions_email": "admissions@ncbis.co.uk",
+        "age_min_years": 3,
+        "age_max_years": 18,
+        "bso_status": "current"
+      },
+      "source_urls": [
+        "https://ncbis.co.uk/",
+        "https://ncbis.co.uk/admissions/welcome-from-admissions/",
+        "https://ncbis.co.uk/contact/",
+        "https://www.get-information-schools.service.gov.uk/Establishments/Establishment/Details/141436"
+      ]
+    },
+    {
+      "name_en": "Cairo English School",
+      "official_website": "https://www.cesegypt.com/",
+      "facts": {
+        "address_en": "Mirage City, New Cairo, Egypt",
+        "admissions_url": "https://www.cesegypt.com/admissions",
+        "admissions_phone": "+20224483433",
+        "admissions_email": "registrar@cesegypt.com",
+        "education_range": "FS1 to Grade 13",
+        "curriculum_evidence": ["English National Curriculum", "Cambridge O Levels", "Cambridge A Levels", "International Baccalaureate Diploma Programme"],
+        "provider_group": "Esol Education"
+      },
+      "source_urls": [
+        "https://www.cesegypt.com/",
+        "https://www.cesegypt.com/admissions",
+        "https://www.cesegypt.com/admissions/contact-admissions",
+        "https://ibo.org/en/school/004939/"
+      ]
+    },
+    {
+      "name_en": "Cairo American College",
+      "official_website": "https://www.cacegypt.org/",
+      "facts": {
+        "address_en": "1 Midan Digla, Maadi, Cairo, Egypt",
+        "education_range": "Pre-Kindergarten through Grade 12",
+        "curriculum_evidence": ["International Baccalaureate", "American High School Diploma"],
+        "school_model_claim": "international school",
+        "founded_year": 1945
+      },
+      "source_urls": [
+        "https://www.cacegypt.org/",
+        "https://ibo.org/school/000708/"
+      ]
+    },
+    {
+      "name_en": "Narmer American College",
+      "official_website": "https://www.nac.edu.eg/",
+      "facts": {
+        "address_en": "20 El-Narguis Service Area, El-Tagamoa El Khames, New Cairo City, Cairo, Egypt 11477",
+        "general_phone": "+20(2) 2587-4000",
+        "programmes_evidence": ["American Diploma", "IGCSE", "International Baccalaureate"],
+        "ib_school_code": "051886"
+      },
+      "source_urls": [
+        "https://www.nac.edu.eg/college/",
+        "https://ibo.org/school/051886/"
+      ]
+    },
+    {
+      "name_en": "Modern Education Schools",
+      "official_website": "https://www.mes.edu.eg/",
+      "facts": {
+        "admissions_url": "https://www.mes.edu.eg/admissions/",
+        "divisions": ["National", "British", "American"],
+        "admissions_2026_2027_note": "National and British admissions are closed; the official page provides an American Division application link."
+      },
+      "source_urls": [
+        "https://www.mes.edu.eg/",
+        "https://www.mes.edu.eg/admissions/"
+      ]
+    },
+    {
+      "name_en": "GEMS British School Al Rehab",
+      "official_website": "https://www.tbs-cairo.com/",
+      "facts": {
+        "address_en": "Talaat Mostafa Road, Al Rehab City, New Cairo, Cairo, Egypt 11841",
+        "admissions_url": "https://www.tbs-cairo.com/admissions/",
+        "admissions_phone": "+201050385588 / +201060039353",
+        "education_range": "PS to Year 12",
+        "admissions_status_source_text": "Admissions are open",
+        "facilities_evidence": ["Playground", "Science Lab", "Football field", "Makerspace"]
+      },
+      "source_urls": [
+        "https://www.tbs-cairo.com/",
+        "https://www.tbs-cairo.com/admissions/"
+      ]
+    },
+    {
+      "name_en": "GEMS British International School Madinaty, Cairo",
+      "official_website": "https://www.bism-cairo.com/",
+      "facts": {
+        "address_en": "Talaat Mostafa Road, Madinaty City, Suez Road, Cairo 19511, Egypt",
+        "admissions_url": "https://www.bism-cairo.com/Admissions/How-to-Apply",
+        "front_desk_phone": "+2010 222 300 14/15/16",
+        "admissions_phone": "+201050385599 / +201050330755",
+        "curriculum_evidence": ["British Curriculum"],
+        "facilities_evidence": ["Basketball Court", "Science Lab", "Library", "Swimming Pool"]
+      },
+      "source_urls": [
+        "https://www.bism-cairo.com/",
+        "https://www.bism-cairo.com/Admissions/How-to-Apply",
+        "https://www.bism-cairo.com/About-Us/Our-Location"
+      ]
+    }
+  ],
+  "notes": "All facts in this seed come from current institution-controlled websites or current regulator/authorizer pages. This is evidence/enrichment input only: no canonical identity, merge, publication or fee inference is performed. Historical fee documents are intentionally excluded from current-fee assertions."
+}
