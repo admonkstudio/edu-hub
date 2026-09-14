@@ -1,0 +1,76 @@
+name: EDU-DATA-2 School Division Schema
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'infra/owned-data/005_international_registry.sql'
+      - 'infra/owned-data/006_bilingual_completion.sql'
+      - 'infra/owned-data/007_school_divisions.sql'
+      - '.github/workflows/edu-data-2-school-divisions.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  schema:
+    name: Validate pre-university division scope model
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:17-3.5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: eduhub_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d eduhub_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: eduhub_test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: sudo apt-get update -qq && sudo apt-get install -y postgresql-client
+      - name: Apply complete reference schema
+        run: |
+          psql -v ON_ERROR_STOP=1 -f infra/owned-data/001_raw_archive.sql
+          psql -v ON_ERROR_STOP=1 -f infra/owned-data/004_national_registry_layers.sql
+          psql -v ON_ERROR_STOP=1 -f infra/owned-data/005_international_registry.sql
+          psql -v ON_ERROR_STOP=1 -f infra/owned-data/006_bilingual_completion.sql
+          psql -v ON_ERROR_STOP=1 -f infra/owned-data/007_school_divisions.sql
+      - name: Assert division-scoped contract
+        run: |
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          do $$
+          begin
+            assert to_regclass('edu_core.school_divisions') is not null, 'missing school divisions';
+            assert to_regclass('edu_core.school_division_localizations') is not null, 'missing school division localizations';
+            assert to_regclass('edu_core.school_division_curricula') is not null, 'missing division curricula';
+            assert to_regclass('edu_core.school_division_accreditations') is not null, 'missing division accreditations';
+            assert to_regclass('edu_core.school_division_level_offerings') is not null, 'missing division level offerings';
+            assert to_regclass('edu_core.school_division_contacts') is not null, 'missing division contacts';
+            assert to_regclass('edu_core.school_division_admission_cycles') is not null, 'missing division admissions';
+            assert to_regclass('edu_core.school_division_fee_schedules') is not null, 'missing division fee schedules';
+            assert to_regclass('edu_core.school_division_completeness') is not null, 'missing division completeness';
+            assert exists(select 1 from edu_core.accreditation_bodies where code='cis'), 'missing CIS accreditation body';
+            assert exists(select 1 from edu_core.accreditation_bodies where code='uk_dfe_bso'), 'missing UK DfE BSO body';
+          end $$;
+          SQL
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          insert into edu_core.evidence_assertions(subject_type, subject_id, field_path, value_json)
+          values ('school_division','00000000-0000-0000-0000-000000000000','test.contract','"ok"'::jsonb);
+          rollback;
+          SQL
+      - name: Re-apply migration to verify idempotency
+        run: psql -v ON_ERROR_STOP=1 -f infra/owned-data/007_school_divisions.sql
