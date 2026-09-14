@@ -25,16 +25,20 @@ class HigherEdReconciliationTests(unittest.TestCase):
         self.assertEqual(report["mohesr_sector_occurrences"], 2)
         self.assertEqual(report["mohesr_distinct_normalized_names"], 1)
         self.assertEqual(report["mohesr_duplicate_sector_occurrences"], 1)
+        self.assertEqual(report["mohesr_unresolved_after_exact"], 0)
         self.assertEqual(report["automatic_identity_acceptances"], 0)
         self.assertFalse(exact[0]["automatic_acceptance"])
 
-    def test_fuzzy_candidate_never_auto_accepts(self):
+    def test_fuzzy_candidate_never_auto_accepts_or_reduces_unresolved_count(self):
         scu = [{"seed_id": "SCU-1", "name_ar": "المعهد العالي للحاسبات ونظم المعلومات", "higher_ed_category": "accredited_private_institute"}]
         mohesr = [{"source_record_id": "M-1", "name_raw": "معهد عالي للحاسبات و نظم المعلومات", "payload": {"category_raw": "computer_science"}}]
         exact, review, report = mod.reconcile(scu, mohesr, fuzzy_threshold=0.5)
         self.assertEqual(exact, [])
         self.assertEqual(len(review), 1)
         self.assertFalse(review[0]["automatic_acceptance"])
+        self.assertEqual(report["mohesr_unresolved_after_exact"], 1)
+        self.assertEqual(report["unmatched_mohesr_distinct_names"], 1)
+        self.assertEqual(report["mohesr_without_fuzzy_suggestion"], 0)
         self.assertEqual(report["edu_core_rows_created"], 0)
         self.assertFalse(report["core_mutation_performed"])
 
