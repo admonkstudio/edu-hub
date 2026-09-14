@@ -289,8 +289,8 @@ def validate_inputs(
     auc: dict,
 ) -> None:
     assert ib["directory_count_observed"] == len(ib["schools"]) == 54
-    assert ib_detail["records_count"] == len(ib_detail["records"]) == 8
-    assert ib_detail["eligible_private"] == 5
+    assert ib_detail["records_count"] == len(ib_detail["records"]) == 12
+    assert ib_detail["eligible_private"] == 9
     assert ib_detail["excluded_state"] == 3
     assert bso["records_count"] == len(bso["records"]) == 11
     assert bso_detail["records_count"] == len(bso_detail["records"]) == 11
