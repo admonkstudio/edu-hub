@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "purpose": "D2.3 official Arabic institution-name evidence",
+  "records_count": 4,
+  "records": [
+    {
+      "name_en": "Modern Education Schools",
+      "name_ar": "مدارس التربية الحديثة",
+      "locale": "ar-EG",
+      "localization_origin": "official_institution_source",
+      "source_url": "https://www.mes.edu.eg/%D8%B1%D9%85%D8%B6%D8%A7%D9%86-%D9%81%D9%89-%D9%85%D8%AF%D8%A7%D8%B1%D8%B3-%D8%A7%D9%84%D8%AA%D8%B1%D8%A8%D9%8A%D8%A9-%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AB%D8%A9/",
+      "source_observed_date": "2026-03-25",
+      "source_recency_state": "current",
+      "review_state": "official_name_evidence_ready"
+    },
+    {
+      "name_en": "British International School Madinaty",
+      "name_ar": "المدرسة البريطانية الدولية بمدينتي",
+      "locale": "ar-EG",
+      "localization_origin": "official_institution_source",
+      "source_url": "https://www.bism-cairo.com/About-Us/Philosophy-and-Mission",
+      "source_observed_date": "2026-09-15",
+      "source_recency_state": "current",
+      "review_state": "official_name_evidence_ready"
+    },
+    {
+      "name_en": "GEMS British School Al Rehab",
+      "name_ar": "المدرسة البريطانية في الرحاب",
+      "locale": "ar-EG",
+      "localization_origin": "official_institution_source",
+      "source_url": "https://www.tbs-cairo.com/-/media/project/gems/tbs_gems_british_school_al_rehab_cairo/_files-and-documents/tbs-pdf/gems-tbs-safeguarding-policy.pdf",
+      "source_observed_date": "2019-09-01",
+      "source_recency_state": "historical_official_name_needs_current_revalidation",
+      "review_state": "official_historical_name_evidence"
+    },
+    {
+      "name_en": "Cairo English School",
+      "name_ar": "مدرسة القاهرة الإنجليزية",
+      "locale": "ar-EG",
+      "localization_origin": "official_institution_source",
+      "source_url": "https://www.cesegypt.com/uploaded/newsletters/Learning_morning_FS_13111.pdf",
+      "source_observed_date": "2011-01-13",
+      "source_recency_state": "historical_official_name_needs_current_revalidation",
+      "review_state": "official_historical_name_evidence"
+    }
+  ],
+  "notes": "Only Arabic names visibly used by the institution itself are included. Historical institution-origin names are preserved as official evidence but remain explicitly flagged for current revalidation rather than silently treated as current."
+}
