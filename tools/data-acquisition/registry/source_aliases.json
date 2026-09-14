@@ -58,11 +58,39 @@
       "default_candidate_status": "ready"
     },
     {
+      "raw_source_id": "mohesr_private_institutes_dportal",
+      "registry_source_id": "mohesr_private_higher_institutes",
+      "authority_class": "primary_official_registry",
+      "coverage_credit": "current",
+      "default_candidate_status": "ready"
+    },
+    {
       "raw_source_id": "mohesr_technical_institutes",
       "registry_source_id": "mohesr_technical_institutes",
       "authority_class": "primary_official_registry",
       "coverage_credit": "current",
       "default_candidate_status": "ready"
+    },
+    {
+      "raw_source_id": "mohesr_technical_institutes_official",
+      "registry_source_id": "mohesr_technical_institutes",
+      "authority_class": "primary_official_registry",
+      "coverage_credit": "current",
+      "default_candidate_status": "ready"
+    },
+    {
+      "raw_source_id": "mohesr_technological_colleges_official",
+      "registry_source_id": "mohesr_technological_colleges",
+      "authority_class": "primary_official_registry",
+      "coverage_credit": "current",
+      "default_candidate_status": "ready"
+    },
+    {
+      "raw_source_id": "mohesr_tourism_hotels_2026_republication",
+      "registry_source_id": null,
+      "authority_class": "secondary_directory",
+      "coverage_credit": "none",
+      "default_candidate_status": "needs_review"
     }
   ]
 }
