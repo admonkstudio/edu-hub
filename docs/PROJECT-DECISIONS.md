@@ -238,6 +238,22 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 **Reference builder:** `tools/data-acquisition/international/build_reviewed_campus_artifacts.py`.
 
+## 2026-09-15 — Incremental explicit identity-review batches are additive
+
+**Decision:** Once a D2.2 review base is accepted, additional explicit single-source identity decisions are added through dated checked-in review batches rather than by rewriting the accepted historical decision package.
+
+**Decision:** Every incremental identity row must target an exact source key that is still present in the explicit unreviewed queue, remain scope-eligible, preserve the source identity/name, and carry high-confidence primary or authoritative evidence. An unmatched row is never unique merely because no duplicate proposal exists.
+
+**Decision:** Incremental identity batches may not retarget a source row already covered by an institution/division review, reuse an existing review identity key, automatically merge identities, or change source IDs. Duplicate batch IDs or duplicate target rows are contract failures.
+
+**Decision:** Incremental identity materialization remains portable review output only: zero automatic identity creation, zero automatic merges, zero canonical/runtime database writes and zero public projection.
+
+**Decision:** The first accepted incremental identity batch resolves the four current KMK-recognized German-school source rows as explicit reviewed identities while preserving the separate known-distinct decision between `Europaschule Kairo` and the IB-listed `Europa Schule Neu Kairo`.
+
+**Reference builder:** `tools/data-acquisition/international/build_incremental_identity_review_artifacts.py`.
+
+**Accepted validation:** `EDU-DATA-2 Incremental Identity Review` run `34908639710`.
+
 ## Deferred decisions until database completion
 
 - Astro-first vs Instatic-first final implementation choice;
