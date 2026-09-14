@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.2_explicit_single_source_identity_review",
+  "batch_id": "batch2-kmk-german-schools",
+  "review_method": "primary_or_authoritative_evidence_explicit_review_no_uniqueness_inference",
+  "records_count": 4,
+  "records": [
+    {
+      "review_identity_key": "deutsche-evangelische-oberschule-kairo",
+      "source_id": "kmk_german_schools_2026_04",
+      "source_record_id": "kmk_german_schools_2026_04:658d02e1887f1b01d7c0",
+      "source_name": "Deutsche Evangelische Oberschule Kairo",
+      "provisional_canonical_name_en": "Deutsche Evangelische Oberschule Kairo",
+      "decision": "confirmed_single_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://www.kmk.org/fileadmin/Dateien/veroeffentlichungen_beschluesse/2026/2026_04_00-Uebersicht-Deutsche-Auslandsschulen.pdf",
+        "https://deokairo.com/",
+        "https://deokairo.com/ueber-uns/impressum/"
+      ],
+      "review_note": "The April 2026 KMK recognized-German-schools list and the current first-party DEO Cairo site resolve to the same Cairo institution. This explicit identity review does not infer uniqueness from absence of another matcher hit and does not claim that campus topology is complete."
+    },
+    {
+      "review_identity_key": "deutsche-schule-der-borromaeerinnen-kairo",
+      "source_id": "kmk_german_schools_2026_04",
+      "source_record_id": "kmk_german_schools_2026_04:71432f3d074f03ca8d8a",
+      "source_name": "Deutsche Schule der Borromäerinnen Kairo",
+      "provisional_canonical_name_en": "Deutsche Schule der Borromäerinnen Kairo",
+      "decision": "confirmed_single_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://www.kmk.org/fileadmin/Dateien/veroeffentlichungen_beschluesse/2026/2026_04_00-Uebersicht-Deutsche-Auslandsschulen.pdf",
+        "https://www.dsbkairo.de/de/deutsche-schule-der-borromaeerinnen-kairo",
+        "https://www.dsbkairo.de/de/impressum"
+      ],
+      "review_note": "KMK and current first-party DSB Cairo evidence resolve to one Cairo school identity. Shared Borromaeerinnen governance/history with the Alexandria school is not treated as evidence that the Cairo and Alexandria schools are one institution."
+    },
+    {
+      "review_identity_key": "deutsche-schule-der-borromaeerinnen-alexandria",
+      "source_id": "kmk_german_schools_2026_04",
+      "source_record_id": "kmk_german_schools_2026_04:8d5c0f28a50a4eae8915",
+      "source_name": "Deutsche Schule der Borromäerinnen Alexandria",
+      "provisional_canonical_name_en": "Deutsche Schule der Borromäerinnen Alexandria",
+      "decision": "confirmed_single_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://www.kmk.org/fileadmin/Dateien/veroeffentlichungen_beschluesse/2026/2026_04_00-Uebersicht-Deutsche-Auslandsschulen.pdf",
+        "https://dsb-alexandria.de/",
+        "https://dsb-alexandria.de/ueber-uns/"
+      ],
+      "review_note": "KMK and current first-party DSB Alexandria evidence resolve to the Alexandria school identity. It remains distinct from the separately evidenced Cairo sister school; common institutional tradition or operator relationships must not collapse the two identities."
+    },
+    {
+      "review_identity_key": "europaschule-kairo",
+      "source_id": "kmk_german_schools_2026_04",
+      "source_record_id": "kmk_german_schools_2026_04:6cffd932022f11807370",
+      "source_name": "Europaschule Kairo",
+      "provisional_canonical_name_en": "Europaschule Kairo",
+      "decision": "confirmed_single_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://www.kmk.org/fileadmin/Dateien/veroeffentlichungen_beschluesse/2026/2026_04_00-Uebersicht-Deutsche-Auslandsschulen.pdf",
+        "https://europaschulekairo.com/",
+        "https://europaschulekairo.com/leitbild/"
+      ],
+      "review_note": "KMK and current first-party Europaschule Kairo evidence resolve to one recognized German school identity. The separate reviewed known-distinct decision for Europa Schule Neu Kairo versus Europaschule Kairo remains authoritative and blocks a false cross-source merge between the two schools."
+    }
+  ],
+  "safety": {
+    "absence_of_match_treated_as_uniqueness_proof": false,
+    "automatic_identity_creation_performed": false,
+    "automatic_merges_performed": 0,
+    "canonical_database_rows_written": 0,
+    "runtime_database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
