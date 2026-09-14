@@ -178,6 +178,20 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 **Decision:** Only reviewed public projections are eligible for publication/indexing.
 
+## 2026-09-15 — Pre-university curriculum divisions are first-class subentities
+
+**Decision:** A school institution, a physical campus, and a curriculum/language/phase division are distinct concepts. A British, American, French, IB or other section operating inside the same school/campus must not be silently duplicated as a separate canonical institution merely because an accreditor or source lists that section independently.
+
+**Decision:** Division-specific evidence must retain its real scope. French homologation, Cognia accreditation, BSO/inspection evidence, curriculum offerings, admissions, contacts or fees that apply to one division must not automatically be promoted to the entire institution.
+
+**Decision:** The canonical reference model therefore includes `school_divisions` below institution/campus identity, with bilingual localizations and division-scoped curricula, certificates, languages, accreditation, education levels, contacts, admissions, fees and completeness metrics.
+
+**Decision:** Cross-source reconciliation may conclude `same institution, different curriculum division` without forcing either a duplicate institution or an institution-wide factual assertion.
+
+**Evidence motivating this decision:** current official institution evidence shows Misr Language Schools operating National, British, American, French and other sections, and El Alsson operating British and American schools/sections within one institutional identity/campus structure.
+
+**Reference migration:** `infra/owned-data/007_school_divisions.sql`.
+
 ## Deferred decisions until database completion
 
 - Astro-first vs Instatic-first final implementation choice;
