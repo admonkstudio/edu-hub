@@ -75,6 +75,7 @@ jobs:
           seed_dir = Path('tools/data-acquisition/international/seeds')
           ib = json.loads((seed_dir/'ib-egypt-directory-2026-09-14.json').read_text(encoding='utf-8'))
           ib_detail = json.loads((seed_dir/'ib-detail-evidence-2026-09-14.json').read_text(encoding='utf-8'))
+          ib_detail_incremental = json.loads((seed_dir/'ib-detail-evidence-2026-09-15.json').read_text(encoding='utf-8'))
           bso = json.loads((seed_dir/'uk-dfe-bso-egypt-2026-08-26.json').read_text(encoding='utf-8'))
           bso_detail = json.loads((seed_dir/'uk-dfe-gias-bso-egypt-detail-2026-09-14.json').read_text(encoding='utf-8'))
           fr = json.loads((seed_dir/'french-homologation-egypt-2026-2027.json').read_text(encoding='utf-8'))
@@ -87,6 +88,12 @@ jobs:
           assert len(ib_detail['records']) == ib_detail['records_count'] == 7
           assert ib_detail['eligible_private'] == 4
           assert ib_detail['excluded_state'] == 3
+          assert len(ib_detail_incremental['records']) == ib_detail_incremental['records_count'] == 1
+          assert ib_detail_incremental['eligible_private'] == 1
+          assert ib_detail_incremental['excluded_state'] == 0
+          assert ib_detail_incremental['records'][0]['name'] == 'Evolution International School - NewGiza'
+          assert ib_detail_incremental['records'][0]['type'] == 'PRIVATE'
+          assert ib_detail_incremental['records'][0]['scope_state'] == 'eligible'
           assert len(bso['records']) == bso['records_count'] == 11
           assert bso['list_updated'] == '2026-08-26'
           assert len(bso_detail['records']) == bso_detail['records_count'] == 11
@@ -100,7 +107,7 @@ jobs:
           assert all(row['public_use_allowed'] is True for row in media['assets'])
           assert all(row['rights_basis'] for row in media['assets'])
           assert all(row['identity_match_state'] == 'verified_by_file_description' for row in media['assets'])
-          print(f"validated {len(ids)} registered sources, 96 source rows, 11 BSO/GIAS detail rows, 7 IB detail decisions and 5 reviewed media assets")
+          print(f"validated {len(ids)} registered sources, 96 source rows, 11 BSO/GIAS detail rows, 8 IB detail decisions and 5 reviewed media assets")
           PY
       - name: Test live-parser and scope boundaries
         run: python tools/data-acquisition/international/test_acquisition.py
@@ -133,10 +140,11 @@ jobs:
           data = json.loads(p.read_text(encoding='utf-8'))
           assert data['source_rows'] == 96
           assert data['source_counts']['uk_dfe_bso_egypt_2026_08'] == 11
-          assert data['eligible_source_rows'] == 35
-          assert data['candidate_source_rows'] == 58
+          assert data['eligible_source_rows'] == 36
+          assert data['candidate_source_rows'] == 57
           assert data['excluded_source_rows'] == 3
-          assert data['ib_detail_rows_applied'] == 7
+          assert data['ib_detail_rows_applied'] == 8
+          assert data['ib_detail_snapshot_counts'] == {'2026-09-14': 7, '2026-09-15': 1}
           assert data['bso_detail_rows_applied'] == 11
           assert data['unique_institutions_claimed'] is None
           assert data['identity_reconciliation_required'] is True
@@ -147,6 +155,9 @@ jobs:
           universe = json.loads(Path('artifacts/international/candidate-universe/candidate-universe-summary.json').read_text(encoding='utf-8'))
           assert universe['source_record_count'] == 96
           assert universe['source_counts']['uk_dfe_bso_egypt_2026_08'] == 11
+          assert universe['scope_or_lead_state_counts']['eligible'] == 36
+          assert universe['scope_or_lead_state_counts']['candidate'] == 57
+          assert universe['scope_or_lead_state_counts']['excluded'] == 3
           assert universe['english_name_present'] == 96
           assert universe['arabic_name_present'] == 9
           assert universe['bilingual_name_gap_count'] == 87
@@ -256,4 +267,5 @@ jobs:
           echo "IB currently returns HTTP 403 to GitHub-hosted direct Python requests, so a 403 is not treated as source absence."
           echo "Edarabia is reference-only under its published terms unless written reuse permission is obtained."
           echo "UK DfE BSO is authoritative international-model evidence; private/independent ownership is still reviewed separately."
+          echo "Incremental IB detail evidence is source-dated and applied without rewriting older evidence snapshots."
           echo "Live fetch scripts remain available for suitable environments, but deterministic CI uses dated evidence snapshots."
