@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.1_accreditor_expansion_scope_review",
+  "review_method": "source_backed_scope_review_no_identity_merge",
+  "records_count": 10,
+  "records": [
+    {
+      "source_id": "cis_international_accreditation_egypt",
+      "source_record_id": "cis_international_accreditation_egypt:eaac72bb1a3907e96769",
+      "name": "Evolution International School",
+      "scope_state": "eligible",
+      "ownership_scope": "private_independent",
+      "scope_basis": "reviewed_same_identity_as_current_private_ib_school",
+      "evidence_urls": [
+        "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/re-accredited-evolution-international-school-egypt",
+        "https://www-prod.ibo.org/school/061134/",
+        "https://eisng.lvng.net/"
+      ],
+      "review_note": "The CIS row is already reviewed as the same institution as Evolution International School - NewGiza in IB. Current accepted IB detail evidence classifies that identity PRIVATE, while CIS remains a separate accreditation assertion."
+    },
+    {
+      "source_id": "cis_international_accreditation_egypt",
+      "source_record_id": "cis_international_accreditation_egypt:0ddc1985dbaaa9918e97",
+      "name": "Cairo English School",
+      "scope_state": "eligible",
+      "ownership_scope": "private_independent",
+      "scope_basis": "reviewed_same_identity_as_current_private_ib_school",
+      "evidence_urls": [
+        "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/re-accredited-cairo-english-school-egypt",
+        "https://ibo.org/en/school/004939/",
+        "https://www.cesegypt.com/"
+      ],
+      "review_note": "The CIS row is already reviewed as the same institution as Cairo English School in IB. Current accepted IB detail evidence classifies that identity PRIVATE."
+    },
+    {
+      "source_id": "cis_international_accreditation_egypt",
+      "source_record_id": "cis_international_accreditation_egypt:8ca9dc5843190638cc14",
+      "name": "NCBIS - New Cairo British International School",
+      "scope_state": "eligible",
+      "ownership_scope": "private_independent",
+      "scope_basis": "reviewed_same_identity_as_current_private_ib_school",
+      "evidence_urls": [
+        "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/re-accredited-ncbis-new-cairo-british-international-school-egypt",
+        "https://ibo.org/fr/programmes/find-an-ib-school/ibaem/n/new-cairo-british-international-school/",
+        "https://ncbis.co.uk/"
+      ],
+      "review_note": "The CIS row is already reviewed under the NCBIS institutional identity with current IB and BSO evidence. Current accepted IB detail classifies the identity PRIVATE."
+    },
+    {
+      "source_id": "cis_international_accreditation_egypt",
+      "source_record_id": "cis_international_accreditation_egypt:e69a14b98712d28196aa",
+      "name": "The British School Al Rehab",
+      "scope_state": "eligible",
+      "ownership_scope": "private_group_operated",
+      "scope_basis": "current_cis_plus_current_gems_private_provider_membership",
+      "evidence_urls": [
+        "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/newly-accredited-the-british-school-al-rehab-egypt",
+        "https://www.gemseducation.com/en/Our-Schools/All-Our-Schools/GEMS-British-School-Al-Rehab",
+        "https://www.gemseducation.com/en/We-Are-GEMS/Our-Company"
+      ],
+      "review_note": "CIS identifies the current international-school accreditation event. GEMS Education's current school directory identifies GEMS British School Al Rehab as a GEMS school, while GEMS describes itself as a private K-12 education provider."
+    },
+    {
+      "source_id": "cis_international_accreditation_egypt",
+      "source_record_id": "cis_international_accreditation_egypt:20245064fbea7b096b0e",
+      "name": "The British School Madinaty",
+      "scope_state": "eligible",
+      "ownership_scope": "private_group_operated",
+      "scope_basis": "current_cis_plus_current_gems_private_provider_membership",
+      "evidence_urls": [
+        "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/newly-accredited-the-british-school-madinaty-egypt",
+        "https://www.gemseducation.com/en/Our-Schools/All-Our-Schools/GEMS-British-International-School-Madinaty",
+        "https://www.gemseducation.com/en/We-Are-GEMS/Our-Company"
+      ],
+      "review_note": "CIS identifies the school accreditation event under its earlier/current source name. Current GEMS records identify the institution as GEMS British International School Madinaty and GEMS describes itself as a private K-12 education provider. The source-name variant still requires D2.2 identity normalization, but the international/private scope gate is satisfied."
+    },
+    {
+      "source_id": "cis_international_accreditation_egypt",
+      "source_record_id": "cis_international_accreditation_egypt:d16ab561b7456b2d4d40",
+      "name": "Cairo American College",
+      "scope_state": "eligible",
+      "ownership_scope": "private_independent",
+      "scope_basis": "reviewed_same_identity_as_current_private_ib_school",
+      "evidence_urls": [
+        "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/re-accredited-cairo-american-college-egypt",
+        "https://ibo.org/school/000708/",
+        "https://www.cacegypt.org/"
+      ],
+      "review_note": "The CIS row is already reviewed as the same institution as Cairo American College in IB. Current accepted IB detail evidence classifies that identity PRIVATE."
+    },
+    {
+      "source_id": "cognia_member_milestones_egypt_2026_2027",
+      "source_record_id": "cognia_member_milestones_egypt_2026_2027:6dee58e42173aaa96882",
+      "name": "Misr Language Schools- American Division",
+      "scope_state": "eligible",
+      "ownership_scope": "private_independent",
+      "scope_basis": "reviewed_division_under_current_private_ib_institution",
+      "evidence_urls": [
+        "https://www.cognia.org/member-milestones/",
+        "https://mls-egypt.org/wp-content/uploads/2024/11/MLS-IBDP-Student-Parent-Handbook.pdf",
+        "https://ibo.org/en/school/051897"
+      ],
+      "review_note": "The Cognia row is already reviewed as the American Division of Misr Language Schools rather than a separate institution. Current direct IB detail review classifies the parent school identity PRIVATE; Cognia evidence remains division-scoped."
+    },
+    {
+      "source_id": "cognia_member_milestones_egypt_2026_2027",
+      "source_record_id": "cognia_member_milestones_egypt_2026_2027:bba887d2d0c7f11d4902",
+      "name": "Modern Education Schools",
+      "scope_state": "eligible",
+      "ownership_scope": "private_company_operated",
+      "scope_basis": "current_cognia_plus_first_party_private_company_and_international_divisions",
+      "evidence_urls": [
+        "https://www.cognia.org/member-milestones/",
+        "https://www.mes.edu.eg/about-us/",
+        "https://www.mes.edu.eg/"
+      ],
+      "review_note": "Current first-party evidence states that Modern Education Schools was established by El-Sharq For Educational Services Company and operates National, British and American divisions. The Cognia milestone strengthens the American-division accreditation evidence; it must not be flattened onto every division."
+    },
+    {
+      "source_id": "cognia_member_milestones_egypt_2026_2027",
+      "source_record_id": "cognia_member_milestones_egypt_2026_2027:258f97ab14aec6fbf25f",
+      "name": "Narmer American College",
+      "scope_state": "eligible",
+      "ownership_scope": "private_independent",
+      "scope_basis": "reviewed_same_identity_as_current_private_ib_school",
+      "evidence_urls": [
+        "https://www.cognia.org/member-milestones/",
+        "https://ibo.org/school/051886/",
+        "https://www.nac.edu.eg/college/"
+      ],
+      "review_note": "The Cognia row is already reviewed as the same institution as Narmer American College in IB. Current accepted IB detail evidence classifies the identity PRIVATE."
+    },
+    {
+      "source_id": "cognia_member_milestones_egypt_2026_2027",
+      "source_record_id": "cognia_member_milestones_egypt_2026_2027:04bead0527606cd5e1b7",
+      "name": "Port Said American School",
+      "scope_state": "eligible",
+      "ownership_scope": "independent_nonprofit_educational_cooperative",
+      "scope_basis": "current_cognia_plus_first_party_american_section_and_national_institute_cooperative_status",
+      "evidence_urls": [
+        "https://www.cognia.org/member-milestones/",
+        "https://portsaidschools.org/american-section",
+        "https://portsaidschools.org/national-section",
+        "https://nis-alqawmia.com/?p=89",
+        "https://moe.gov.eg/ar/search?pageIndex=-3&types=7337"
+      ],
+      "review_note": "Current first-party Port Said Schools evidence identifies PSAS as the American section and describes Port Said Schools as a non-profit organisation. The General Association of National Institutes explains that national-institute schools are managed through educational cooperative associations and elected boards under Law 1/1990 and Ministry supervision; the MOE law index publishes that law. This is treated as independent/cooperative non-public operation, not an Egyptian state-school identity. The Cognia evidence applies to the American section and should be modeled division-scoped in D2.2."
+    }
+  ],
+  "summary": {
+    "reviewed_rows": 10,
+    "eligible_rows": 10,
+    "excluded_rows": 0,
+    "needs_review_rows": 0
+  },
+  "safety": {
+    "source_record_ids_changed": 0,
+    "identity_merges_performed": 0,
+    "canonical_database_rows_written": 0,
+    "runtime_database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
