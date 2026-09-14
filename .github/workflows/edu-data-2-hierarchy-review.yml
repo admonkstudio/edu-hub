@@ -1,0 +1,119 @@
+name: EDU-DATA-2 Hierarchy Review
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'tools/data-acquisition/international/build_authoritative_seed.py'
+      - 'tools/data-acquisition/international/apply_ib_detail_batches.py'
+      - 'tools/data-acquisition/international/apply_bso_scope_review.py'
+      - 'tools/data-acquisition/international/build_accreditor_expansion.py'
+      - 'tools/data-acquisition/international/apply_accreditor_scope_review.py'
+      - 'tools/data-acquisition/international/build_extended_identity_artifacts.py'
+      - 'tools/data-acquisition/international/build_hierarchy_review_artifacts.py'
+      - 'tools/data-acquisition/international/seeds/ib-detail-evidence-*-batch*.json'
+      - 'tools/data-acquisition/international/seeds/bso-scope-review-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/accreditor-scope-review-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/identity-review-decisions-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/single-source-identity-decisions-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/division-review-decisions-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/hierarchy-review-decisions-2026-09-15.json'
+      - '.github/workflows/edu-data-2-hierarchy-review.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hierarchy:
+    name: Validate reviewed parent and division hierarchy artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile data tools
+        run: |
+          python -m py_compile tools/data-acquisition/international/build_authoritative_seed.py
+          python -m py_compile tools/data-acquisition/international/apply_ib_detail_batches.py
+          python -m py_compile tools/data-acquisition/international/apply_bso_scope_review.py
+          python -m py_compile tools/data-acquisition/international/build_accreditor_expansion.py
+          python -m py_compile tools/data-acquisition/international/apply_accreditor_scope_review.py
+          python -m py_compile tools/data-acquisition/international/build_extended_identity_artifacts.py
+          python -m py_compile tools/data-acquisition/international/build_hierarchy_review_artifacts.py
+      - name: Build fully scope-reviewed 106-row source universe
+        run: |
+          python tools/data-acquisition/international/build_authoritative_seed.py --output-dir artifacts/international
+          python tools/data-acquisition/international/apply_ib_detail_batches.py
+          python tools/data-acquisition/international/apply_bso_scope_review.py
+          python tools/data-acquisition/international/build_accreditor_expansion.py \
+            --base artifacts/international/bso-scope-review/authoritative-source-candidates-with-bso-scope-review.jsonl \
+            --output-dir artifacts/international/bso-scope-review/accreditor-expansion
+          python tools/data-acquisition/international/apply_accreditor_scope_review.py
+      - name: Build extended identity review artifacts
+        run: python tools/data-acquisition/international/build_extended_identity_artifacts.py
+      - name: Materialize explicit institution-division hierarchies
+        run: python tools/data-acquisition/international/build_hierarchy_review_artifacts.py
+      - name: Assert hierarchy review safety contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('artifacts/international/hierarchy-review')
+          summary = json.loads((root/'hierarchy-review-summary.json').read_text(encoding='utf-8'))
+          institutions = [json.loads(line) for line in (root/'reviewed-institution-drafts.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          divisions = [json.loads(line) for line in (root/'reviewed-school-division-drafts.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          scoped = [json.loads(line) for line in (root/'division-source-scope-memberships.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          queue = [json.loads(line) for line in (root/'unreviewed-source-queue.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+
+          assert summary['source_universe_rows'] == 106
+          assert summary['base_reviewed_institution_drafts'] == 19
+          assert summary['new_first_party_parent_institutions'] == 1
+          assert summary['reviewed_institution_drafts'] == len(institutions) == 20
+          assert summary['base_reviewed_division_drafts'] == 4
+          assert summary['new_reviewed_division_drafts'] == 6
+          assert summary['reviewed_division_drafts'] == len(divisions) == 10
+          assert summary['division_source_scope_memberships'] == len(scoped) == 2
+          assert summary['newly_reviewed_source_rows_via_division_scope'] == 1
+          assert summary['reviewed_unique_source_rows'] == 31
+          assert summary['unreviewed_source_rows'] == len(queue) == 75
+          assert summary['full_universe_unique_institution_count_claimed'] is None
+          assert summary['automatic_hierarchy_inference_performed'] is False
+          assert summary['source_row_forced_to_institution_level'] is False
+          assert summary['automatic_merges_performed'] == 0
+          assert summary['canonical_database_rows_written'] == 0
+          assert summary['runtime_database_mutation_performed'] is False
+          assert summary['public_projection_rows_created'] == 0
+
+          by_key = {row['review_identity_key']: row for row in institutions}
+          assert 'modern-education-schools' in by_key
+          assert 'port-said-schools' in by_key
+          assert by_key['port-said-schools']['source_record_count'] == 0
+          assert by_key['port-said-schools']['created_from_absence_of_match'] is False
+
+          division_keys = {(row['review_identity_key'], row['division_key']) for row in divisions}
+          for key in {
+              ('modern-education-schools','national'),
+              ('modern-education-schools','british'),
+              ('modern-education-schools','american'),
+              ('port-said-schools','national'),
+              ('port-said-schools','british'),
+              ('port-said-schools','american'),
+          }:
+              assert key in division_keys
+
+          port_said = [row for row in scoped if row['review_identity_key'] == 'port-said-schools']
+          assert len(port_said) == 1
+          assert port_said[0]['division_key'] == 'american'
+          assert port_said[0]['source_id'] == 'cognia_member_milestones_egypt_2026_2027'
+
+          print(json.dumps(summary, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-hierarchy-review
+          path: artifacts/international/hierarchy-review/
+          if-no-files-found: error
