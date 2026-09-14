@@ -85,8 +85,10 @@ jobs:
           memberships = [json.loads(line) for line in (root/'discovered-source-memberships.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
           original_queue = [json.loads(line) for line in (root/'original-unreviewed-source-queue.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
           discovery_queue = [json.loads(line) for line in (root/'unqualified-discovery-queue.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          qualified_queue = [json.loads(line) for line in (root/'qualified-discovery-identity-queue.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
 
           assert summary['base_reviewed_institution_drafts'] == 24
+          assert summary['discovery_identity_review_batches'] == 1
           assert summary['new_discovered_identity_drafts'] == len(memberships) == 2
           assert summary['reviewed_institution_drafts'] == len(institutions) == 26
           assert summary['reviewed_division_drafts'] == len(divisions) == 10
@@ -94,7 +96,8 @@ jobs:
           assert summary['reviewed_discovery_source_rows'] == 2
           assert summary['reviewed_source_or_lead_rows'] == 37
           assert summary['original_unreviewed_source_rows'] == len(original_queue) == 71
-          assert summary['unqualified_discovery_rows'] == len(discovery_queue) == 33
+          assert summary['unqualified_discovery_rows'] == len(discovery_queue) == 68
+          assert summary['qualified_discovery_rows_pending_identity_review'] == len(qualified_queue) == 0
           assert summary['full_universe_unique_institution_count_claimed'] is None
           assert summary['absence_of_match_treated_as_uniqueness_proof'] is False
           assert summary['unqualified_discovery_rows_entered_identity_review'] is False
