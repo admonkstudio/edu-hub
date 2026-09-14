@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "source_id": "ib_world_schools_egypt",
+  "snapshot_date": "2026-09-15",
+  "integration_state": "captured_pending_deterministic_seed_integration",
+  "notes": "Final incremental batch needed to complete direct current IB ownership/type review for all 54 captured Egypt directory identities. PRIVATE classification is taken from the current official IB profile for each exact identity. Evidence is additive and source identities remain unchanged.",
+  "records": [
+    {
+      "name": "Notion International School",
+      "ib_school_code": "052366",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.notion-edu.com",
+      "phone": "+200237465406",
+      "address": "20 Metwally El Shaarawy St., Lebiny, Giza, Cairo, Egypt",
+      "source_url": "https://ibo.org/fr/programmes/find-an-ib-school/ibaem/n/notion-international-school/"
+    },
+    {
+      "name": "Princeton International School",
+      "ib_school_code": "061332",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.princetoninternationalschool.net",
+      "phone": "+2001001595449",
+      "address": "Section 4, Ziznia District, beside AUC Gate 4, Fifth Settlement, New Cairo, Cairo 11835, Egypt",
+      "source_url": "https://ibo.org/en/school/061332/"
+    },
+    {
+      "name": "Rahn Schulen Kairo",
+      "ib_school_code": "051542",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.rahn.education",
+      "phone": null,
+      "address": "Plot 15, Al-Istesthmar Region, El-Kattamia, Cairo, Egypt",
+      "source_url": "https://ibo.org/fr/programmes/find-an-ib-school/ibaem/a/rahn-schulen-kairo/"
+    },
+    {
+      "name": "Royal Canadian School Cairo",
+      "ib_school_code": "062996",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "royalcanadianschool.com/",
+      "phone": "+201287810526",
+      "address": "Plot D2-SC-3, Residential Neighbourhood R-2, New Administrative Capital, Cairo, Egypt",
+      "source_url": "https://ibo.org/fr/programmes/find-an-ib-school/ibaem2/r/royal-canadian-school-cairo/"
+    },
+    {
+      "name": "Salahaldin International School",
+      "ib_school_code": "062309",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "sis.edu.eg/cairo/",
+      "phone": "+201033337291",
+      "address": "Land 90, North 90th Street, Yasmeen Area 8, Fifth Settlement, New Cairo, Cairo 11835, Egypt",
+      "source_url": "https://ibo.org/school/062309/"
+    },
+    {
+      "name": "Schutz American School",
+      "ib_school_code": "061960",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.schutzschool.org.eg/",
+      "phone": null,
+      "address": "51 Schutz Street, PO Box 1000, Alexandria 21111, Egypt",
+      "source_url": "https://ibo.org/fr/school/061960/"
+    },
+    {
+      "name": "Uptown International School",
+      "ib_school_code": "061856",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.uisegypt.com",
+      "phone": "+2001226846380",
+      "address": "Plot 2 on Block 6092, 58 Street Part G, Moqattam, Cairo 11571, Egypt",
+      "source_url": "https://ibo.org/programmes/find-an-ib-school/ibaem2/u/uptown-international-school/"
+    }
+  ],
+  "records_count": 7,
+  "eligible_private": 7,
+  "excluded_state": 0
+}
