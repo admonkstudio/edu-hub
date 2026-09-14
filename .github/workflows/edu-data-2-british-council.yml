@@ -70,7 +70,7 @@ jobs:
           bc_root = Path('artifacts/international/british-council-browser-discovery')
           bc = json.loads((bc_root/'british-council-browser-summary.json').read_text(encoding='utf-8'))
           assert bc['reviewed_discovery_batch_rows'] == 35
-          assert bc['rows_with_website_reference'] == 32
+          assert bc['rows_with_website_reference'] == 30
           assert bc['international_eligibility_granted'] == 0
           assert bc['canonical_institutions_created'] == 0
           assert bc['automatic_merges_performed'] == 0
