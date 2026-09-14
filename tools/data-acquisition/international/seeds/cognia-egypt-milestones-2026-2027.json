@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "source_id": "cognia_member_milestones_egypt_2026_2027",
+  "publisher": "Cognia",
+  "authority_class": "recognized_accreditor",
+  "snapshot_date": "2026-09-15",
+  "source_url": "https://www.cognia.org/member-milestones/",
+  "source_role": "accreditation_evidence_and_candidate_discovery",
+  "milestone_school_year": "2026-2027",
+  "records_count": 4,
+  "records": [
+    {
+      "name": "Misr Language Schools- American Division",
+      "country": "Egypt",
+      "accreditation_milestone_years": 25,
+      "scope_state": "candidate",
+      "scope_class": "international_school",
+      "eligibility_pending": "verify_international_school_model_and_private_or_independent_ownership"
+    },
+    {
+      "name": "Modern Education Schools",
+      "country": "Egypt",
+      "accreditation_milestone_years": 25,
+      "scope_state": "candidate",
+      "scope_class": "international_school",
+      "eligibility_pending": "verify_international_school_model_and_private_or_independent_ownership"
+    },
+    {
+      "name": "Narmer American College",
+      "country": "Egypt",
+      "accreditation_milestone_years": 25,
+      "scope_state": "candidate",
+      "scope_class": "international_school",
+      "eligibility_pending": "verify_international_school_model_and_private_or_independent_ownership"
+    },
+    {
+      "name": "Port Said American School",
+      "country": "Egypt",
+      "accreditation_milestone_years": 25,
+      "scope_state": "candidate",
+      "scope_class": "international_school",
+      "eligibility_pending": "verify_international_school_model_and_private_or_independent_ownership"
+    }
+  ],
+  "notes": "Cognia's 2026-2027 member milestone page identifies these Egypt institutions as reaching 25 years of accreditation. Accreditation alone does not establish Edu Hub international-school scope; the school model and ownership boundary remain separate review gates."
+}
