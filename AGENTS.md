@@ -48,7 +48,6 @@ The canonical reusable studio system remains in `admonkstudio/admonk`.
 For relevant work, inspect the current canonical skill before implementation, especially:
 
 - `.agents/skills/admonk-astro/SKILL.md`
-- `.agents/skills/admonk-supabase/SKILL.md`
 - `.agents/skills/admonk-seo/SKILL.md`
 - `.agents/skills/admonk-localization/SKILL.md`
 - `.agents/skills/admonk-performance/SKILL.md`
@@ -57,6 +56,8 @@ For relevant work, inspect the current canonical skill before implementation, es
 - `.agents/skills/admonk-ux-systems/SKILL.md`
 - `.agents/skills/admonk-design-quality/SKILL.md`
 - `.agents/skills/admonk-web-design/SKILL.md`
+
+Do not assume Supabase for Edu Hub and do not apply Supabase-specific skills or architecture unless the project owner explicitly reverses the current decision.
 
 Do not duplicate the entire Admonk skill library into this repository.
 
@@ -81,9 +82,43 @@ Phase 1 includes directory, editorial, research/admin, bilingual SEO architectur
 
 Do not implement Phase 2 commercial functions unless a later approved issue explicitly adds them. This includes subscriptions, premium listings, advertising marketplace, lead selling, institution dashboards, applications, consultant marketplace, and payment flows.
 
-## 6. Astro
+## 6. Platform
 
-Use Astro because it fits the content-heavy, SEO-sensitive product.
+Approved product runtime choices are **Astro-first** or **Instatic-first**.
+
+Use Astro when the public directory/search/SEO experience benefits from a coded application layer.
+
+Use Instatic when its self-hosted CMS, media library and static publishing workflow can satisfy the product with less complexity.
+
+Do not create an Astro + Instatic hybrid by default. If both are used, define one canonical data owner and a one-way integration boundary.
+
+Supabase is not part of the Edu Hub architecture.
+
+## 7. Data model
+
+The logical data path is:
+
+```text
+external source
+→ raw evidence
+→ staging/reconciliation
+→ reviewed canonical data
+→ public projection
+→ Astro or Instatic
+```
+
+The relational SQL schemas are a canonical domain/reference model, but physical runtime storage may be Instatic SQLite, directly attached PostgreSQL, or owned static/generated data depending on the selected platform.
+
+- model institutions relationally where the runtime supports it
+- preserve explicit taxonomies for important searchable concepts
+- preserve provenance/evidence separately from canonical values
+- use migrations/versioned import contracts where appropriate
+- never expose admin/database credentials in browser code
+- do not weaken security policies to make development easier
+
+## 8. Astro
+
+If Astro is selected, use it because it fits the content-heavy, SEO-sensitive product.
 
 Core rule:
 
@@ -93,19 +128,7 @@ Prefer `.astro` components and server-rendered HTML. Use client islands only for
 
 Do not add React/Svelte/Vue merely by habit.
 
-## 7. Database
-
-PostgreSQL is the operational source of truth. Supabase is the approved initial platform direction.
-
-- model institutions relationally
-- preserve explicit taxonomies for important searchable concepts
-- preserve provenance/evidence separately from canonical values
-- use migrations
-- design RLS deliberately for exposed data
-- never expose service-role credentials in browser code
-- do not weaken security policies to make development easier
-
-## 8. SEO
+## 9. SEO
 
 SEO is a product requirement, not a final plugin.
 
@@ -117,30 +140,32 @@ Important requirements include:
 - canonical policy
 - `hreflang`
 - robots/indexability rules
-- database-driven segmented sitemaps
+- segmented sitemaps
 - structured data matching visible content
 - internal linking
 - crawl controls for filters/search
 - redirects for changed/merged entities
 - rendered HTML verification
 
-## 9. Research and factual integrity
+## 10. Research and factual integrity
 
 Never invent institution facts, fees, accreditations, admission dates, rankings, ratings, or claims.
 
 When sources conflict, preserve the conflict and require review instead of silently choosing one.
 
+Secondary commercial directories such as Edarabia may support discovery and enrichment but may not establish international eligibility or override primary evidence.
+
 Historical fee/admission records should be versioned where the data model supports it rather than overwritten.
 
 Institution-submitted edits in future phases must go through a review/change-request boundary before becoming canonical data.
 
-## 10. Localization
+## 11. Localization
 
 Arabic and English are independent editorial experiences tied to the same underlying factual entity.
 
 Do not treat Arabic as an afterthought or merely machine-translated English. Test RTL layout, long text, navigation, forms, filters, metadata, structured data, and locale relationships.
 
-## 11. Quality gates
+## 12. Quality gates
 
 For implementation work, verify at minimum:
 
@@ -148,7 +173,7 @@ For implementation work, verify at minimum:
 lint
 → typecheck
 → tests where configured
-→ production build
+→ production build/publish
 → rendered browser QA
 → responsive/RTL QA where relevant
 → console/network sanity
@@ -156,7 +181,7 @@ lint
 
 Performance, responsive behavior, accessibility, and SEO are continuous constraints.
 
-## 12. Secrets
+## 13. Secrets
 
 Never commit API keys, database passwords, tokens, service-role credentials, or private `.env` files.
 
