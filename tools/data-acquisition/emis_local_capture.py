@@ -2,14 +2,13 @@
 """Capture the live public MOE/EMIS Egyptian Schools Directory contract.
 
 This tool is intentionally a *capture/probe*, not a bulk scraper. The current
-search.emis.gov.eg host times out from the project's GitHub-hosted runners, so
-this script is designed to be run from an Egypt/local network where the public
-directory is reachable.
+search.emis.gov.eg host times out from the project's hosted acquisition runners,
+so this script is designed to be run from an Egypt/local network where the
+public directory is reachable.
 
-It saves the public HTML, headers, forms/selects, script references and likely
-ASP.NET endpoints needed to implement a tested row-level enumerator afterwards.
-It does not authenticate, bypass access controls, submit private forms or evade
-rate limits.
+It saves public HTML plus a redacted machine-readable contract manifest needed
+to build a tested row-level enumerator afterwards. It does not authenticate,
+bypass access controls, submit private forms or evade rate limits.
 """
 from __future__ import annotations
 
@@ -17,7 +16,6 @@ import argparse
 import hashlib
 import json
 import re
-import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -35,8 +33,14 @@ DEFAULT_TARGETS = [
 ]
 
 USER_AGENT = (
-    "EduHubResearchBot/1.0 "
+    "EduHubResearchBot/1.1 "
     "(+https://github.com/admonkstudio/edu-hub; public-source-contract-capture)"
+)
+
+POSTBACK_RE = re.compile(r"__doPostBack\(['\"]([^'\"]+)['\"]", re.I)
+ENDPOINT_RE = re.compile(
+    r"['\"]([^'\"]+\.(?:aspx|asmx|ashx|json|php)(?:\?[^'\"]*)?)['\"]",
+    re.I,
 )
 
 
@@ -85,47 +89,105 @@ def option_manifest(select) -> list[dict[str, str | bool]]:
                 "value": opt.get("value", ""),
                 "text": clean(opt.get_text(" ", strip=True)),
                 "selected": opt.has_attr("selected"),
+                "disabled": opt.has_attr("disabled"),
             }
         )
     return out
 
 
-def form_manifest(page_url: str, form) -> dict:
+def build_label_map(form) -> dict[str, str]:
+    labels: dict[str, str] = {}
+    for label in form.find_all("label"):
+        target = label.get("for")
+        text = clean(label.get_text(" ", strip=True))
+        if target and text:
+            labels[target] = text
+    return labels
+
+
+def field_label(element, label_map: dict[str, str]) -> str | None:
+    element_id = element.get("id")
+    if element_id and element_id in label_map:
+        return label_map[element_id]
+    parent_label = element.find_parent("label")
+    if parent_label:
+        text = clean(parent_label.get_text(" ", strip=True))
+        if text:
+            return text
+    return None
+
+
+def public_attrs(element) -> dict[str, str]:
+    """Keep only non-secret behavioral attributes useful for contract analysis."""
+    allowed = ("onchange", "onclick", "class", "role", "aria-label", "data-val", "data-placeholder")
+    out: dict[str, str] = {}
+    for key in allowed:
+        value = element.get(key)
+        if value is None:
+            continue
+        if isinstance(value, list):
+            value = " ".join(value)
+        text = clean(str(value))
+        if text:
+            out[key] = text[:1000]
+    return out
+
+
+def form_manifest(page_url: str, form, form_index: int) -> dict:
     fields = []
+    label_map = build_label_map(form)
+    postback_targets: set[str] = set()
+
     for element in form.find_all(["input", "select", "button", "textarea"]):
+        input_type = (element.get("type") or "").lower()
         item: dict[str, object] = {
             "tag": element.name,
             "name": element.get("name"),
             "id": element.get("id"),
+            "label": field_label(element, label_map),
+            "attrs": public_attrs(element),
         }
+        behavior_blob = " ".join(str(v) for v in item["attrs"].values())
+        postback_targets.update(POSTBACK_RE.findall(behavior_blob))
+
         if element.name == "input":
-            item.update(
-                {
-                    "type": element.get("type", "text"),
-                    "value": element.get("value", ""),
-                }
-            )
+            item["type"] = input_type or "text"
+            # Hidden ASP.NET state values are deliberately omitted from the JSON
+            # manifest; the raw HTML evidence retains them for later local replay.
+            if input_type != "hidden":
+                item["value"] = element.get("value", "")
+            item["is_hidden_state"] = input_type == "hidden" and str(element.get("name", "")).startswith("__")
         elif element.name == "select":
             opts = option_manifest(element)
             item.update(
                 {
                     "options_count": len(opts),
                     "options": opts,
-                    "autopostback": "__doPostBack" in str(element),
+                    "autopostback": "__doPostBack" in str(element) or bool(POSTBACK_RE.search(behavior_blob)),
                 }
             )
         elif element.name == "button":
             item["text"] = clean(element.get_text(" ", strip=True))
             item["value"] = element.get("value", "")
+            item["type"] = element.get("type", "submit")
         else:
             item["value"] = clean(element.get_text(" ", strip=True))
         fields.append(item)
 
+    hidden_names = [
+        element.get("name")
+        for element in form.find_all("input", attrs={"type": "hidden", "name": True})
+        if element.get("name")
+    ]
+
     return {
+        "index": form_index,
         "id": form.get("id"),
         "name": form.get("name"),
         "method": (form.get("method") or "get").lower(),
         "action": urljoin(page_url, form.get("action") or page_url),
+        "aspnet_state_fields": [name for name in hidden_names if str(name).startswith("__")],
+        "postback_targets": sorted(postback_targets),
         "fields": fields,
     }
 
@@ -148,7 +210,20 @@ def capture_page(s: requests.Session, url: str, out_dir: Path, timeout: float) -
                 "content_type": response.headers.get("content-type"),
                 "content_length": len(response.content),
                 "sha256": sha256_bytes(response.content),
-                "headers": dict(response.headers),
+                "headers": {
+                    key: value
+                    for key, value in response.headers.items()
+                    if key.lower() in {
+                        "content-type",
+                        "content-length",
+                        "server",
+                        "cache-control",
+                        "date",
+                        "last-modified",
+                        "etag",
+                        "x-powered-by",
+                    }
+                },
             }
         )
         if not response.ok:
@@ -157,11 +232,12 @@ def capture_page(s: requests.Session, url: str, out_dir: Path, timeout: float) -
         file_stem = safe_name(response.url)
         html_path = out_dir / f"{file_stem}.html"
         html_path.write_bytes(response.content)
-        result["saved_html"] = str(html_path)
+        result["saved_html"] = html_path.name
 
         soup = BeautifulSoup(response.text, "html.parser")
         result["title"] = clean(soup.title.get_text(" ", strip=True)) if soup.title else None
-        result["forms"] = [form_manifest(response.url, f) for f in soup.find_all("form")]
+        result["html_lang"] = soup.html.get("lang") if soup.html else None
+        result["forms"] = [form_manifest(response.url, f, i) for i, f in enumerate(soup.find_all("form"))]
 
         scripts = []
         for tag in soup.find_all("script", src=True):
@@ -190,23 +266,23 @@ def capture_page(s: requests.Session, url: str, out_dir: Path, timeout: float) -
         result["candidate_links"] = links[:500]
 
         inline_refs: set[str] = set()
+        inline_postbacks: set[str] = set()
         for script in soup.find_all("script"):
             text = script.string or script.get_text() or ""
-            for match in re.findall(
-                r"['\"]([^'\"]+\.(?:aspx|asmx|ashx|json|php)(?:\?[^'\"]*)?)['\"]",
-                text,
-                re.I,
-            ):
+            inline_postbacks.update(POSTBACK_RE.findall(text))
+            for match in ENDPOINT_RE.findall(text):
                 inline_refs.add(urljoin(response.url, match))
         result["inline_endpoint_refs"] = sorted(inline_refs)
+        result["inline_postback_targets"] = sorted(inline_postbacks)
 
-        # Preserve hidden ASP.NET form-state names without printing full token
-        # values into the human report. The raw HTML remains the evidence copy.
         hidden_names = []
         for inp in soup.find_all("input", attrs={"type": "hidden", "name": True}):
             hidden_names.append(inp.get("name"))
         result["hidden_field_names"] = list(dict.fromkeys(hidden_names))
-
+        result["aspnet_detected"] = any(
+            name in {"__VIEWSTATE", "__EVENTVALIDATION", "__VIEWSTATEGENERATOR"}
+            for name in hidden_names
+        )
         return result
     except Exception as exc:  # network diagnostics must preserve failures
         result.update(
@@ -224,14 +300,14 @@ def main() -> int:
     ap.add_argument(
         "--output-dir",
         default="artifacts/emis-local-capture",
-        help="Directory for raw HTML and manifests",
+        help="Directory for raw HTML and redacted manifests",
     )
     ap.add_argument("--timeout", type=float, default=45.0)
     ap.add_argument(
         "--url",
         action="append",
         default=[],
-        help="Additional or replacement public URL(s). May be specified multiple times.",
+        help="Replacement public URL(s). May be specified multiple times.",
     )
     args = ap.parse_args()
 
@@ -247,15 +323,21 @@ def main() -> int:
 
     report = {
         "tool": "emis_local_capture",
-        "version": 1,
+        "version": 2,
         "captured_at": datetime.now(timezone.utc).isoformat(),
         "user_agent": USER_AGENT,
         "targets": targets,
         "reachable_pages": sum(1 for p in pages if p.get("ok")),
         "pages": pages,
+        "safety": {
+            "authentication_used": False,
+            "access_controls_bypassed": False,
+            "bulk_enumeration_performed": False,
+            "hidden_state_values_redacted_from_manifest": True,
+        },
         "next_gate": (
-            "Do not bulk-enumerate yet. Review the captured forms/endpoints, then implement "
-            "and test a conservative public-directory enumerator against the current live contract."
+            "Run analyze_emis_capture.py against this folder. Do not bulk-enumerate until the "
+            "captured form/state contract has been reviewed and a bounded pilot adapter passes."
         ),
     }
     report_path = out_dir / "capture-report.json"
@@ -271,8 +353,6 @@ def main() -> int:
         ensure_ascii=False,
     ))
 
-    # Reachability failure is a useful diagnostic but should return non-zero so
-    # an operator does not mistakenly believe a capture succeeded.
     return 0 if report["reachable_pages"] > 0 else 3
 
 
