@@ -9,7 +9,10 @@ on:
       - 'infra/owned-data/001_raw_archive.sql'
       - 'infra/owned-data/004_national_registry_layers.sql'
       - 'infra/owned-data/005_international_registry.sql'
+      - 'infra/owned-data/006_bilingual_completion.sql'
       - 'docs/EDU-DATA-2-INTERNATIONAL-REGISTRY.md'
+      - 'docs/DATABASE-COMPLETION-PLAN.md'
+      - 'docs/SOURCE-USAGE-POLICY.md'
       - '.github/workflows/edu-data-2-international-registry.yml'
   workflow_dispatch:
 
@@ -32,6 +35,7 @@ jobs:
           python -m py_compile tools/data-acquisition/international/acquire_ib_egypt.py
           python -m py_compile tools/data-acquisition/international/acquire_scu_foreign_branches.py
           python -m py_compile tools/data-acquisition/international/build_authoritative_seed.py
+          python -m py_compile tools/data-acquisition/international/build_candidate_universe.py
           python -m py_compile tools/data-acquisition/international/prepare_import_package.py
           python -m py_compile tools/data-acquisition/international/plan_identity_reconciliation.py
           python -m py_compile tools/data-acquisition/international/discover_wikimedia_media.py
@@ -52,10 +56,15 @@ jobs:
               'scu_foreign_university_branches',
               'msche_auc',
               'wikimedia_commons',
+              'edarabia_egypt',
               'legacy_v7_archive',
           ):
               assert required in ids
           assert all('auto_eligibility' in row for row in registry['sources'])
+          edarabia = next(row for row in registry['sources'] if row['source_id'] == 'edarabia_egypt')
+          assert edarabia['auto_eligibility'] is False
+          assert edarabia['acquisition_mode'] == 'manual_reference_only_due_terms'
+          assert 'do_not_systematically_copy' in edarabia['storage_policy']
 
           seed_dir = Path('tools/data-acquisition/international/seeds')
           ib = json.loads((seed_dir/'ib-egypt-directory-2026-09-14.json').read_text(encoding='utf-8'))
@@ -84,7 +93,7 @@ jobs:
         run: python tools/data-acquisition/international/test_acquisition.py
 
   build-seed:
-    name: Build authoritative source seed and import package
+    name: Build authoritative seed, candidate universe and import package
     needs: contract
     runs-on: ubuntu-latest
     steps:
@@ -94,6 +103,8 @@ jobs:
           python-version: '3.12'
       - name: Build deterministic source candidates
         run: python tools/data-acquisition/international/build_authoritative_seed.py --output-dir artifacts/international
+      - name: Build D2.1 candidate universe and bilingual gaps
+        run: python tools/data-acquisition/international/build_candidate_universe.py
       - name: Prepare provenance-safe import package
         run: python tools/data-acquisition/international/prepare_import_package.py --output-dir artifacts/international/import-package
       - name: Generate review-only identity proposals
@@ -116,6 +127,15 @@ jobs:
           assert data['public_promotion_performed'] is False
           assert data['ib_directory_country_summary_conflict']['review_required'] is True
 
+          universe = json.loads(Path('artifacts/international/candidate-universe/candidate-universe-summary.json').read_text(encoding='utf-8'))
+          assert universe['source_record_count'] == 85
+          assert universe['unique_institutions_claimed'] is None
+          assert universe['canonical_institutions_created'] == 0
+          assert universe['automatic_merges_performed'] == 0
+          assert universe['public_projection_rows_created'] == 0
+          assert universe['presentation_runtime_dependency'] is None
+          assert universe['bilingual_name_gap_count'] > 0
+
           manifest = json.loads(Path('artifacts/international/import-package/manifest.json').read_text(encoding='utf-8'))
           assert manifest['sources'] == 5
           assert manifest['raw_records'] == 85
@@ -129,7 +149,7 @@ jobs:
           proposals = [json.loads(line) for line in Path('artifacts/international/import-package/identity-review-proposals.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
           assert all(row['decision'] == 'needs_review' for row in proposals)
           assert all(row['left_source_id'] != row['right_source_id'] for row in proposals)
-          print(json.dumps({'source_summary': data, 'import_manifest': manifest, 'identity_review_proposals': len(proposals)}, indent=2))
+          print(json.dumps({'source_summary': data, 'candidate_universe': universe, 'import_manifest': manifest, 'identity_review_proposals': len(proposals)}, indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
@@ -138,7 +158,7 @@ jobs:
           if-no-files-found: error
 
   schema:
-    name: Validate clean international PostgreSQL schema
+    name: Validate bilingual international PostgreSQL reference schema
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -169,6 +189,7 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f infra/owned-data/001_raw_archive.sql
           psql -v ON_ERROR_STOP=1 -f infra/owned-data/004_national_registry_layers.sql
           psql -v ON_ERROR_STOP=1 -f infra/owned-data/005_international_registry.sql
+          psql -v ON_ERROR_STOP=1 -f infra/owned-data/006_bilingual_completion.sql
       - name: Assert international schema contract
         run: |
           psql -v ON_ERROR_STOP=1 <<'SQL'
@@ -179,15 +200,24 @@ jobs:
             assert to_regclass('edu_core.institutions') is not null, 'missing institutions';
             assert to_regclass('edu_core.international_eligibility') is not null, 'missing international eligibility';
             assert to_regclass('edu_core.campuses') is not null, 'missing campuses';
-            assert to_regclass('edu_core.institution_accreditations') is not null, 'missing accreditations';
-            assert to_regclass('edu_core.fee_schedules') is not null, 'missing fee schedules';
-            assert to_regclass('edu_core.programs') is not null, 'missing programs';
-            assert to_regclass('edu_core.institution_media') is not null, 'missing media links';
+            assert to_regclass('edu_core.campus_localizations') is not null, 'missing bilingual campus localizations';
+            assert to_regclass('edu_core.institution_aliases') is not null, 'missing institution aliases';
+            assert to_regclass('edu_core.education_levels') is not null, 'missing education levels';
+            assert to_regclass('edu_core.campus_level_offerings') is not null, 'missing campus level offerings';
+            assert to_regclass('edu_core.facilities') is not null, 'missing facilities taxonomy';
+            assert to_regclass('edu_core.campus_facilities') is not null, 'missing campus facilities';
+            assert to_regclass('edu_core.admission_requirements') is not null, 'missing admission requirements';
+            assert to_regclass('edu_core.academic_unit_localizations') is not null, 'missing academic unit localizations';
+            assert to_regclass('edu_core.program_localizations') is not null, 'missing program localizations';
+            assert to_regclass('edu_core.institution_media_localizations') is not null, 'missing media localizations';
+            assert to_regclass('edu_core.evidence_assertions') is not null, 'missing universal evidence assertions';
+            assert to_regclass('edu_core.international_profile_completeness') is not null, 'missing profile completeness';
             assert exists(select 1 from pg_extension where extname='postgis'), 'postgis not enabled';
           end $$;
           SQL
           psql -Atc "select code from edu_core.curricula order by code"
-          psql -Atc "select code from edu_core.accreditation_bodies order by code"
+          psql -Atc "select code from edu_core.education_levels order by sort_order"
+          psql -Atc "select code from edu_core.facilities order by code"
 
   note-live-refresh:
     name: Record live-refresh boundary
@@ -197,4 +227,5 @@ jobs:
       - run: |
           echo "Authoritative snapshots are refreshed through browser-capable/source-appropriate acquisition paths."
           echo "IB currently returns HTTP 403 to GitHub-hosted direct Python requests, so a 403 is not treated as source absence."
+          echo "Edarabia is reference-only under its published terms unless written reuse permission is obtained."
           echo "Live fetch scripts remain available for suitable environments, but deterministic CI uses dated evidence snapshots."
