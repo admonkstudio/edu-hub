@@ -50,29 +50,42 @@ Branch: `edu-data-2-international-registry`
 
 Canonical contract: `docs/EDU-DATA-2-INTERNATIONAL-REGISTRY.md`
 
-Architecture:
+Logical data architecture:
 
-`external source -> edu_raw -> edu_staging -> edu_core -> public projection -> website`
+`external source -> raw evidence -> staging/reconciliation -> reviewed canonical data -> public projection -> Astro or Instatic`
 
 No public page may depend on a live third-party source after acquisition.
+
+## Platform correction — 2026-09-14
+
+Supabase is **not** part of the Edu Hub architecture.
+
+Approved implementation choices are now:
+
+- **Astro-first** for a coded, SEO-sensitive directory/application; or
+- **Instatic-first** for a self-hosted CMS/static-publishing implementation.
+
+A hybrid Astro + Instatic architecture is not the default and should only be introduced if there is a demonstrated product need and one canonical data owner is defined.
+
+The existing relational SQL schema remains the canonical reference model. Physical runtime storage may be Instatic SQLite, directly attached PostgreSQL, or owned static/generated data for Astro. No Supabase database/auth/storage/RLS/function dependency is allowed.
 
 ## Completed scope reset / cleanup
 
 ### Source of truth
 
-- `README.md`, `docs/PROJECT-BRIEF.md`, `docs/PROJECT-DECISIONS.md`, `docs/PROJECT-STATUS.md` and the milestone contract now reflect the international-only scope.
+- `README.md`, `AGENTS.md`, `docs/PLATFORM.md`, `docs/PROJECT-BRIEF.md`, `docs/PROJECT-DECISIONS.md`, `docs/PROJECT-STATUS.md` and the milestone contract reflect the international-only scope and no-Supabase platform direction.
 - International scope states are explicit: `candidate`, `eligible`, `excluded`, `needs_review`.
 - International eligibility must be evidenced; names/marketing language cannot establish eligibility.
 - British Council attached/partner status, Overture, OSM, V7 and commercial directories are supporting/discovery evidence only.
 
-### Clean relational database foundation
+### Clean relational data foundation
 
 `infra/owned-data/005_international_registry.sql` extends the evidence architecture with:
 
 - providers/groups;
 - bilingual institution localizations;
 - international eligibility + evidence;
-- locations and campuses with PostGIS;
+- locations and campuses;
 - curricula/certificates/languages;
 - accreditation/authorization bodies and institution accreditations;
 - contacts;
@@ -81,113 +94,112 @@ No public page may depend on a live third-party source after acquisition.
 - academic units and programmes;
 - media license/creator/attribution/rights-evidence metadata.
 
-CI applies migrations `001`, `004`, and `005` to a clean PostGIS PostgreSQL service and asserts the international schema contract.
+CI applies migrations `001`, `004`, and `005` to a clean PostgreSQL/PostGIS test service as a schema/reference validation gate. This does not imply PostgreSQL/Supabase is required by the final runtime.
 
 ## Authoritative evidence acquired / prepared
 
 ### International Baccalaureate
 
 - Live Egypt-filtered IB directory snapshot contains **54 school rows** across three pages.
-- The IB country summary reported **55 schools** on the same date; the 54/55 discrepancy is preserved as a review flag rather than fabricating a record.
-- The checked-in snapshot preserves names, IB programmes and listed languages for all 54 rows.
-- All 54 remain `candidate` until each school type/ownership is confirmed; public/state schools will be excluded from the active scope.
-- A live acquisition adapter remains available, but IB blocks GitHub-hosted direct Python requests with HTTP 403; deterministic CI therefore validates dated source evidence rather than treating the hosted-runner response as source absence.
+- The IB country summary reported **55 schools** on the same date; the 54/55 discrepancy is preserved as a review flag.
+- Checked-in evidence preserves names, IB programmes and listed languages.
+- Ownership/school-type evidence is being resolved; public/state rows are excluded from active scope.
 
 ### French homologation
 
 - Official French 2026–2027 homologation evidence is captured for **17 Egypt source rows** with UAI identifiers, city, levels, homologated classes and stream limitations.
-- These rows are strong international-programme eligibility evidence, with any French-stream-only limitation retained explicitly.
 
 ### German recognition
 
-- Official April 2026 KMK evidence is captured for **4 recognized German schools abroad in Egypt**, including recognition dates.
+- Official April 2026 KMK evidence is captured for **4 recognized German schools abroad in Egypt**.
 
 ### Higher education
 
 - Current SCU evidence is captured for **9 recognized foreign university branches**.
-- AUC is independently captured as an `eligible` international independent university using current MSCHE institutional accreditation plus AUC's Egypt/US institutional framework evidence.
-- MOHESR reconciliation remains to be completed; any branch present in one regulator source but absent in another remains review-only.
+- AUC is independently captured as an eligible international independent university using current MSCHE accreditation plus institutional evidence.
+- MOHESR reconciliation remains review-only where regulator sources disagree.
 
 ### Current deterministic authoritative seed
 
-`tools/data-acquisition/international/build_authoritative_seed.py` currently builds **85 source rows**:
+The deterministic authoritative seed currently contains **85 source rows** before further ownership filtering and cross-source deduplication:
 
-- 54 IB candidate source rows;
-- 17 French eligible source rows;
-- 4 German eligible source rows;
-- 9 SCU foreign-branch eligible source rows;
-- 1 AUC eligible source row.
+- 54 IB source rows;
+- 17 French rows;
+- 4 German rows;
+- 9 SCU foreign-branch rows;
+- 1 AUC row.
 
-Current source-row state before cross-source identity reconciliation:
+The project does not claim these are 85 unique institutions.
 
-- **31 eligible source rows**;
-- **54 candidate source rows**;
-- unique institution count intentionally not claimed yet because French/German/IB overlaps and campus relationships still require reconciliation.
+## Supporting discovery/enrichment sources
+
+### Edarabia
+
+Edarabia is now registered as an approved **commercial directory supporting source**.
+
+Its Egypt school pages expose useful discovery/enrichment fields such as institution names, addresses, curriculum labels, listed tuition fees, location information, photos/videos and reviews.
+
+Policy:
+
+- use for candidate discovery and missing-field leads;
+- use for cross-checking addresses/websites/curricula/fee leads;
+- do not let it establish international eligibility, accreditation or regulatory status;
+- corroborate important facts with regulator/accreditor/official institution sources before canonical promotion;
+- ratings/reviews are not canonical facts;
+- images remain discovery-only unless independent reuse rights are established.
 
 ## Import and identity safety
 
-`tools/data-acquisition/international/prepare_import_package.py` now converts the deterministic seed into a provenance-safe package containing:
+`tools/data-acquisition/international/prepare_import_package.py` builds a provenance-safe package containing source definitions, source-shaped raw records, staging candidates, reviewed-media metadata and checksums.
 
-- source definitions;
-- 85 source-shaped raw records with stable hashes;
-- 85 staging candidates;
-- reviewed media metadata;
-- checksums/manifest.
+The package creates zero canonical institutions, performs zero automatic merges and creates zero public projection rows.
 
-The package creates **zero canonical institutions**, performs **zero merges** and creates **zero public projection rows**.
-
-`tools/data-acquisition/international/plan_identity_reconciliation.py` creates cross-source duplicate/campus proposals using conservative name evidence. Every proposal is `needs_review`; auto-accept is prohibited.
+`tools/data-acquisition/international/plan_identity_reconciliation.py` creates review-only duplicate/campus proposals. Auto-accept is prohibited.
 
 ## Media state
 
-Media publication remains rights-aware.
+Automatic Commons discovery records license/provenance candidates but never authorizes them automatically.
 
-Automatic Commons discovery records license/provenance candidates but never authorizes them automatically. A separate reviewed seed currently contains **5 publication-safe Wikimedia assets** whose Commons descriptions identify the institution/campus and whose reuse basis was recorded:
+A reviewed seed currently contains **5 publication-safe Wikimedia assets** for AIS Egypt, British International School Cairo, Cairo English School and two AUC campus views, with reuse basis and attribution metadata recorded.
 
-- American International School in Egypt — campus image — CC BY-SA 4.0;
-- British International School, Cairo — image released to public domain;
-- Cairo English School — CC BY-SA 4.0;
-- AUC Tahrir/Downtown — CC BY-SA 3.0/compatible source declarations;
-- AUC New Cairo — CC BY-SA 3.0.
+Institution websites, social channels and commercial directories may provide media discovery leads, but their images are not publication-safe by default.
 
-Attribution/share-alike obligations are retained in the media metadata. Institution website/social media may be stored as discovery candidates but is not publication-safe without a defensible rights basis. When no safe image exists, the UI uses a designed placeholder with the institution's English name.
+If no safe image exists, the public UI uses a designed placeholder containing the institution's English name.
 
 ## Current CI state
 
-The prior complete EDU-DATA-2 run at commit `3dfe62f5652001c51c87eda1bb1d1d9487657486` passed successfully.
+The core EDU-DATA-2 contract, import package, review-only identity proposal pipeline and clean relational schema reference have passed CI in prior runs. New source/platform documentation changes continue to use the same validation branch.
 
-The newest run for the import-package + review-only identity proposal contract is currently being validated. Do not treat it as green until all jobs finish.
+## Runtime / infrastructure state
 
-## Infrastructure state / only provisioning blocker
+There is **no Supabase provisioning task** for Edu Hub.
 
-A dedicated Edu Hub PostgreSQL/Supabase project still does **not** exist.
+The project already has an Instatic self-hosted direction available, and Astro remains the coded frontend alternative.
 
-The connected Supabase organization currently exposes Ask Kalam projects only; those projects must not receive Edu Hub data.
-
-The schema, authoritative seed, reviewed media metadata and import package are ready to move into a dedicated project after explicit organization selection and cost approval.
+The next runtime step is not database provisioning. It is to decide whether the real product should be **Instatic-first or Astro-first**, then create the narrow import/publication adapter for that target.
 
 ## Immediate next actions
 
-1. Finish/repair the current EDU-DATA-2 CI run if needed.
-2. Provision a **dedicated Edu Hub Supabase/PostgreSQL project** after the owner selects the Supabase organization and explicitly approves the reported provisioning cost.
-3. Apply migrations `001`, `004`, `005` to that clean project.
-4. Import the 85 raw/staging source rows and reviewed-media metadata; do not create canonical identities until reconciliation review.
-5. Complete cross-source institution/campus reconciliation and resolve the IB public/private ownership gate.
-6. Reconcile MOHESR foreign-university evidence against the SCU set.
-7. Ingest the September 2026 British Council Partner Schools PDF as discovery/contact evidence only.
-8. Add Cognia/other American accreditation evidence and verify the international-school model from official institution sources.
-9. Enrich eligible institutions from official websites: campuses, coordinates, contacts, curricula, grades/ages, admissions, current fees, facilities, academic units/programmes and source-backed descriptions.
-10. Match eligible/candidate identities to Overture/OSM/Wikidata/V7 for coordinates, aliases and supporting evidence without allowing those sources to establish eligibility alone.
-11. Continue rights-safe media discovery/review and build the first representative public projection only after canonical identity review.
+1. Audit the existing Instatic deployment against the required institution collection model, bilingual content, media handling, search/filter needs and static publication workflow.
+2. Decide Instatic-first vs Astro-first using that audit; do not introduce both without a clear need.
+3. Build the target-specific import adapter from the clean EDU-DATA-2 package.
+4. Continue IB private/state ownership verification and cross-source institution/campus reconciliation.
+5. Reconcile MOHESR foreign-university evidence against SCU.
+6. Ingest British Council Partner Schools as discovery/contact evidence only.
+7. Add Cognia/other American accreditation evidence and verify school models from primary sources.
+8. Use Edarabia systematically as a discovery/completeness source to find missing institutions and profile fields, then corroborate them against primary sources.
+9. Enrich eligible institutions from official websites: campuses, coordinates, contacts, curricula, grades/ages, admissions, current fees, facilities, programmes and source-backed descriptions.
+10. Continue rights-safe media discovery/review and prepare the first reviewed public projection for the chosen Astro/Instatic runtime.
 
 ## Non-negotiable constraints
 
 - Do not reintroduce full Egyptian public-school/university coverage without a new owner decision.
 - Do not confuse exam-centre/partner status with international-school eligibility.
 - Do not infer international status from branding words.
-- Do not turn foreign partnerships into international-university identities.
+- Do not let a commercial directory establish eligibility or override stronger evidence.
 - Do not invent institution facts, fees, rankings, accreditations or admissions data.
 - Do not publish media without a recorded rights basis.
+- Do not use Supabase for Edu Hub.
 - Do not import Edu Hub data into Ask Kalam infrastructure.
-- Do not publish directly from `edu_raw` or `edu_staging`.
+- Do not publish raw/staging evidence directly.
 - Keep Arabic/RTL, provenance, portability, performance and SEO requirements active.
