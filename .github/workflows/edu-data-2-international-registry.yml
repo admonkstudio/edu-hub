@@ -33,6 +33,7 @@ jobs:
           python -m py_compile tools/data-acquisition/international/acquire_scu_foreign_branches.py
           python -m py_compile tools/data-acquisition/international/build_authoritative_seed.py
           python -m py_compile tools/data-acquisition/international/prepare_import_package.py
+          python -m py_compile tools/data-acquisition/international/plan_identity_reconciliation.py
           python -m py_compile tools/data-acquisition/international/discover_wikimedia_media.py
           python -m py_compile tools/data-acquisition/international/test_acquisition.py
       - name: Validate source registry and authoritative snapshots
@@ -91,6 +92,8 @@ jobs:
         run: python tools/data-acquisition/international/build_authoritative_seed.py --output-dir artifacts/international
       - name: Prepare provenance-safe import package
         run: python tools/data-acquisition/international/prepare_import_package.py --output-dir artifacts/international/import-package
+      - name: Generate review-only identity proposals
+        run: python tools/data-acquisition/international/plan_identity_reconciliation.py
       - name: Verify seed safety and counts
         run: |
           python - <<'PY'
@@ -116,7 +119,11 @@ jobs:
           assert manifest['identity_merges_performed'] == 0
           assert manifest['public_projection_rows_created'] == 0
           assert len(manifest['checksums']) == 4
-          print(json.dumps({'source_summary': data, 'import_manifest': manifest}, indent=2))
+
+          proposals = [json.loads(line) for line in Path('artifacts/international/import-package/identity-review-proposals.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          assert all(row['decision'] == 'needs_review' for row in proposals)
+          assert all(row['left_source_id'] != row['right_source_id'] for row in proposals)
+          print(json.dumps({'source_summary': data, 'import_manifest': manifest, 'identity_review_proposals': len(proposals)}, indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
