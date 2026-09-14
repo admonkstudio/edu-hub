@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "scope": "egypt_international_education",
-  "updated_at": "2026-09-14",
+  "updated_at": "2026-09-15",
   "sources": [
     {
       "source_id": "ib_world_schools_egypt",
@@ -38,8 +38,9 @@
       "role": ["discovery", "contact", "website", "address"],
       "auto_eligibility": false,
       "scope_condition": "requires_additional_international_evidence",
-      "acquisition_mode": "official_pdf",
-      "active": true
+      "acquisition_mode": "official_pdf_browser_or_local_adapter",
+      "active": true,
+      "notes": "Current September 2026 PDF is browser-accessible but returns HTTP 403 to GitHub-hosted direct Python requests. Use the approved --pdf-path adapter when necessary."
     },
     {
       "source_id": "french_homologation_2026_2027",
@@ -67,6 +68,19 @@
       "active": true
     },
     {
+      "source_id": "cis_international_accreditation_egypt",
+      "name": "Council of International Schools - Egypt Accreditation Evidence",
+      "url": "https://www.cois.org/about-cis/news",
+      "publisher": "Council of International Schools",
+      "authority_class": "recognized_accreditor",
+      "role": ["identity", "international_school_model", "eligibility_support", "accreditation"],
+      "auto_eligibility": false,
+      "scope_condition": "current_or_recent_cis_accreditation_plus_private_or_independent_ownership",
+      "acquisition_mode": "official_accreditation_announcement_pages",
+      "active": true,
+      "notes": "CIS accreditation is strong international-school-model evidence, but Edu Hub still applies the private/independent ownership gate separately."
+    },
+    {
       "source_id": "cognia_accredited_egypt",
       "name": "Cognia Accredited Institutions - Egypt",
       "url": "https://www.cognia.org/accreditation/",
@@ -77,6 +91,20 @@
       "scope_condition": "must_also_show_international_school_model",
       "acquisition_mode": "directory_search",
       "active": true
+    },
+    {
+      "source_id": "cognia_member_milestones_egypt_2026_2027",
+      "name": "Cognia Member Milestones - Egypt 2026-2027",
+      "url": "https://www.cognia.org/member-milestones/",
+      "publisher": "Cognia",
+      "authority_class": "recognized_accreditor",
+      "role": ["identity", "accreditation", "candidate_discovery", "eligibility_support"],
+      "auto_eligibility": false,
+      "scope_condition": "accreditation_evidence_requires_separate_international_school_model_and_private_or_independent_checks",
+      "expected_current_count": 4,
+      "acquisition_mode": "official_html_milestone_list",
+      "active": true,
+      "notes": "The 2026-2027 milestone page identifies four Egypt institutions reaching 25 years of Cognia accreditation. Accreditation alone does not establish Edu Hub scope."
     },
     {
       "source_id": "scu_foreign_university_branches",
@@ -121,7 +149,7 @@
       "url": "https://example.invalid/institution-specific",
       "publisher": "Institution-specific",
       "authority_class": "official_institution",
-      "role": ["identity_support", "campus", "contact", "admissions", "fees", "curriculum", "programs", "media_discovery"],
+      "role": ["identity_support", "campus", "contact", "admissions", "fees", "curriculum", "programs", "media_discovery", "localization"],
       "auto_eligibility": false,
       "scope_condition": "must_be_linked_to_eligible_candidate",
       "acquisition_mode": "institution_specific",
