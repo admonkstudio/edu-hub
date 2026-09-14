@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "source_id": "scu_foreign_university_branches",
+  "snapshot_date": "2026-09-14",
+  "source_url": "https://scu.eg/branches-of-international-universities/",
+  "publisher": "Supreme Council of Universities",
+  "source_reported_count": 9,
+  "records": [
+    {"name_ar":"فرع جامعة كوفنتري البريطانية","parent_university_en":"Coventry University","country_code":"GB","scope_state":"eligible","scope_class":"foreign_university_branch"},
+    {"name_ar":"فرع جامعة جزيرة الأمير إدوارد","parent_university_en":"University of Prince Edward Island","country_code":"CA","scope_state":"eligible","scope_class":"foreign_university_branch"},
+    {"name_ar":"فرع جامعة هيرتفوردشاير البريطانية","parent_university_en":"University of Hertfordshire","country_code":"GB","scope_state":"eligible","scope_class":"foreign_university_branch"},
+    {"name_ar":"فرع جامعة نوفا البرتغالية","parent_university_en":"NOVA University Lisbon","country_code":"PT","scope_state":"eligible","scope_class":"foreign_university_branch"},
+    {"name_ar":"فرع جامعة لندن","parent_university_en":"University of London","country_code":"GB","scope_state":"eligible","scope_class":"foreign_university_branch"},
+    {"name_ar":"فرع جامعة إيست لندن","parent_university_en":"University of East London","country_code":"GB","scope_state":"eligible","scope_class":"foreign_university_branch"},
+    {"name_ar":"فرع جامعة لانكشاير","parent_university_en":"University of Central Lancashire","country_code":"GB","scope_state":"eligible","scope_class":"foreign_university_branch"},
+    {"name_ar":"فرع جامعة كازان الروسية","parent_university_en":"Kazan Federal University","country_code":"RU","scope_state":"eligible","scope_class":"foreign_university_branch"},
+    {"name_ar":"فرع جامعة سان بطرسبرج الروسية","parent_university_en":"Saint Petersburg State University","country_code":"RU","scope_state":"eligible","scope_class":"foreign_university_branch"}
+  ],
+  "records_count": 9,
+  "notes": "SCU's current statistics and category page both report nine branches of international universities. Operator/foundation, campus address and programme details are enriched from SCU-linked operator sites and MOHESR/institution sources rather than inferred here."
+}
