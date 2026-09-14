@@ -1,0 +1,67 @@
+name: EDU-DATA-2 Official Site Enrichment
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'tools/data-acquisition/international/build_official_site_enrichment.py'
+      - 'tools/data-acquisition/international/seeds/official-site-enrichment-evidence-2026-09-15.json'
+      - '.github/workflows/edu-data-2-official-site-enrichment.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate D2.4 first-party enrichment package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile enrichment builder
+        run: python -m py_compile tools/data-acquisition/international/build_official_site_enrichment.py
+      - name: Build first-party enrichment package
+        run: python tools/data-acquisition/international/build_official_site_enrichment.py
+      - name: Validate evidence and safety contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('artifacts/international/official-site-enrichment')
+          summary = json.loads((root/'official-site-enrichment-summary.json').read_text(encoding='utf-8'))
+          rows = [json.loads(line) for line in (root/'official-site-enrichment.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+
+          assert summary['institution_evidence_records'] == len(rows) == 8
+          assert summary['website_coverage'] == 8
+          assert summary['location_coverage'] >= 6
+          assert summary['contact_coverage'] >= 6
+          assert summary['admissions_coverage'] >= 6
+          assert summary['curriculum_or_programme_coverage'] >= 5
+          assert summary['facilities_coverage'] >= 2
+          assert summary['current_fee_schedules_asserted'] == 0
+          assert summary['canonical_institutions_created'] == 0
+          assert summary['canonical_fields_mutated'] == 0
+          assert summary['automatic_merges_performed'] == 0
+          assert summary['public_projection_rows_created'] == 0
+          assert summary['database_mutation_performed'] is False
+
+          assert all(row['canonical_identity_created'] is False for row in rows)
+          assert all(row['canonical_fields_mutated'] is False for row in rows)
+          assert all(row['fees_inferred'] is False for row in rows)
+          assert all(row['automatic_merge_performed'] is False for row in rows)
+          assert all(row['public_promotion_performed'] is False for row in rows)
+          assert any(row['name_en'] == 'Evolution International School - NewGiza' for row in rows)
+          assert any(row['name_en'] == 'New Cairo British International School' for row in rows)
+          assert any(row['name_en'] == 'GEMS British International School Madinaty, Cairo' for row in rows)
+          print(json.dumps(summary, ensure_ascii=False, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-official-site-enrichment
+          path: artifacts/international/official-site-enrichment/
+          if-no-files-found: error
