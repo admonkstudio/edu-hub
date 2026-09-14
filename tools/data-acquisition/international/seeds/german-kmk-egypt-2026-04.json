@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "source_id": "kmk_german_schools_2026_04",
+  "snapshot_date": "2026-09-14",
+  "source_status_date": "2026-04",
+  "source_url": "https://www.kmk.org/fileadmin/Dateien/veroeffentlichungen_beschluesse/2026/2026_04_00-Uebersicht-Deutsche-Auslandsschulen.pdf",
+  "publisher": "Kultusministerkonferenz",
+  "evidence_type": "recognized_german_school_abroad",
+  "records": [
+    {"name":"Deutsche Evangelische Oberschule Kairo","city":"Cairo","recognition_decision_date":"1957-08-31","scope_state":"eligible","scope_class":"international_school"},
+    {"name":"Deutsche Schule der Borromäerinnen Kairo","city":"Cairo","recognition_decision_date":"1995-12-05","scope_state":"eligible","scope_class":"international_school"},
+    {"name":"Deutsche Schule der Borromäerinnen Alexandria","city":"Alexandria","recognition_decision_date":"1996-07-03","scope_state":"eligible","scope_class":"international_school"},
+    {"name":"Europaschule Kairo","city":"Cairo","recognition_decision_date":"2016-09-22","scope_state":"eligible","scope_class":"international_school"}
+  ],
+  "records_count": 4,
+  "notes": "The April 2026 KMK recognized-German-schools list identifies these four Egypt institutions as recognized German schools abroad leading to German general university entrance qualification. Other German-model schools may still qualify through separate IB or German examination evidence, but are not added to this strong-recognition seed unless supported by a separate source."
+}
