@@ -1,0 +1,36 @@
+name: EDU-DATA-1 EMIS Navigation Contract
+
+on:
+  push:
+    branches:
+      - edu-data-1-national-registry
+    paths:
+      - 'tools/data-acquisition/emis_navigation_probe.py'
+      - 'tools/data-acquisition/emis_local_capture.py'
+      - 'tools/data-acquisition/run_emis_local_capture.py'
+      - 'tools/data-acquisition/registry/test_emis_navigation_probe.py'
+      - '.github/workflows/edu-data-1-emis-navigation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate bounded EMIS navigation probe
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install minimal probe dependencies
+        run: pip install requests beautifulsoup4
+      - name: Compile local EMIS tools
+        run: |
+          python -m py_compile tools/data-acquisition/emis_local_capture.py
+          python -m py_compile tools/data-acquisition/emis_navigation_probe.py
+          python -m py_compile tools/data-acquisition/run_emis_local_capture.py
+          python -m py_compile tools/data-acquisition/registry/test_emis_navigation_probe.py
+      - name: Enforce bounded root-navigation safety contract
+        run: python tools/data-acquisition/registry/test_emis_navigation_probe.py
