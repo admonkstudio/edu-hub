@@ -82,21 +82,23 @@ jobs:
           summary = json.loads((root/'discovery-identity-summary.json').read_text(encoding='utf-8'))
           institutions = [json.loads(line) for line in (root/'reviewed-institution-drafts.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
           divisions = [json.loads(line) for line in (root/'reviewed-school-division-drafts.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
-          memberships = [json.loads(line) for line in (root/'discovered-source-memberships.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          discovery_memberships = [json.loads(line) for line in (root/'discovered-source-memberships.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          overlap_original = [json.loads(line) for line in (root/'discovery-overlap-original-source-memberships.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
           original_queue = [json.loads(line) for line in (root/'original-unreviewed-source-queue.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
           discovery_queue = [json.loads(line) for line in (root/'unqualified-discovery-queue.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
           qualified_queue = [json.loads(line) for line in (root/'qualified-discovery-identity-queue.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
 
           assert summary['base_reviewed_institution_drafts'] == 24
-          assert summary['discovery_identity_review_batches'] == 1
-          assert summary['new_discovered_identity_drafts'] == len(memberships) == 2
-          assert summary['reviewed_institution_drafts'] == len(institutions) == 26
+          assert summary['discovery_identity_review_batches'] == 2
+          assert summary['new_discovery_driven_identity_drafts'] == len(discovery_memberships) == 6
+          assert summary['reviewed_institution_drafts'] == len(institutions) == 30
           assert summary['reviewed_division_drafts'] == len(divisions) == 10
           assert summary['base_reviewed_original_source_rows'] == 35
-          assert summary['reviewed_discovery_source_rows'] == 2
-          assert summary['reviewed_source_or_lead_rows'] == 37
-          assert summary['original_unreviewed_source_rows'] == len(original_queue) == 71
-          assert summary['unqualified_discovery_rows'] == len(discovery_queue) == 68
+          assert summary['reviewed_original_source_rows_from_discovery_overlap'] == len(overlap_original) == 4
+          assert summary['reviewed_discovery_source_rows'] == 6
+          assert summary['reviewed_source_or_lead_rows'] == 45
+          assert summary['original_unreviewed_source_rows'] == len(original_queue) == 67
+          assert summary['unqualified_discovery_rows'] == len(discovery_queue) == 64
           assert summary['qualified_discovery_rows_pending_identity_review'] == len(qualified_queue) == 0
           assert summary['full_universe_unique_institution_count_claimed'] is None
           assert summary['absence_of_match_treated_as_uniqueness_proof'] is False
@@ -106,11 +108,26 @@ jobs:
           assert summary['runtime_database_mutation_performed'] is False
           assert summary['public_projection_rows_created'] == 0
 
-          expected = {'kings-school-the-crown', 'international-school-choueifat-cairo'}
-          assert {row['review_identity_key'] for row in memberships} == expected
+          expected_discovery = {
+              'kings-school-the-crown',
+              'international-school-choueifat-cairo',
+              'global-paradigm-baccalaureate-school',
+              'capital-international-schools',
+              'mount-international-school-community',
+              'international-school-elite-education',
+          }
+          expected_overlaps = {
+              'global-paradigm-baccalaureate-school',
+              'capital-international-schools',
+              'mount-international-school-community',
+              'international-school-elite-education',
+          }
+          assert {row['review_identity_key'] for row in discovery_memberships} == expected_discovery
+          assert {row['review_identity_key'] for row in overlap_original} == expected_overlaps
           by_key = {row['review_identity_key']: row for row in institutions}
-          assert expected <= set(by_key)
-          assert all(by_key[key]['uniqueness_inferred_from_absence_of_match'] is False for key in expected)
+          assert expected_discovery <= set(by_key)
+          assert all(by_key[key]['uniqueness_inferred_from_absence_of_match'] is False for key in expected_discovery)
+          assert all(by_key[key]['source_record_count'] == 2 for key in expected_overlaps)
           assert len({row['draft_institution_id'] for row in institutions}) == len(institutions)
 
           print(json.dumps(summary, indent=2))
