@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "source_id": "french_homologation_2026_2027",
+  "snapshot_date": "2026-09-14",
+  "legal_source": "Arrêté du 19 juin 2026 établissant la liste des établissements d'enseignement français à l'étranger homologués",
+  "legal_identifier": "MENC2615127A",
+  "source_url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054341397",
+  "academic_year": "2026-2027",
+  "country": "Egypt",
+  "records": [
+    {"city":"Alexandria","name":"Collège Saint-Marc","uai":"3010020L","levels":["Ecole"],"homologated_classes":"PS, MS, GS, CP, CE1, CE2, CM1, CM2","remark":"Homologation subject to conclusion of an AEFE partnership agreement; homologation applies only to the French-programme stream."},
+    {"city":"Alexandria","name":"Lycée français - Mlf","uai":"3010003T","levels":["Ecole","Collège","Lycée"],"homologated_classes":"PS, MS, GS, CP, CE1, CE2, CM1, CM2, 6e, 5e, 4e, 3e, 2nde, 1re Gén, Tale Gén","remark":null},
+    {"city":"Alexandria","name":"Lycée Molière (International School of Egypt)","uai":"3010017H","levels":["Ecole"],"homologated_classes":"PS, MS, GS, CP, CE1, CE2, CM1, CM2","remark":"Homologation applies only to the French-programme stream."},
+    {"city":"Hurghada","name":"Ecole française d'Hurghada","uai":"3010016G","levels":["Ecole"],"homologated_classes":"CP, CE1, CE2, CM1, CM2","remark":null},
+    {"city":"Cairo","name":"Collège de la Mère-de-Dieu","uai":"3010012C","levels":["Lycée"],"homologated_classes":"2nde, 1re Gén, Tale Gén","remark":"Homologation applies only to the French-programme stream."},
+    {"city":"Cairo","name":"Collège du Sacré-Cœur de Ghamra","uai":"3010008Y","levels":["Lycée"],"homologated_classes":"2nde, 1re Gén, Tale Gén","remark":"Homologation applies only to the French-programme stream."},
+    {"city":"Cairo","name":"Collège Saint-Vincent-de-Paul - Helmieh","uai":"3010021M","levels":["Lycée"],"homologated_classes":"2nde, 1re Gén, Tale Gén","remark":"Homologation subject to conclusion of an AEFE partnership agreement; homologation applies only to the French-programme stream."},
+    {"city":"Cairo","name":"Collège-lycée de la-Sainte-Famille","uai":"3010013D","levels":["Lycée"],"homologated_classes":"2nde, 1re Gén, Tale Gén","remark":"Homologation applies only to the French-programme stream."},
+    {"city":"Cairo","name":"Collège-lycée de La-Salle","uai":"3010014E","levels":["Ecole","Collège","Lycée"],"homologated_classes":"MS, GS, CP, CE1, CE2, CM1, CM2, 6e, 5e, 4e, 3e, 2nde, 1re Gén, Tale Gén","remark":"Homologation applies only to the French-programme stream."},
+    {"city":"Cairo","name":"Lycée Albert-Camus","uai":"3010015F","levels":["Ecole","Collège","Lycée"],"homologated_classes":"PS, MS, GS, CP, CE1, CE2, CM1, CM2, 6e, 5e, 4e, 3e, 2nde, 1re Gén, Tale Gén","remark":null},
+    {"city":"Cairo","name":"Lycée Concordia","uai":"3010011B","levels":["Ecole","Collège","Lycée"],"homologated_classes":"PS, MS, GS, CP, CE1, CE2, CM1, CM2, 6e, 5e, 4e, 3e, 2nde, 1re Gén, Tale Gén","remark":null},
+    {"city":"Cairo","name":"Lycée français du Caire","uai":"3010002S","levels":["Ecole","Collège","Lycée"],"homologated_classes":"PS, MS, GS, CP, CE1, CE2, CM1, CM2, 6e, 5e, 4e, 3e, 2nde, 1re Gén, Tale Gén","remark":null},
+    {"city":"Cairo","name":"Lycée français international Simone-de-Beauvoir","uai":"3010009Z","levels":["Ecole","Collège","Lycée"],"homologated_classes":"MS, GS, CP, CE1, CE2, CM1, CM2, 6e, 5e, 4e, 3e, 2nde, 1re Gén, Tale Gén","remark":null},
+    {"city":"Cairo","name":"Lycée international Honoré-de-Balzac","uai":"3010006W","levels":["Ecole","Collège","Lycée"],"homologated_classes":"PS, MS, GS, CP, CE1, CE2, CM1, CM2, 6e, 5e, 4e, 3e, 2nde, 1re Gén, Tale Gén","remark":null},
+    {"city":"Cairo","name":"Lycée Voltaire (Smart Village)","uai":"3010010A","levels":["Ecole","Collège","Lycée"],"homologated_classes":"PS, MS, GS, CP, CE1, CE2, CM1, CM2, 6e, 5e, 4e, 3e, 2nde, 1re Gén, Tale Gén","remark":null},
+    {"city":"Cairo","name":"MISR Language School - Mlf","uai":"3010007X","levels":["Ecole","Collège","Lycée"],"homologated_classes":"PS, MS, GS, CP, CE1, CE2, CM1, CM2, 6e, 5e, 4e, 3e, 2nde, 1re Gén, Tale Gén","remark":"Homologation applies only to the French-programme stream."},
+    {"city":"Sharm el Sheikh","name":"Ecole française de Sharm el Sheikh","uai":"3010018J","levels":["Ecole"],"homologated_classes":"PS, MS, GS","remark":null}
+  ],
+  "records_count": 17,
+  "scope_note": "French government homologation is strong international-programme evidence. Institutions whose homologation is limited to a French-programme stream remain eligible candidates, with that limitation preserved as a field-level fact rather than generalized to the whole institution without review."
+}
