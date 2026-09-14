@@ -2,7 +2,7 @@
   "schema_version": 1,
   "source_id": "ib_world_schools_egypt",
   "snapshot_date": "2026-09-15",
-  "notes": "Incremental current IB school-profile evidence captured after the 2026-09-14 detail seed. Records in this file supplement, not replace, the prior detail snapshot. PRIVATE/STATE classification is taken from the current official IB profile for each exact directory identity.",
+  "notes": "Incremental current IB school-profile evidence captured after the 2026-09-14 detail seed. Records in this file supplement, not replace, the prior detail snapshot.",
   "records": [
     {
       "name": "Evolution International School - NewGiza",
@@ -57,59 +57,9 @@
       "phone": "+2025657115",
       "address": "Road 17, 1st District, 3rd Zone, 5th Settlement, New Cairo, Cairo 11835, Egypt",
       "source_url": "https://ibo.org/fr/programmes/find-an-ib-school/ibaem/n/new-cairo-british-international-school/"
-    },
-    {
-      "name": "AIA School",
-      "ib_school_code": "061879",
-      "type": "PRIVATE",
-      "scope_state": "eligible",
-      "website": "aia-alex.com/",
-      "phone": "+2001273542658",
-      "address": "Plot 2 & 3, Abyss District 1, Eastern Zone Educational Administration, Alexandria 22628, Egypt",
-      "source_url": "https://ibo.org/programmes/find-an-ib-school/ibaem/a/aia-school/"
-    },
-    {
-      "name": "Al-Hoda International School",
-      "ib_school_code": "063638",
-      "type": "PRIVATE",
-      "scope_state": "eligible",
-      "website": "alhodaschools.com",
-      "phone": "+2020238834229",
-      "address": "6th October West of Somid, Giza, Egypt",
-      "source_url": "https://ibo.org/school/063638/"
-    },
-    {
-      "name": "American International School in Egypt",
-      "ib_school_code": "000654",
-      "type": "PRIVATE",
-      "scope_state": "eligible",
-      "website": "www.aisegypt.com/",
-      "phone": "+2026188402",
-      "address": "Uptown Cairo (Emaar) Compound, Al Abageya, El Mokattam, Past Eleva Gate, Cairo Governorate 4415301, Egypt",
-      "source_url": "https://ibo.org/en/school/000654"
-    },
-    {
-      "name": "American International School in Egypt West Campus",
-      "ib_school_code": "049504",
-      "type": "PRIVATE",
-      "scope_state": "eligible",
-      "website": "www.aisegypt.com/",
-      "phone": null,
-      "address": "Entrance 2, Greens Compound, Sheikh Zayed City, Giza, Cairo 12588, Egypt",
-      "source_url": "https://ibo.org/es/school/049504/"
-    },
-    {
-      "name": "Bedayia International School",
-      "ib_school_code": "052332",
-      "type": "PRIVATE",
-      "scope_state": "eligible",
-      "website": "www.bedayia.com",
-      "phone": null,
-      "address": "Al Banafseg District, First Settlement, New Cairo, Cairo 11865, Egypt",
-      "source_url": "https://ibo.org/es/programmes/find-an-ib-school/ibaem/b/bedayia-international-school/"
     }
   ],
-  "records_count": 10,
-  "eligible_private": 10,
+  "records_count": 5,
+  "eligible_private": 5,
   "excluded_state": 0
 }
