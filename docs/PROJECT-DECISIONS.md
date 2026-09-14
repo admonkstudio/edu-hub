@@ -192,6 +192,22 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 **Reference migration:** `infra/owned-data/007_school_divisions.sql`.
 
+## 2026-09-15 — Reviewed canonical drafts are portable review artifacts, not database writes
+
+**Decision:** D2.2 may materialize explicit, source-backed identity decisions into deterministic portable draft records before a runtime database exists, provided the artifacts preserve all source memberships and review boundaries.
+
+**Decision:** Deterministic UUIDv5 identifiers used in D2.2 build artifacts are stable draft identifiers. They do not by themselves create `edu_core` rows, authorize a runtime import, or make an entity publishable.
+
+**Decision:** Identity review and eligibility selection remain separate. Grouping source records into one reviewed identity does not automatically select a final institution-wide eligibility state when evidence is division-scoped or otherwise unresolved.
+
+**Decision:** A reviewed institution identity does not imply a reviewed campus structure. Until campus count/relationships are explicitly sourced and reviewed, the canonical draft must record `campus_structure_state=not_yet_reviewed` and create zero canonical campus records.
+
+**Decision:** Unreviewed source rows remain in an explicit D2.2 review queue; they are not silently treated as unique institutions merely because no duplicate has yet been found.
+
+**Decision:** The current D2.2 materialization boundary permits reviewed institution drafts, reviewed division drafts, unresolved campus review states and review queues, while still requiring zero automatic merges, zero runtime database mutation and zero public projection.
+
+**Reference builder:** `tools/data-acquisition/international/build_reviewed_canonical_artifacts.py`.
+
 ## Deferred decisions until database completion
 
 - Astro-first vs Instatic-first final implementation choice;
