@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "registry_id": "edu-data-1-egypt-national-education-registry",
-  "updated_on": "2026-09-13",
+  "updated_on": "2026-09-14",
   "principles": {
     "raw_records_are_not_canonical_entities": true,
     "secondary_sources_cannot_satisfy_official_coverage_targets": true,
@@ -109,6 +109,26 @@
       ],
       "publication_role": "identity_and_hierarchy_evidence",
       "notes": "Do not flatten parent technological colleges and child institutes into unrelated canonical entities."
+    },
+    {
+      "source_id": "mohesr_technological_colleges",
+      "name": "Ministry of Higher Education — Technological College Parents",
+      "entity_family": "higher_education",
+      "authority_class": "primary_official_registry",
+      "base_url": "https://mohesr.gov.eg/",
+      "coverage_target": {
+        "count": 8,
+        "period": "current acquired official structure",
+        "basis": "8 parent technological colleges in the official 44-institute structure",
+        "reference_url": "https://mohesr.gov.eg/"
+      },
+      "row_level_status": "acquired_from_official_structure",
+      "preferred_acquisition": [
+        "official_page_enumeration",
+        "preserve_parent_child_relationships"
+      ],
+      "publication_role": "higher_education_hierarchy_parent_evidence",
+      "notes": "Track the 8 parent colleges separately so they do not inflate the 44 child-institute coverage count."
     },
     {
       "source_id": "moss_nursery_census",
