@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "registry_id": "edu-data-1-egypt-national-education-registry",
+  "updated_on": "2026-09-14",
+  "principles": {
+    "raw_records_are_not_canonical_entities": true,
+    "secondary_sources_cannot_satisfy_official_coverage_targets": true,
+    "missing_fields_must_not_be_invented": true,
+    "mirrored_media_is_not_automatically_public": true
+  },
+  "sources": [
+    {
+      "source_id": "moe_emis_school_directory",
+      "name": "Ministry of Education / EMIS Egyptian Schools Directory",
+      "entity_family": "pre_university",
+      "authority_class": "primary_official_registry",
+      "base_url": "https://search.emis.gov.eg/",
+      "coverage_target": {
+        "count": 62690,
+        "period": "2025/26",
+        "basis": "MOE annual statistics official school count",
+        "reference_url": "https://emis.gov.eg/statistics/books/2025-2026/main_book25-26.html"
+      },
+      "row_level_status": "official_directory_confirmed_bulk_acquisition_unresolved_from_github_runners",
+      "preferred_acquisition": [
+        "egypt_or_local_reachable_runner",
+        "official_machine_readable_export"
+      ],
+      "publication_role": "identity_and_classification_evidence",
+      "notes": "Do not substitute secondary school directories for official national coverage."
+    },
+    {
+      "source_id": "azhar_institute_guide",
+      "name": "Al-Azhar Official Institute Guide",
+      "entity_family": "pre_university",
+      "authority_class": "primary_official_registry",
+      "base_url": "https://azhar.gov.eg/IDSC/InstGuide/Guide_Search.aspx",
+      "coverage_target": {
+        "count": 7674,
+        "period": "latest successful Edu Hub official acquisition",
+        "basis": "enumerated official institute records",
+        "reference_url": "https://azhar.gov.eg/IDSC/InstGuide/Guide_Search.aspx"
+      },
+      "row_level_status": "acquired",
+      "preferred_acquisition": [
+        "public_filter_enumeration_with_conservative_rate",
+        "periodic_refresh"
+      ],
+      "publication_role": "identity_classification_location_and_fee_evidence",
+      "notes": "Current live detail pages also expose institute fees when populated."
+    },
+    {
+      "source_id": "scu_institutions",
+      "name": "Supreme Council of Universities — Universities and Institutions",
+      "entity_family": "higher_education",
+      "authority_class": "primary_official_registry",
+      "base_url": "https://scu.eg/universities-institution/",
+      "coverage_target": {
+        "count": 327,
+        "period": "2026 current category contract",
+        "basis": "SCU category counts used by Edu Hub acquisition",
+        "reference_url": "https://scu.eg/universities-institution/"
+      },
+      "row_level_status": "public_category_pages_available",
+      "preferred_acquisition": [
+        "official_category_page_enumeration",
+        "institution_detail_enrichment"
+      ],
+      "publication_role": "higher_education_identity_and_category_evidence",
+      "notes": "Category total is an acquisition coverage contract. Preserve category membership and reconcile overlaps in staging."
+    },
+    {
+      "source_id": "mohesr_private_higher_institutes",
+      "name": "Ministry of Higher Education — Private Higher Institutes",
+      "entity_family": "higher_education",
+      "authority_class": "primary_official_registry",
+      "base_url": "https://mohesr.gov.eg/",
+      "coverage_target": {
+        "count": 208,
+        "period": "current ministry headline",
+        "basis": "MOHESR private institute count",
+        "reference_url": "https://mohesr.gov.eg/"
+      },
+      "row_level_status": "partially_acquired_from_official_sector_pages",
+      "preferred_acquisition": [
+        "official_sector_page_enumeration",
+        "reconcile_with_scu_accreditation_registry"
+      ],
+      "publication_role": "identity_sector_and_regulatory_evidence",
+      "notes": "The ministry 208 count and SCU accredited-private-institute count describe different registry views and must remain separate until reconciled."
+    },
+    {
+      "source_id": "mohesr_technical_institutes",
+      "name": "Ministry of Higher Education — Technological Colleges and Technical Institutes",
+      "entity_family": "higher_education",
+      "authority_class": "primary_official_registry",
+      "base_url": "https://mohesr.gov.eg/",
+      "coverage_target": {
+        "count": 44,
+        "parent_count": 8,
+        "period": "current acquired official structure",
+        "basis": "44 institutes under 8 technological colleges",
+        "reference_url": "https://mohesr.gov.eg/"
+      },
+      "row_level_status": "acquired_from_official_structure",
+      "preferred_acquisition": [
+        "official_page_enumeration",
+        "preserve_parent_child_relationships"
+      ],
+      "publication_role": "identity_and_hierarchy_evidence",
+      "notes": "Do not flatten parent technological colleges and child institutes into unrelated canonical entities."
+    },
+    {
+      "source_id": "mohesr_technological_colleges",
+      "name": "Ministry of Higher Education — Technological College Parents",
+      "entity_family": "higher_education",
+      "authority_class": "primary_official_registry",
+      "base_url": "https://mohesr.gov.eg/",
+      "coverage_target": {
+        "count": 8,
+        "period": "current acquired official structure",
+        "basis": "8 parent technological colleges in the official 44-institute structure",
+        "reference_url": "https://mohesr.gov.eg/"
+      },
+      "row_level_status": "acquired_from_official_structure",
+      "preferred_acquisition": [
+        "official_page_enumeration",
+        "preserve_parent_child_relationships"
+      ],
+      "publication_role": "higher_education_hierarchy_parent_evidence",
+      "notes": "Track the 8 parent colleges separately so they do not inflate the 44 child-institute coverage count."
+    },
+    {
+      "source_id": "moss_nursery_census",
+      "name": "Ministry of Social Solidarity — National Nursery Census",
+      "entity_family": "early_education",
+      "authority_class": "primary_official_registry",
+      "base_url": "https://www.moss.gov.eg/",
+      "coverage_target": {
+        "count": 48225,
+        "period": "2025 national census",
+        "basis": "MOSS national comprehensive nursery census",
+        "reference_url": "https://www.moss.gov.eg/"
+      },
+      "row_level_status": "official_database_exists_public_row_level_export_not_exposed",
+      "preferred_acquisition": [
+        "official_data_request_or_data_sharing_export",
+        "future_public_nursery_map_after_launch"
+      ],
+      "publication_role": "nursery_identity_licensing_capacity_and_fee_evidence_when_released",
+      "notes": "Secondary nursery directories may aid discovery but cannot be represented as national census coverage."
+    },
+    {
+      "source_id": "naqaae_nqf",
+      "name": "NAQAAE National Qualifications Framework Registry",
+      "entity_family": "higher_education",
+      "authority_class": "primary_accreditation",
+      "base_url": "https://nqf.naqaae.eg/",
+      "coverage_target": null,
+      "row_level_status": "public_registry_available",
+      "preferred_acquisition": [
+        "institution_and_qualification_enrichment"
+      ],
+      "publication_role": "accreditation_qualification_and_program_evidence",
+      "notes": "Use for accreditation/qualification assertions and higher-education hierarchy enrichment, not as the sole institution identity universe."
+    },
+    {
+      "source_id": "capmas_preuniversity_statistics",
+      "name": "CAPMAS Pre-University Education Statistics",
+      "entity_family": "pre_university",
+      "authority_class": "primary_official_aggregate",
+      "base_url": "https://www.capmas.gov.eg/",
+      "coverage_target": null,
+      "row_level_status": "aggregate_statistics",
+      "preferred_acquisition": [
+        "coverage_audit_only"
+      ],
+      "publication_role": "coverage_and_geographic_audit",
+      "notes": "Aggregate counts validate coverage but do not create institution identities."
+    },
+    {
+      "source_id": "osm_egypt_education",
+      "name": "OpenStreetMap Egypt Education Features",
+      "entity_family": "mixed",
+      "authority_class": "secondary_open_data",
+      "base_url": "https://www.openstreetmap.org/",
+      "coverage_target": null,
+      "row_level_status": "acquired_secondary_geospatial_snapshot",
+      "preferred_acquisition": [
+        "geospatial_enrichment_and_matching"
+      ],
+      "publication_role": "coordinates_address_and_discovery_evidence",
+      "notes": "OSM does not establish licensing/regulatory status of an education institution."
+    }
+  ]
+}
