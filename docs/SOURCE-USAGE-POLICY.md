@@ -39,7 +39,32 @@ Terms reference: `https://www.edarabia.com/privacy-policy/` (section titled "Use
 
 ## British Council Partner Schools
 
-Use as discovery/contact/supporting evidence. Partner/attached-centre status does not automatically establish that an institution is an international school under Edu Hub scope.
+Use the September 2026 Partner Schools list as discovery/contact/supporting evidence. Partner/attached-centre status does not automatically establish that an institution is an international school under Edu Hub scope.
+
+The current PDF is browser-accessible and contains 19 pages, but direct Python retrieval from GitHub-hosted runners currently returns HTTP 403. Do not interpret that hosted 403 as source absence. The approved adapter supports a browser/local PDF supplied with `--pdf-path`; source rows remain candidate/discovery rows with zero automatic eligibility, merge or public promotion.
+
+## Council of International Schools (CIS)
+
+CIS International Accreditation is strong evidence that a school delivers international education under an internationally benchmarked accreditation framework.
+
+Active rule:
+
+- CIS accreditation may establish strong international-school-model/accreditation evidence;
+- Edu Hub still applies the private/independent ownership scope gate separately;
+- accreditation announcements are source evidence, not authorization to auto-create or auto-merge canonical identities;
+- recent/current accreditation evidence is preferred;
+- old accreditation announcements without current revalidation remain historical evidence and must not silently be treated as current accreditation.
+
+## Cognia
+
+Cognia is a recognized accreditation source. Cognia accreditation is useful for accreditation evidence and American/international-school candidate discovery.
+
+Active rule:
+
+- Cognia accreditation does **not** by itself prove that an Egyptian institution fits Edu Hub's international-school scope;
+- separately verify the international-school model and private/independent ownership;
+- dated official Cognia milestone/current-status evidence may be retained with provenance;
+- do not infer a curriculum, ownership model or active international-school classification from the Cognia name alone.
 
 ## Overture Maps
 
@@ -56,6 +81,8 @@ Asset-by-asset rights review is required. Store creator, license, license URL an
 ## Official institution websites
 
 Primary source for institution-controlled facts such as current contacts, campus details, admissions, fees, curriculum descriptions and programmes. Website publication does not automatically grant image/content republication rights; factual extraction and media reuse are separate issues.
+
+Official institution-origin Arabic and English names may be retained as localization evidence. Historical official names must retain their source date/recency state and should be revalidated before being treated as current where practical.
 
 ## Commercial directories generally
 
