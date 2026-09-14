@@ -4,227 +4,146 @@
 
 Edu Hub does **not** use Supabase.
 
-The project must remain deployable through either:
+The public presentation/runtime may eventually use:
 
-1. **Astro + TypeScript** as the public application/site layer; or
-2. **Instatic CMS** as the self-hosted CMS/publisher when its visual/content workflow is the better fit.
+1. **Astro + TypeScript**; or
+2. **Instatic CMS**.
 
-The data-acquisition and domain model must remain portable between these presentation/runtime choices. No current product requirement may depend on Supabase-specific database, auth, storage, RLS, functions or APIs.
+However, **the final platform choice is deferred until the database-completion gate is finished**.
 
-## Core stack direction
+The current milestone must therefore remain presentation-neutral. The data-acquisition, canonical model, bilingual localization, provenance and media layers must be complete and portable before the project decides how to render them.
 
-- Astro + TypeScript for the SEO-sensitive public application when a coded frontend is required
-- Instatic CMS as the preferred self-hosted visual CMS/publishing option when an editorial/admin workflow is required
-- owned structured data and evidence artifacts
-- relational data model for institutions, campuses, curricula, accreditations, fees, admissions, programmes and media provenance
-- Zod or equivalent validation at application/import boundaries
-- server-side/background jobs only where justified
-- owned media storage; never operational hotlinks to third-party images
+## Current priority
 
-### Runtime database choice
+The active stack is the **data/research system**, not the public website.
 
-The domain model is relational, but the runtime database is intentionally not locked to Supabase.
+Current work focuses on:
 
-Acceptable implementations include:
+- source acquisition;
+- canonical identity reconciliation;
+- English/Arabic localization architecture;
+- profile enrichment;
+- evidence/provenance;
+- historical/versioned admissions and fees;
+- media references and rights;
+- completeness/conflict reporting;
+- deterministic portable exports.
 
-- Instatic's own self-hosted database/storage stack;
-- SQLite for a compact self-hosted Instatic deployment when the active corpus and concurrency make it appropriate;
-- PostgreSQL attached directly to the self-hosted Instatic/Railway deployment when scale, querying or operational requirements justify it;
-- an owned local/server database or generated static data layer consumed by Astro.
+Do not spend the current milestone optimizing for CMS collections, Astro routes, UI components, filtering UX or page templates.
 
-The current SQL migrations remain a canonical relational reference and validation target. They must not force the public product to adopt a separate managed database service when the selected Astro/Instatic architecture does not need one.
+## Logical data architecture
 
-## Recommended product architecture
-
-### Option A — Instatic-first
-
-Use Instatic as the operational CMS and publishing layer when its collections, visual editor, media library and static publishing can represent the required institution/profile model cleanly.
-
-```text
-external sources
-→ acquisition/evidence artifacts
-→ normalization + reconciliation
-→ reviewed canonical data
-→ Instatic import/collections + owned media
-→ published website
-```
-
-This is the preferred low-complexity route if the existing Instatic deployment proves capable of the registry, bilingual content and structured profile requirements.
-
-### Option B — Astro-first
-
-Use Astro when the directory/search/filtering/SEO architecture needs more control than Instatic provides.
-
-```text
-external sources
-→ acquisition/evidence artifacts
-→ normalization + reconciliation
-→ reviewed canonical data/static export
-→ Astro build/server routes
-→ published website
-```
-
-In this model, use build-time/static data wherever possible and add a server database only when measured product needs require it.
-
-### Hybrid use
-
-Do not create a hybrid Astro + Instatic architecture by default. Use both only if Instatic clearly improves editorial operations while Astro is demonstrably needed for the public directory/search experience. If both are used, one canonical data owner must be defined so content is not duplicated or allowed to drift.
-
-## Repository architecture
-
-For an Astro implementation, prefer:
-
-```text
-apps/
-  web/       Astro public platform
-
-packages/
-  domain/
-  data/
-  seo/
-  research/
-  ui/
-  config/
-
-tools/
-  data-acquisition/
-```
-
-If Instatic is selected, keep acquisition/reconciliation tooling in this repository and add a narrow export/import adapter rather than duplicating the research system inside the CMS.
-
-Do not create a generic multi-vertical product framework yet.
-
-## Rendering policy
-
-Default principle:
-
-> Keep static content static; add runtime only where the experience earns it.
-
-For Astro:
-
-### Prerender/static where suitable
-
-- homepage
-- stable marketing/legal pages
-- editorial content
-- institution profiles whose data changes infrequently
-- selected major directory/topic hubs
-
-### Server/on-demand + caching only where justified
-
-- high-volume browse/search
-- complex faceted filtering
-- comparison
-- authenticated admin functions if Astro eventually owns them
-
-### Client islands only where justified
-
-- filtering
-- autocomplete
-- maps
-- comparison
-- future account-specific interaction
-
-Do not add React/Svelte/Vue islands by default.
-
-For Instatic, prefer its native static publishing and media pipeline. Do not add a separate frontend framework solely to reproduce what Instatic already publishes well.
-
-## Data ownership
-
-Edu Hub owns a persistent copy of the data required to operate the product.
-
-The enforced logical path remains:
+The project retains:
 
 ```text
 external source
 → raw evidence
 → staging/reconciliation
 → reviewed canonical data
-→ publication projection
-→ Astro or Instatic
+→ bilingual localization
+→ completeness/media audit
+→ portable export
+→ presentation platform later
 ```
 
-Public pages must never depend on a live third-party directory/API after acquisition.
+The SQL migrations remain a canonical relational/reference model and validation target. They do **not** require Supabase or commit the project to a final production database technology.
 
-The current `edu_raw`, `edu_staging`, and `edu_core` SQL schemas describe this logical separation. Physical implementation may be adapted for Instatic/SQLite/static artifacts as long as the evidence, review and publication boundaries remain intact.
+## Presentation options after database completion
 
-## Media
+### Astro-first
 
-- store owned copies only when rights permit possession/reuse;
-- preserve source URL, creator, license and attribution metadata;
-- institution-site/social images may be discovery candidates but are not public-use assets by default;
-- publication-safe media should be stored in the selected self-hosted runtime/media layer;
-- if no safe photo exists, use the institution's English name on the designed placeholder.
+Use Astro if the completed dataset shows a need for strong coded control over directory/search/filtering, programmatic SEO, comparison or custom profile experiences.
 
-## Security
+### Instatic-first
 
-- never expose admin/database credentials to public browser code;
-- admin/research operations require authenticated access in the selected platform;
-- public reads expose only reviewed publication data;
-- future institution users submit reviewed change requests rather than unrestricted canonical edits;
-- perform security review before public user data, uploads, claims, payments or lead/application workflows.
+Use Instatic if the completed dataset maps cleanly to its collection/media/editorial model and the lower-complexity static publishing workflow is sufficient.
+
+### Hybrid
+
+Do not use Astro + Instatic together by default. A hybrid is permitted only after the database is complete and a clear division of responsibility is documented with one canonical data owner.
+
+## Data ownership
+
+Edu Hub owns/controls a persistent copy of the data required to operate the product.
+
+Public rendering must never depend on live third-party directory/API calls after acquisition.
+
+The physical storage implementation chosen later must preserve:
+
+- raw source evidence;
+- staging/reconciliation state;
+- canonical identities;
+- EN/AR localizations;
+- source/field provenance;
+- historical/versioned values;
+- media rights/provenance;
+- exportability and backup.
 
 ## Localization
 
-Launch locales:
+Database locales:
 
 - `en-EG`
 - `ar-EG`
 
-Requirements:
+Language-neutral factual fields are stored once. Localized text is modeled separately.
 
-- locale-aware routes
-- correct HTML language/direction
-- RTL layout support
-- locale-specific metadata
-- `hreflang`
-- localized content validation
-- Arabic search normalization without altering canonical display strings
+Localization metadata should distinguish:
 
-## Search
+- official source;
+- institution source;
+- verified translation;
+- editorial translation;
+- transliteration;
+- needs review.
 
-Start as simply as the selected runtime allows.
+Prefer official Arabic names. Transliteration/editorial Arabic must never be confused with an official sourced name.
 
-For the current international-only corpus, prefer static/generated indexes or lightweight local queries before adding a dedicated search service. Add a more complex search engine only after measured corpus/query requirements justify it.
+## Media
 
-## Performance
+The database must record media independently of the future public renderer.
 
-Performance is continuous, not a launch-only task.
+Store/reference:
 
-Track:
+- source page/original media reference;
+- related institution/campus;
+- role;
+- creator/license/attribution;
+- rights basis;
+- identity-match state;
+- public-use flag;
+- owned/local storage key and hash when acquisition is permitted;
+- EN/AR caption/alt where relevant.
 
-- server/build response behavior
-- client JavaScript/island cost
-- image/media delivery
-- fonts
-- third-party scripts
-- layout stability
-- interaction responsiveness
-- directory/search query behavior
-- mobile runtime
+If no safe image exists, `placeholder_required` is a valid completed media state.
 
-## QA
+## Portability requirement
 
-Minimum implementation checks where configured:
+Before selecting Astro or Instatic, EDU-DATA-2 must be able to generate a deterministic presentation-neutral package containing:
 
-```text
-lint
-→ typecheck
-→ tests
-→ production build/publish
-→ browser QA
-→ responsive/RTL QA
-→ console/network review
-```
+- canonical institutions/campuses/providers;
+- EN/AR localization;
+- curricula/accreditations;
+- geography/contacts;
+- admissions/fees history;
+- programmes/academic units;
+- media manifest/rights;
+- evidence/provenance;
+- conflict/review state;
+- completeness metrics.
 
-## Environment handling
+No CMS or frontend framework may become the only holder of the database.
 
-Provide `.env.example` with non-secret variable names only when the selected runtime needs environment variables.
+## Deferred platform decisions
 
-Never commit actual credentials/secrets.
+Do not resolve these during the database-completion gate:
 
-## Current platform decision still to resolve
+- Astro-first vs Instatic-first;
+- final physical runtime database;
+- final public collection/page architecture;
+- search/filter implementation;
+- hosting adapter;
+- frontend deployment;
+- visual component system.
 
-The remaining choice is **Astro-first vs Instatic-first**, based on the real directory/CMS requirements and the capabilities of the existing self-hosted Instatic instance.
-
-Supabase is not a candidate for Edu Hub.
+The completed database will determine these requirements later.
