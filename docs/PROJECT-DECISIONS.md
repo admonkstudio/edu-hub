@@ -22,11 +22,13 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 **Decision (2026-09-14):** Edu Hub will not use Supabase.
 
-**Decision (2026-09-14):** The product should be implemented as either Astro-first or Instatic-first. Instatic is the approved self-hosted CMS/publisher option. A hybrid Astro + Instatic stack is allowed only if there is a clear product need and one canonical data owner is defined.
+**Decision (2026-09-14):** The product should eventually be implemented as either Astro-first or Instatic-first. Instatic is the approved self-hosted CMS/publisher option. A hybrid Astro + Instatic stack is allowed only if there is a clear product need and one canonical data owner is defined.
+
+**Decision (2026-09-14):** The final Astro vs Instatic presentation/runtime choice is deferred until the database-completion gate is satisfied. Current data architecture must not be bent around a premature frontend/CMS decision.
 
 **Decision (2026-09-14):** The data/research layer must remain portable and independent of Supabase-specific database, auth, storage, RLS, Edge Functions or APIs.
 
-**Decision (2026-09-14):** The relational SQL model remains a canonical domain/reference model, but the physical runtime may use Instatic's self-hosted database/storage, SQLite, directly attached PostgreSQL, or owned static/generated data consumed by Astro.
+**Decision (2026-09-14):** The relational SQL model remains a canonical domain/reference model, but physical runtime storage is a later implementation choice.
 
 **Decision:** Arabic and English are first-class locales from launch, initially `ar-EG` and `en-EG`.
 
@@ -62,7 +64,7 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 **Decision:** Conflicting assertions remain review work until resolved.
 
-**Decision:** If Instatic/SQLite/static artifacts are selected, the logical raw/staging/core boundaries must still be preserved even if the physical storage implementation differs from the PostgreSQL reference schemas.
+**Decision:** If Instatic/SQLite/static artifacts are selected later, the logical raw/staging/core boundaries must still be preserved even if the physical storage implementation differs from the PostgreSQL reference schemas.
 
 ## 2026-09-14 — Scope reset to international education
 
@@ -140,6 +142,26 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 **Decision:** Ask Kalam infrastructure remains unrelated and must not receive Edu Hub data.
 
+## 2026-09-14 — Database-first completion gate
+
+**Decision:** The current project priority is **database completion and bilingual data architecture before presentation**.
+
+**Decision:** No final Astro/Instatic selection, profile template, filter UX, visual system or public-page architecture should drive the data model during this gate.
+
+**Decision:** English and Arabic are modeled as first-class localizations of one canonical factual entity model. Language-neutral facts are stored once; localized names/descriptions/display text are stored separately with localization origin/status.
+
+**Decision:** Prefer official Arabic names where available. Where no official Arabic form exists, transliteration/editorial localization must be explicitly marked and must never be presented internally as an official sourced name.
+
+**Decision:** Database completeness is measured independently across factual coverage, English localization, Arabic localization, provenance/conflict state and media coverage.
+
+**Decision:** Fees and admissions are versioned by academic year/cycle. New values do not overwrite historical values.
+
+**Decision:** Every eligible institution must have an explicit media status even when no publishable image exists. `placeholder_required` is a valid completed media state.
+
+**Decision:** The database-completion gate ends with a deterministic, presentation-neutral export containing canonical identities, EN/AR localization, source references, historical/time-sensitive facts, media manifest/rights, conflict state and completeness metrics.
+
+**Canonical plan:** `docs/DATABASE-COMPLETION-PLAN.md`.
+
 ## 2026-09-14 — SEO/publication boundary retained
 
 **Decision:** A database/content record does not automatically become an indexable page.
@@ -148,14 +170,15 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 **Decision:** Only reviewed public projections are eligible for publication/indexing.
 
-## Pending decisions
+## Deferred decisions until database completion
 
 - Astro-first vs Instatic-first final implementation choice;
-- if Instatic-first: SQLite vs directly attached PostgreSQL based on real scale/query requirements;
+- if Instatic-first: physical database/storage choice based on real corpus/query requirements;
+- final public profile/listing presentation architecture;
 - final public brand name/domain;
 - final Astro hosting adapter if Astro is selected;
 - final visual identity/design system;
 - final map provider;
 - final analytics/consent stack;
-- exact minimum profile completeness threshold for first public launch;
+- exact public-page completeness threshold;
 - institution media permission/claim workflow for Phase 2.
