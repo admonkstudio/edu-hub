@@ -34,6 +34,43 @@ def normalize_space(value: object) -> str:
     return " ".join(str(value or "").split())
 
 
+def combine_ib_detail_snapshots(*snapshots: dict) -> dict:
+    """Combine dated IB detail evidence while preserving the source date per row.
+
+    Later snapshots supersede an earlier row only when the exact normalized
+    school name repeats. This keeps incremental evidence source-dated without
+    rewriting older snapshots.
+    """
+    by_name: dict[str, dict] = {}
+    snapshot_counts: dict[str, int] = {}
+    for snapshot in snapshots:
+        snapshot_date = snapshot["snapshot_date"]
+        records = snapshot.get("records", [])
+        assert snapshot["records_count"] == len(records)
+        snapshot_counts[snapshot_date] = snapshot_counts.get(snapshot_date, 0) + len(records)
+        for source_row in records:
+            row = dict(source_row)
+            row["detail_snapshot_date"] = snapshot_date
+            by_name[normalize_space(row["name"]).casefold()] = row
+
+    records = list(by_name.values())
+    return {
+        "records": records,
+        "records_count": len(records),
+        "eligible_private": sum(
+            1
+            for row in records
+            if row.get("type") == "PRIVATE" and row.get("scope_state") == "eligible"
+        ),
+        "excluded_state": sum(
+            1
+            for row in records
+            if row.get("type") == "STATE" and row.get("scope_state") == "excluded"
+        ),
+        "snapshot_counts": snapshot_counts,
+    }
+
+
 def ib_records(data: dict, detail_data: dict) -> list[dict]:
     source_id = data["source_id"]
     snapshot_date = data["snapshot_date"]
@@ -70,6 +107,7 @@ def ib_records(data: dict, detail_data: dict) -> list[dict]:
                 {
                     "source_url": detail["source_url"],
                     "detail_source_url": detail["source_url"],
+                    "detail_source_snapshot_date": detail.get("detail_snapshot_date"),
                     "ib_school_code": detail.get("ib_school_code"),
                     "ib_school_type": detail.get("type"),
                     "scope_state": detail["scope_state"],
@@ -251,8 +289,8 @@ def validate_inputs(
     auc: dict,
 ) -> None:
     assert ib["directory_count_observed"] == len(ib["schools"]) == 54
-    assert ib_detail["records_count"] == len(ib_detail["records"]) == 7
-    assert ib_detail["eligible_private"] == 4
+    assert ib_detail["records_count"] == len(ib_detail["records"]) == 8
+    assert ib_detail["eligible_private"] == 5
     assert ib_detail["excluded_state"] == 3
     assert bso["records_count"] == len(bso["records"]) == 11
     assert bso_detail["records_count"] == len(bso_detail["records"]) == 11
@@ -286,7 +324,9 @@ def validate_inputs(
 
 def build(seed_dir: Path, output_dir: Path) -> dict:
     ib = load_json(seed_dir / "ib-egypt-directory-2026-09-14.json")
-    ib_detail = load_json(seed_dir / "ib-detail-evidence-2026-09-14.json")
+    ib_detail_2026_09_14 = load_json(seed_dir / "ib-detail-evidence-2026-09-14.json")
+    ib_detail_2026_09_15 = load_json(seed_dir / "ib-detail-evidence-2026-09-15.json")
+    ib_detail = combine_ib_detail_snapshots(ib_detail_2026_09_14, ib_detail_2026_09_15)
     bso = load_json(seed_dir / "uk-dfe-bso-egypt-2026-08-26.json")
     bso_detail = load_json(seed_dir / "uk-dfe-gias-bso-egypt-detail-2026-09-14.json")
     french = load_json(seed_dir / "french-homologation-egypt-2026-2027.json")
@@ -322,6 +362,7 @@ def build(seed_dir: Path, output_dir: Path) -> dict:
         "candidate_source_rows": sum(1 for row in rows if row["scope_state"] == "candidate"),
         "excluded_source_rows": sum(1 for row in rows if row["scope_state"] == "excluded"),
         "ib_detail_rows_applied": len(ib_detail["records"]),
+        "ib_detail_snapshot_counts": ib_detail["snapshot_counts"],
         "bso_detail_rows_applied": len(bso_detail["records"]),
         "unique_institutions_claimed": None,
         "identity_reconciliation_required": True,
