@@ -14,6 +14,7 @@ on:
       - 'tools/data-acquisition/emis_local_capture.py'
       - 'tools/data-acquisition/scrape_scu.py'
       - 'tools/data-acquisition/scrape_azhar.py'
+      - 'tools/data-acquisition/scrape_mohesr_private.py'
       - '.github/workflows/edu-data-1-contract.yml'
   pull_request:
     branches:
@@ -28,6 +29,7 @@ on:
       - 'tools/data-acquisition/emis_local_capture.py'
       - 'tools/data-acquisition/scrape_scu.py'
       - 'tools/data-acquisition/scrape_azhar.py'
+      - 'tools/data-acquisition/scrape_mohesr_private.py'
       - '.github/workflows/edu-data-1-contract.yml'
   workflow_dispatch:
 
@@ -43,7 +45,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate source registry
+      - name: Validate source and alias registry contracts
         run: |
           mkdir -p artifacts/edu-data-1
           python tools/data-acquisition/registry/validate_registry.py \
@@ -55,13 +57,18 @@ jobs:
           python -m py_compile tools/data-acquisition/registry/test_build_staging_seed.py
           python -m py_compile tools/data-acquisition/registry/plan_core_seed.py
           python -m py_compile tools/data-acquisition/registry/test_plan_core_seed.py
+          python -m py_compile tools/data-acquisition/registry/reconcile_higher_ed.py
+          python -m py_compile tools/data-acquisition/registry/test_reconcile_higher_ed.py
           python -m py_compile tools/data-acquisition/registry/prepare_official_export.py
           python -m py_compile tools/data-acquisition/registry/test_prepare_official_export.py
           python -m py_compile tools/data-acquisition/emis_local_capture.py
+          python -m py_compile tools/data-acquisition/scrape_mohesr_private.py
       - name: Enforce staging coverage safety rules
         run: python tools/data-acquisition/registry/test_build_staging_seed.py
       - name: Enforce core identity planning safety rules
         run: python tools/data-acquisition/registry/test_plan_core_seed.py
+      - name: Enforce higher-education reconciliation safety rules
+        run: python tools/data-acquisition/registry/test_reconcile_higher_ed.py
       - name: Enforce official export intake safety rules
         run: python tools/data-acquisition/registry/test_prepare_official_export.py
       - uses: actions/upload-artifact@v4
@@ -74,7 +81,7 @@ jobs:
   official-source-smoke:
     name: Probe accessible official registries
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -99,6 +106,37 @@ jobs:
           print(json.dumps(data, ensure_ascii=False, indent=2))
           if total < 250:
               raise SystemExit(f'SCU smoke acquisition unexpectedly small: {total}')
+          PY
+      - name: Acquire current MOHESR private-institute sector registry
+        run: |
+          python tools/data-acquisition/scrape_mohesr_private.py \
+            --output artifacts/edu-data-1/mohesr_private_institutes.jsonl \
+            --report artifacts/edu-data-1/mohesr_private_institutes_report.json \
+            --page-text artifacts/edu-data-1/mohesr_private_page.txt
+      - name: Build SCU-MOHESR reconciliation proposals
+        run: |
+          python tools/data-acquisition/registry/reconcile_higher_ed.py \
+            --scu-csv tools/data-acquisition/seeds/scu_higher_ed_snapshot.csv \
+            --mohesr-private artifacts/edu-data-1/mohesr_private_institutes.jsonl \
+            --out-dir artifacts/edu-data-1/higher-ed-reconciliation
+      - name: Validate reconciliation remains proposal-only
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('artifacts/edu-data-1/higher-ed-reconciliation/reconciliation_report.json')
+          data = json.loads(p.read_text(encoding='utf-8'))
+          print(json.dumps(data, ensure_ascii=False, indent=2))
+          if int(data.get('scu_private_source_rows', 0)) < 150:
+              raise SystemExit('SCU private-institute reconciliation input unexpectedly small')
+          if int(data.get('mohesr_sector_occurrences', 0)) < 170:
+              raise SystemExit('MOHESR private-institute reconciliation input unexpectedly small')
+          if data.get('automatic_identity_acceptances') != 0:
+              raise SystemExit('Reconciliation must not auto-accept identities')
+          if data.get('edu_core_rows_created') != 0 or data.get('core_mutation_performed') is not False:
+              raise SystemExit('Reconciliation must not mutate edu_core')
+          if data.get('public_promotion_performed') is not False:
+              raise SystemExit('Reconciliation must not promote public data')
           PY
       - name: Probe Al-Azhar live adapter with a bounded sample
         run: |
