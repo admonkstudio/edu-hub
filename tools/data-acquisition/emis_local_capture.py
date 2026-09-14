@@ -6,9 +6,10 @@ search.emis.gov.eg host times out from the project's hosted acquisition runners,
 so this script is designed to be run from an Egypt/local network where the
 public directory is reachable.
 
-It saves public HTML plus a redacted machine-readable contract manifest needed
-to build a tested row-level enumerator afterwards. It does not authenticate,
-bypass access controls, submit private forms or evade rate limits.
+It saves local raw HTML plus redacted shareable HTML and a redacted machine-
+readable contract manifest needed to build a tested row-level enumerator
+later. It does not authenticate, bypass access controls, submit private forms
+or evade rate limits.
 """
 from __future__ import annotations
 
@@ -33,7 +34,7 @@ DEFAULT_TARGETS = [
 ]
 
 USER_AGENT = (
-    "EduHubResearchBot/1.1 "
+    "EduHubResearchBot/1.2 "
     "(+https://github.com/admonkstudio/edu-hub; public-source-contract-capture)"
 )
 
@@ -152,8 +153,6 @@ def form_manifest(page_url: str, form, form_index: int) -> dict:
 
         if element.name == "input":
             item["type"] = input_type or "text"
-            # Hidden ASP.NET state values are deliberately omitted from the JSON
-            # manifest; the raw HTML evidence retains them for later local replay.
             if input_type != "hidden":
                 item["value"] = element.get("value", "")
             item["is_hidden_state"] = input_type == "hidden" and str(element.get("name", "")).startswith("__")
@@ -190,6 +189,14 @@ def form_manifest(page_url: str, form, form_index: int) -> dict:
         "postback_targets": sorted(postback_targets),
         "fields": fields,
     }
+
+
+def redact_hidden_values(html_text: str) -> str:
+    soup = BeautifulSoup(html_text, "html.parser")
+    for inp in soup.find_all("input", attrs={"type": "hidden"}):
+        if inp.has_attr("value"):
+            inp["value"] = "[REDACTED]"
+    return str(soup)
 
 
 def capture_page(s: requests.Session, url: str, out_dir: Path, timeout: float) -> dict:
@@ -230,9 +237,13 @@ def capture_page(s: requests.Session, url: str, out_dir: Path, timeout: float) -
             return result
 
         file_stem = safe_name(response.url)
-        html_path = out_dir / f"{file_stem}.html"
-        html_path.write_bytes(response.content)
-        result["saved_html"] = html_path.name
+        raw_html_path = out_dir / f"{file_stem}.raw.html"
+        raw_html_path.write_bytes(response.content)
+
+        redacted_html_path = out_dir / f"{file_stem}.redacted.html"
+        redacted_html_path.write_text(redact_hidden_values(response.text), encoding="utf-8")
+        result["saved_html"] = redacted_html_path.name
+        result["saved_raw_html_local"] = raw_html_path.name
 
         soup = BeautifulSoup(response.text, "html.parser")
         result["title"] = clean(soup.title.get_text(" ", strip=True)) if soup.title else None
@@ -284,7 +295,7 @@ def capture_page(s: requests.Session, url: str, out_dir: Path, timeout: float) -
             for name in hidden_names
         )
         return result
-    except Exception as exc:  # network diagnostics must preserve failures
+    except Exception as exc:
         result.update(
             {
                 "ok": False,
@@ -300,7 +311,7 @@ def main() -> int:
     ap.add_argument(
         "--output-dir",
         default="artifacts/emis-local-capture",
-        help="Directory for raw HTML and redacted manifests",
+        help="Directory for local raw HTML, redacted HTML and manifests",
     )
     ap.add_argument("--timeout", type=float, default=45.0)
     ap.add_argument(
@@ -323,7 +334,7 @@ def main() -> int:
 
     report = {
         "tool": "emis_local_capture",
-        "version": 2,
+        "version": 3,
         "captured_at": datetime.now(timezone.utc).isoformat(),
         "user_agent": USER_AGENT,
         "targets": targets,
@@ -334,6 +345,8 @@ def main() -> int:
             "access_controls_bypassed": False,
             "bulk_enumeration_performed": False,
             "hidden_state_values_redacted_from_manifest": True,
+            "shareable_html_hidden_values_redacted": True,
+            "raw_html_kept_local": True,
         },
         "next_gate": (
             "Run analyze_emis_capture.py against this folder. Do not bulk-enumerate until the "
