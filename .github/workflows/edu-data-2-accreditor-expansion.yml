@@ -1,0 +1,96 @@
+name: EDU-DATA-2 Accreditor Expansion
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'tools/data-acquisition/international/build_accreditor_expansion.py'
+      - 'tools/data-acquisition/international/plan_identity_reconciliation.py'
+      - 'tools/data-acquisition/international/build_candidate_universe.py'
+      - 'tools/data-acquisition/international/seeds/cis-egypt-accreditation-evidence-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/cognia-egypt-milestones-2026-2027.json'
+      - '.github/workflows/edu-data-2-accreditor-expansion.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate CIS and Cognia D2.1 expansion
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile expansion tools
+        run: |
+          python -m py_compile tools/data-acquisition/international/build_authoritative_seed.py
+          python -m py_compile tools/data-acquisition/international/build_accreditor_expansion.py
+          python -m py_compile tools/data-acquisition/international/build_candidate_universe.py
+          python -m py_compile tools/data-acquisition/international/plan_identity_reconciliation.py
+      - name: Build existing deterministic authoritative base
+        run: python tools/data-acquisition/international/build_authoritative_seed.py --output-dir artifacts/international
+      - name: Build accreditor expansion and combined source universe
+        run: python tools/data-acquisition/international/build_accreditor_expansion.py
+      - name: Build combined D2.1 candidate universe
+        run: |
+          python tools/data-acquisition/international/build_candidate_universe.py \
+            --authoritative artifacts/international/accreditor-expansion/authoritative-source-candidates-with-accreditors.jsonl \
+            --output-dir artifacts/international/accreditor-expansion/candidate-universe
+      - name: Generate review-only cross-source identity proposals
+        run: |
+          python tools/data-acquisition/international/plan_identity_reconciliation.py \
+            --input artifacts/international/accreditor-expansion/authoritative-source-candidates-with-accreditors.jsonl \
+            --output artifacts/international/accreditor-expansion/identity-review-proposals.jsonl
+      - name: Validate expansion safety and coverage
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('artifacts/international/accreditor-expansion')
+          summary = json.loads((root/'accreditor-expansion-summary.json').read_text(encoding='utf-8'))
+          universe = json.loads((root/'candidate-universe/candidate-universe-summary.json').read_text(encoding='utf-8'))
+          rows = [json.loads(line) for line in (root/'accreditor-source-candidates.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          proposals = [json.loads(line) for line in (root/'identity-review-proposals.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+
+          assert summary['source_rows'] == 10
+          assert summary['source_counts']['cis_international_accreditation_egypt'] == 6
+          assert summary['source_counts']['cognia_member_milestones_egypt_2026_2027'] == 4
+          assert summary['candidate_rows'] == 10
+          assert summary['base_source_rows'] == 96
+          assert summary['combined_source_rows'] == 106
+          assert summary['international_eligibility_granted_by_expansion'] == 0
+          assert summary['canonical_institutions_created'] == 0
+          assert summary['automatic_merges_performed'] == 0
+          assert summary['public_projection_rows_created'] == 0
+          assert summary['database_mutation_performed'] is False
+
+          assert universe['source_record_count'] == 106
+          assert universe['scope_or_lead_state_counts']['candidate'] == 68
+          assert universe['scope_or_lead_state_counts']['eligible'] == 35
+          assert universe['scope_or_lead_state_counts']['excluded'] == 3
+          assert universe['english_name_present'] == 106
+          assert universe['arabic_name_present'] == 9
+          assert universe['bilingual_name_gap_count'] == 97
+          assert universe['canonical_institutions_created'] == 0
+          assert universe['automatic_merges_performed'] == 0
+          assert universe['public_projection_rows_created'] == 0
+          assert universe['presentation_runtime_dependency'] is None
+
+          assert all(row['scope_state'] == 'candidate' for row in rows)
+          assert all(row['auto_eligibility'] is False for row in rows)
+          assert all(row['canonical_identity_created'] is False for row in rows)
+          assert all(row['automatic_merge_performed'] is False for row in rows)
+          assert all(row['decision'] == 'needs_review' for row in proposals)
+          assert all(row['left_source_id'] != row['right_source_id'] for row in proposals)
+          print(json.dumps({'expansion': summary, 'combined_universe': universe, 'identity_review_proposals': len(proposals)}, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-accreditor-expansion
+          path: artifacts/international/accreditor-expansion/
+          if-no-files-found: error
