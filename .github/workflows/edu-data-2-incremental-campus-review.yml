@@ -61,7 +61,7 @@ jobs:
             --base artifacts/international/bso-scope-review/authoritative-source-candidates-with-bso-scope-review.jsonl \
             --output-dir artifacts/international/bso-scope-review/accreditor-expansion
           python tools/data-acquisition/international/apply_accreditor_scope_review.py
-      - name: Rebuild current 26-identity D2.2 artifact
+      - name: Rebuild current D2.2 identity artifact
         run: |
           python tools/data-acquisition/international/build_extended_identity_artifacts.py
           python tools/data-acquisition/international/build_hierarchy_review_artifacts.py
@@ -86,13 +86,13 @@ jobs:
           new = [json.loads(line) for line in (root/'incremental-current-campus-drafts.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
           pending = [json.loads(line) for line in (root/'campus-review-queue.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
 
-          assert summary['reviewed_institution_drafts'] == 26
+          assert summary['reviewed_institution_drafts'] == 30
           assert summary['base_current_campus_records'] == 9
           assert summary['incremental_review_batches'] == 1
           assert summary['new_current_campus_records'] == len(new) == 2
           assert summary['reviewed_current_campus_records'] == len(campuses) == 11
           assert summary['institutions_with_current_campus_evidence'] == len(structures) == 11
-          assert summary['institutions_pending_current_campus_review'] == len(pending) == 15
+          assert summary['institutions_pending_current_campus_review'] == len(pending) == 19
           assert summary['campus_structure_complete_records'] == 0
           assert summary['additional_current_campuses_ruled_out_records'] == 0
           assert summary['automatic_additional_campus_inference_performed'] is False
@@ -106,6 +106,14 @@ jobs:
           assert all(row['campus_structure_complete'] is False for row in campuses)
           assert all(row['additional_current_campuses_ruled_out'] is False for row in campuses)
           assert len({row['draft_campus_id'] for row in campuses}) == len(campuses)
+
+          pending_keys = {row['review_identity_key'] for row in pending}
+          assert {
+              'global-paradigm-baccalaureate-school',
+              'capital-international-schools',
+              'mount-international-school-community',
+              'international-school-elite-education',
+          } <= pending_keys
 
           print(json.dumps(summary, indent=2))
           PY
