@@ -7,6 +7,7 @@ on:
     paths:
       - 'tools/data-acquisition/international/acquire_british_council_partner_schools.py'
       - 'tools/data-acquisition/international/build_british_council_browser_discovery.py'
+      - 'tools/data-acquisition/international/apply_british_council_primary_scope_review.py'
       - 'tools/data-acquisition/international/build_candidate_universe.py'
       - 'tools/data-acquisition/international/build_authoritative_seed.py'
       - 'tools/data-acquisition/international/apply_ib_detail_batches.py'
@@ -14,6 +15,7 @@ on:
       - 'tools/data-acquisition/international/build_accreditor_expansion.py'
       - 'tools/data-acquisition/international/apply_accreditor_scope_review.py'
       - 'tools/data-acquisition/international/seeds/british-council-browser-discovery-*.json'
+      - 'tools/data-acquisition/international/seeds/british-council-primary-scope-review-*.json'
       - 'tools/data-acquisition/international/seeds/ib-detail-evidence-*-batch*.json'
       - 'tools/data-acquisition/international/seeds/bso-scope-review-2026-09-15.json'
       - 'tools/data-acquisition/international/seeds/accreditor-scope-review-2026-09-15.json'
@@ -25,7 +27,7 @@ permissions:
 
 jobs:
   discovery:
-    name: Validate browser-captured Partner Schools discovery batch
+    name: Validate Partner Schools discovery and primary re-sourcing
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +40,7 @@ jobs:
         run: |
           python -m py_compile tools/data-acquisition/international/acquire_british_council_partner_schools.py
           python -m py_compile tools/data-acquisition/international/build_british_council_browser_discovery.py
+          python -m py_compile tools/data-acquisition/international/apply_british_council_primary_scope_review.py
           python -m py_compile tools/data-acquisition/international/build_candidate_universe.py
           python -m py_compile tools/data-acquisition/international/build_authoritative_seed.py
           python -m py_compile tools/data-acquisition/international/apply_ib_detail_batches.py
@@ -55,13 +58,21 @@ jobs:
           python tools/data-acquisition/international/apply_accreditor_scope_review.py
       - name: Materialize reviewed browser discovery batch
         run: python tools/data-acquisition/international/build_british_council_browser_discovery.py
-      - name: Build expanded D2.1 discovery universe
+      - name: Build raw expanded D2.1 discovery universe
         run: |
           python tools/data-acquisition/international/build_candidate_universe.py \
             --authoritative artifacts/international/accreditor-scope-review/reviewed-source-universe.jsonl \
             --lead-file artifacts/international/british-council-browser-discovery/british-council-browser-leads.jsonl \
             --output-dir artifacts/international/british-council-candidate-universe
-      - name: Assert discovery-only safety contract
+      - name: Apply primary evidence scope review
+        run: python tools/data-acquisition/international/apply_british_council_primary_scope_review.py
+      - name: Build scope-reviewed expanded D2.1 universe
+        run: |
+          python tools/data-acquisition/international/build_candidate_universe.py \
+            --authoritative artifacts/international/accreditor-scope-review/reviewed-source-universe.jsonl \
+            --lead-file artifacts/international/british-council-primary-scope-review/british-council-leads-with-primary-review.jsonl \
+            --output-dir artifacts/international/british-council-reviewed-candidate-universe
+      - name: Assert discovery and primary-review safety contracts
         run: |
           python - <<'PY'
           import json
@@ -78,13 +89,32 @@ jobs:
           assert bc['public_projection_rows_created'] == 0
           assert bc['full_pdf_extraction_complete'] is False
 
-          root = Path('artifacts/international/british-council-candidate-universe')
+          raw_root = Path('artifacts/international/british-council-candidate-universe')
+          raw = json.loads((raw_root/'candidate-universe-summary.json').read_text(encoding='utf-8'))
+          assert raw['source_record_count'] == 141
+          assert raw['scope_or_lead_state_counts']['eligible'] == 103
+          assert raw['scope_or_lead_state_counts']['excluded'] == 3
+          assert raw['scope_or_lead_state_counts']['supporting_candidate'] == 35
+
+          review_root = Path('artifacts/international/british-council-primary-scope-review')
+          review = json.loads((review_root/'british-council-primary-scope-summary.json').read_text(encoding='utf-8'))
+          assert review['source_rows'] == 35
+          assert review['reviewed_rows'] == 2
+          assert review['eligible_rows'] == 2
+          assert review['remaining_supporting_candidates'] == 33
+          assert review['partner_status_treated_as_international_eligibility'] is False
+          assert review['automatic_identity_creation_performed'] is False
+          assert review['automatic_merges_performed'] == 0
+          assert review['database_mutation_performed'] is False
+          assert review['public_projection_rows_created'] == 0
+
+          root = Path('artifacts/international/british-council-reviewed-candidate-universe')
           summary = json.loads((root/'candidate-universe-summary.json').read_text(encoding='utf-8'))
           assert summary['source_record_count'] == 141
           assert summary['source_counts']['british_council_partner_schools_egypt_2026_09'] == 35
-          assert summary['scope_or_lead_state_counts']['eligible'] == 103
+          assert summary['scope_or_lead_state_counts']['eligible'] == 105
           assert summary['scope_or_lead_state_counts']['excluded'] == 3
-          assert summary['scope_or_lead_state_counts']['supporting_candidate'] == 35
+          assert summary['scope_or_lead_state_counts']['supporting_candidate'] == 33
           assert summary['english_name_present'] == 141
           assert summary['bilingual_name_gap_count'] == 97
           assert summary['unique_institutions_claimed'] is None
@@ -92,17 +122,25 @@ jobs:
           assert summary['automatic_merges_performed'] == 0
           assert summary['database_mutation_performed'] is False
           assert summary['public_projection_rows_created'] == 0
-          print(json.dumps({'british_council': bc, 'candidate_universe': summary}, indent=2))
+
+          evidence = [json.loads(line) for line in (review_root/'primary-scope-review-evidence.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          assert {row['source_record_id'] for row in evidence} == {
+              'bcps2026:kings-school-the-crown',
+              'bcps2026:international-school-choueifat-cairo',
+          }
+          print(json.dumps({'browser_discovery': bc, 'primary_review': review, 'reviewed_candidate_universe': summary}, indent=2))
           PY
-      - name: Record direct-acquisition boundary
+      - name: Record acquisition boundary
         run: |
-          echo "The September 2026 British Council PDF is browser-accessible but may return HTTP 403 to GitHub-hosted direct Python requests."
-          echo "The checked-in browser discovery batch is source-page referenced and remains supporting evidence only."
-          echo "Future full-PDF extraction may use acquire_british_council_partner_schools.py --pdf-path after a permitted browser/local download."
+          echo "British Council Partner School status remains supporting discovery/contact evidence only."
+          echo "Only exact leads with separately checked-in high-confidence primary/recognized evidence can receive eligibility state."
+          echo "The historical 106-row classified source universe remains independently reproducible and unchanged."
       - uses: actions/upload-artifact@v4
         with:
           name: edu-data-2-british-council-discovery
           path: |
             artifacts/international/british-council-browser-discovery/
             artifacts/international/british-council-candidate-universe/
+            artifacts/international/british-council-primary-scope-review/
+            artifacts/international/british-council-reviewed-candidate-universe/
           if-no-files-found: error
