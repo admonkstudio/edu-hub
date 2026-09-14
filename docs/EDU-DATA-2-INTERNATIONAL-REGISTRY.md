@@ -1,12 +1,14 @@
 # EDU-DATA-2 — Egypt International Education Registry
 
-Status: ACTIVE
+Status: **ACTIVE — DATABASE COMPLETION GATE**
 
 Branch: `edu-data-2-international-registry`
 
+Canonical completion plan: `docs/DATABASE-COMPLETION-PLAN.md`
+
 ## Product scope
 
-Edu Hub now focuses on **international education in Egypt** rather than attempting to represent the complete Egyptian public education system.
+Edu Hub focuses on **international education in Egypt** rather than attempting to represent the complete Egyptian public education system.
 
 Phase 1 registry scope includes:
 
@@ -28,6 +30,16 @@ Explicitly excluded from the active Phase 1 registry:
 - entities whose only evidence is a commercial directory listing.
 
 Historical national-registry work is retained for provenance and future optional expansion, but it is no longer an active product dependency.
+
+## Current execution priority
+
+The active objective is **database completion and bilingual EN/AR architecture before presentation**.
+
+Do not select or optimize for Astro vs Instatic during this gate. The finished database must be portable enough to feed either one later.
+
+Current sequence:
+
+`source discovery -> raw evidence -> identity reconciliation -> canonical institution/campus data -> EN/AR localization -> enrichment -> media/reference completion -> completeness audit -> portable export`
 
 ## International eligibility contract
 
@@ -55,7 +67,7 @@ The following are useful but do not automatically establish eligibility by thems
 
 - British Council Partner School / attached-centre status;
 - Cambridge/Pearson examination delivery alone;
-- commercial school directories;
+- Edarabia and other commercial school directories;
 - Overture/OSM/Wikidata place records;
 - the historical V7 archive;
 - an institution name containing `international`, `American`, `British`, `German`, etc.;
@@ -72,15 +84,41 @@ Do not include an Egyptian university merely because it offers a foreign validat
 
 ## Data architecture
 
-The existing evidence architecture remains valid:
+The evidence architecture remains:
 
-`external source -> edu_raw -> edu_staging -> edu_core -> public projection`
+`external source -> edu_raw -> edu_staging -> edu_core -> portable/public projection`
 
-But EDU-DATA-2 narrows what may be promoted into `edu_core` and adds a richer relational international profile.
+The SQL schemas are a canonical relational/reference model. They are not a commitment to Supabase or a final runtime database.
 
 ### Core identity
 
-One institution identity may have multiple campuses. A campus is never silently duplicated as a separate institution unless the source establishes it as a legally/academically separate institution.
+Primary entities:
+
+- provider/group;
+- institution;
+- campus/branch;
+- academic unit;
+- programme.
+
+A campus is never silently duplicated as a separate institution unless evidence establishes it as legally/academically separate.
+
+### Bilingual localization
+
+English and Arabic are first-class representations of the same canonical factual entity.
+
+Language-neutral facts are stored once. Localized text is modeled separately with locale and origin/status.
+
+Required localizable domains include, where applicable:
+
+- official/display institution name;
+- short/alternate names;
+- address display text;
+- descriptions/profile copy;
+- programme/academic-unit display names where needed.
+
+Localization status must distinguish official/institution-source text from verified/editorial translation and transliteration.
+
+Prefer official Arabic names. If an official Arabic form cannot be found, a transliteration/editorial Arabic display form may be stored only with an explicit non-official status.
 
 ### Required profile domains
 
@@ -106,6 +144,18 @@ For each eligible institution collect, when source-backed and available:
 
 Missing fields remain null/unknown. They are never invented.
 
+### Time-sensitive facts
+
+Fees and admissions must be versioned by academic year/cycle.
+
+Do not overwrite historical values when new values arrive.
+
+### Provenance and conflicts
+
+Every important canonical fact retains source/evidence, authority class, review/confidence state and validity period where relevant.
+
+Conflicting values remain explicit review work rather than being silently overwritten.
+
 ## Source priority
 
 ### Tier A — authoritative international/regulatory evidence
@@ -123,13 +173,14 @@ Missing fields remain null/unknown. They are never invented.
 - official admissions/fees pages and PDFs
 - official institution-controlled social/media channels when needed for current public contact facts
 
-### Tier C — discovery/geospatial evidence
+### Tier C — discovery/geospatial/supporting evidence
 
 - British Council Partner Schools
+- Edarabia
 - Overture Maps
 - OpenStreetMap / Wikidata
 - retained V7 records
-- commercial directories used only when their terms permit the intended use
+- other commercial directories used only when their terms permit the intended use
 
 Tier C alone cannot establish a factual claim that requires stronger evidence.
 
@@ -137,41 +188,45 @@ Tier C alone cannot establish a factual claim that requires stronger evidence.
 
 Media is collected separately from factual identity.
 
-Permitted publication sources include:
+For each media candidate preserve:
 
-1. institution-provided media with explicit reuse permission;
-2. Wikimedia Commons or other openly licensed media with license/creator/attribution preserved;
-3. media later supplied through a verified institution claim;
-4. original Edu Hub/Admonk-created media.
+- institution/campus relation;
+- source page and original reference;
+- media role;
+- creator/license/attribution where known;
+- identity-match state;
+- rights basis;
+- public-use flag;
+- owned/local storage reference and content hash when acquisition is permitted;
+- EN/AR caption/alt where appropriate.
 
-Official institution website/social images may be stored as **discovery candidates and provenance references**, but public reuse is disabled unless a defensible rights basis exists.
+Publication-safe sources include institution-provided permission, Wikimedia/open-license media, verified institution claims, or original Edu Hub/Admonk production.
 
-If no publication-safe photo exists, the public UI uses the institution's English name on a designed placeholder rather than scraping or hotlinking copyrighted imagery.
+If no publication-safe image exists, the institution receives an explicit `placeholder_required` media state.
 
-## Initial source acquisition order
+## Data-completion work packages
 
-1. IB Egypt — complete 54-school country set; exclude state/public schools from active scope.
-2. SCU foreign university branches — current regulator list.
-3. MOHESR international/foreign branches — reconcile against SCU.
-4. French 2026–2027 homologated institutions — Egypt subset.
-5. German KMK/ZfA recognized schools — Egypt subset.
-6. Cognia / relevant US accreditation evidence.
-7. British Council September 2026 Partner Schools — discovery and contact enrichment, not automatic eligibility.
-8. official institution websites — contacts, campuses, admissions, fees, curricula, programmes and media candidates.
-9. Overture/OSM/Wikidata — coordinates and identity cross-checking.
-10. Wikimedia Commons — licensed media discovery.
+1. **D2.1 Candidate universe completion** — exhaust approved source families and measure discovery coverage.
+2. **D2.2 Identity/campus reconciliation** — deduplicate institutions, campuses, providers and aliases.
+3. **D2.3 EN/AR canonical localization** — complete bilingual naming/localized fields with origin/status.
+4. **D2.4 Profile enrichment** — systematically attempt core profile fields for every eligible institution.
+5. **D2.5 Media completion** — discover/reference/review media and establish terminal media state per institution.
+6. **D2.6 Completeness/conflict audit** — measure factual, EN, AR, freshness/conflict and media coverage.
+7. **D2.7 Portable database/export freeze** — emit deterministic presentation-neutral canonical exports plus evidence and media manifests.
 
-## Quality gates
+## Quality gates before canonical completion
 
-Before an institution becomes public:
+For an eligible institution:
 
 - scope state = `eligible`;
 - at least one strong identity/international-scope evidence source;
-- canonical name established;
-- institution vs campus relationship reviewed;
+- canonical institution identity established;
+- institution/campus relationship reviewed;
 - no unresolved high-risk identity conflict;
-- every published fact has source provenance;
-- media either has `public_use_allowed=true` with rights metadata or the generated placeholder is used.
+- EN and AR naming coverage exists with localization origin/status;
+- every stored important fact has provenance;
+- fees/admissions retain academic-year/cycle history;
+- media status is explicit even if no publishable image exists.
 
 ## Legacy cleanup rule
 
@@ -182,14 +237,21 @@ Do not delete the old national-registry evidence or raw archive. Preserve it as 
 - do not auto-promote legacy V7 records into the international registry;
 - only reuse a legacy record when it matches an EDU-DATA-2 eligible institution and the specific source terms/provenance remain valid.
 
-## Definition of done
+## Definition of database complete
 
-EDU-DATA-2 foundation is complete when:
+EDU-DATA-2's database gate is complete when:
 
-- the dedicated Edu Hub PostgreSQL/Supabase project exists;
-- the international relational schema is migrated;
-- authoritative source acquisition jobs are repeatable;
-- the candidate universe has been deduplicated into institution/campus identities;
-- every included institution has an explicit eligibility evidence trail;
-- media rights/publication status is explicit;
-- an initial representative public projection can be generated without reading live third-party sources at page-render time.
+- the approved candidate-source universe has been systematically covered;
+- every candidate has an explicit scope decision or documented unresolved reason;
+- eligible institutions/campuses have reviewed canonical identities;
+- cross-source duplicates are reconciled or explicitly queued;
+- every eligible institution has EN and AR naming coverage with localization origin/status;
+- every core factual field that is present has source provenance;
+- important changing facts preserve history/versioning;
+- higher-education parent/programme relationships are represented correctly;
+- every institution has an explicit media status;
+- factual completeness, English completeness, Arabic completeness, freshness/conflicts and media completeness are measurable;
+- a deterministic portable export can be generated without Astro, Instatic or Supabase;
+- no final frontend/CMS decision is required to understand or operate the dataset.
+
+Only after this definition is satisfied do we decide how to display the database publicly.
