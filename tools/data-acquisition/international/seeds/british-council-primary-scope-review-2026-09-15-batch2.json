@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.1_british_council_primary_scope_review",
+  "batch_id": "batch2-current-ib-overlaps",
+  "review_method": "british_council_discovery_then_primary_or_recognized_evidence_review",
+  "records_count": 4,
+  "records": [
+    {
+      "source_record_id": "bcps2026:global-paradigm-baccalaureate-school",
+      "source_name": "Global Paradigm Baccalaureate School",
+      "decision": "eligible",
+      "decision_confidence": "high",
+      "scope_class": "international_school",
+      "ownership_scope": "private_independent",
+      "curriculum_codes": ["ib", "british"],
+      "website": "https://globalparadigmschools-baccalaureate.com/",
+      "evidence_urls": [
+        "https://ibo.org/fr/programmes/find-an-ib-school/ibaem2/g/global-paradigm-baccalaureate-school/",
+        "https://globalparadigmschools-baccalaureate.com/",
+        "https://globalparadigmschools-baccalaureate.com/who-we-are/"
+      ],
+      "eligibility_basis": [
+        "current_ib_world_school_private_type",
+        "current_first_party_ib_and_british_section_identity"
+      ],
+      "review_note": "The British Council row is discovery evidence only. The current IB profile identifies Global Paradigm Baccalaureate School as PRIVATE and an authorized IB World School. Current first-party evidence identifies the same Mostakbal City school and its IB and British sections. This row is expected to reconcile to the already captured IB source identity in D2.2 rather than create a new institution."
+    },
+    {
+      "source_record_id": "bcps2026:capital-international-schools",
+      "source_name": "Capital International Schools",
+      "decision": "eligible",
+      "decision_confidence": "high",
+      "scope_class": "international_school",
+      "ownership_scope": "private_independent",
+      "curriculum_codes": ["ib", "british", "american"],
+      "website": "https://www.capitalschools.edu.eg/",
+      "evidence_urls": [
+        "https://ibo.org/school/061877/",
+        "https://www.capitalschools.edu.eg/"
+      ],
+      "eligibility_basis": [
+        "current_ib_world_school_private_type",
+        "current_first_party_multi_pathway_international_school_identity"
+      ],
+      "review_note": "The current IB profile identifies Capital International Schools as PRIVATE and an IB World School. Current first-party evidence identifies British, American and IBDP pathways and current New Cairo campuses. British Council Partner School status is not used as the eligibility basis. The row should reconcile to the existing IB source identity in D2.2."
+    },
+    {
+      "source_record_id": "bcps2026:mount-international-school-community",
+      "source_name": "Mount International School Community",
+      "decision": "eligible",
+      "decision_confidence": "high",
+      "scope_class": "international_school",
+      "ownership_scope": "private_independent",
+      "curriculum_codes": ["ib"],
+      "website": "https://misc-edu.com/",
+      "evidence_urls": [
+        "https://ibo.org/programmes/find-an-ib-school/ibaem2/m/mount-international-school-community/",
+        "https://misc-edu.com/"
+      ],
+      "eligibility_basis": [
+        "current_ib_world_school_private_type",
+        "current_ib_authorized_pyp_myp_identity"
+      ],
+      "review_note": "The current IB profile identifies Mount International School Community as PRIVATE, currently authorized for PYP and MYP, and located in Egypt's New Capital. The British Council row is therefore qualified from IB evidence, not Partner School status, and should reconcile to the existing IB source identity in D2.2."
+    },
+    {
+      "source_record_id": "bcps2026:international-school-elite-education",
+      "source_name": "The International School of Elite Education",
+      "decision": "eligible",
+      "decision_confidence": "high",
+      "scope_class": "international_school",
+      "ownership_scope": "private_independent",
+      "curriculum_codes": ["ib", "british", "american"],
+      "website": "https://isee-eg.com/",
+      "evidence_urls": [
+        "https://ibo.org/school/051954/",
+        "https://isee-eg.com/",
+        "https://isee-eg.com/who-we-are-2/"
+      ],
+      "eligibility_basis": [
+        "current_ib_world_school_private_type",
+        "current_first_party_private_international_school_identity"
+      ],
+      "review_note": "The current IB profile identifies The International School of Elite Education as PRIVATE and an IB World School. The current first-party site explicitly describes ISEE as a private co-educational international school with American, British and IB schools/streams. The British Council row is qualified from that evidence and should reconcile to the existing IB source identity in D2.2."
+    }
+  ],
+  "safety": {
+    "partner_status_treated_as_international_eligibility": false,
+    "unreviewed_british_council_leads_promoted": false,
+    "automatic_identity_creation_performed": false,
+    "automatic_merges_performed": 0,
+    "canonical_database_rows_written": 0,
+    "public_projection_rows_created": 0
+  }
+}
