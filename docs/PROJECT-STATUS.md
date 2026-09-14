@@ -52,6 +52,7 @@ Canonical contracts:
 
 - `docs/EDU-DATA-2-INTERNATIONAL-REGISTRY.md`
 - `docs/DATABASE-COMPLETION-PLAN.md`
+- `docs/SOURCE-USAGE-POLICY.md`
 
 Logical data architecture:
 
@@ -59,19 +60,19 @@ Logical data architecture:
 
 The final public presentation layer is intentionally deferred until this gate is complete.
 
-## Platform correction — 2026-09-14
+## Platform boundary
 
 Supabase is **not** part of the Edu Hub architecture.
 
-Astro and Instatic remain possible later presentation/publishing choices, but **no current work package should optimize the database for either one yet**.
+Astro and Instatic remain possible later presentation/publishing choices, but no current work package should optimize the database for either one yet.
 
 The database/research layer must be presentation-neutral, exportable and able to feed either implementation later.
 
 ## Current database completion objective
 
-We are now finishing the **complete source-backed bilingual data architecture first**.
+We are finishing the **complete source-backed bilingual data architecture first**.
 
-The current target is not a website, CMS mapping or UI. It is a trustworthy portable dataset containing:
+The target dataset contains:
 
 - canonical institution identities;
 - provider/group relationships;
@@ -79,10 +80,12 @@ The current target is not a website, CMS mapping or UI. It is a trustworthy port
 - English and Arabic localizations;
 - international eligibility evidence;
 - curricula and certificates;
+- education stages, grades and age ranges;
+- languages of instruction;
 - accreditation/authorization relationships;
 - geography and coordinates;
 - contacts and official digital presence;
-- admissions history;
+- admissions history and requirements;
 - academic-year fee history;
 - facilities/profile attributes;
 - higher-education academic units and programmes;
@@ -92,24 +95,26 @@ The current target is not a website, CMS mapping or UI. It is a trustworthy port
 
 Missing information remains explicit. No value is invented to make a profile look complete.
 
-## Bilingual architecture
+## Bilingual architecture progress
 
 English and Arabic are first-class and attached to the same canonical entities.
 
-Language-neutral facts are stored once. Localized text is separate.
+`infra/owned-data/006_bilingual_completion.sql` now extends the reference schema with:
 
-For localizable fields, the database must distinguish the origin/status of the localized value, for example:
+- source/review metadata on provider and institution localizations;
+- source-backed aliases;
+- bilingual campus localizations;
+- controlled education-level/stage taxonomy;
+- campus grade/age/curriculum offerings;
+- controlled facilities taxonomy and campus facilities;
+- admissions requirements with EN/AR localizations;
+- fee-item EN/AR localizations;
+- bilingual academic-unit and programme localizations;
+- bilingual media alt/caption/credit metadata;
+- a universal evidence assertion ledger for facts below institution scope;
+- independent factual, English, Arabic and media completeness metrics.
 
-- official source;
-- institution source;
-- verified translation;
-- editorial translation;
-- transliteration;
-- needs review.
-
-Official Arabic institution names are preferred. If no official Arabic name is available, any transliteration/editorial form must be explicitly marked instead of being treated as official.
-
-Database completeness is measured separately for factual completeness, English localization, Arabic localization and media completeness.
+Official Arabic institution names are preferred. If no official Arabic name is available, transliteration/editorial localization must be explicitly marked instead of being treated as official.
 
 ## Authoritative evidence acquired / prepared
 
@@ -118,7 +123,7 @@ Database completeness is measured separately for factual completeness, English l
 - Live Egypt-filtered IB directory snapshot contains **54 school rows** across three pages.
 - The IB country summary reported **55 schools** on the same date; the discrepancy is preserved as a review flag.
 - Checked-in evidence preserves names, programmes and listed languages.
-- Public/state ownership checks are being resolved; public/state rows are excluded from active scope.
+- Seven ownership/type detail checks are captured: 4 private/in-scope and 3 state/out-of-scope.
 
 ### French homologation
 
@@ -136,7 +141,7 @@ Database completeness is measured separately for factual completeness, English l
 
 ### Current deterministic authoritative seed
 
-The deterministic seed currently contains **85 source rows** before further ownership filtering and cross-source deduplication:
+The deterministic seed currently contains **85 source rows** before cross-source identity reconciliation:
 
 - 54 IB source rows;
 - 17 French rows;
@@ -144,23 +149,49 @@ The deterministic seed currently contains **85 source rows** before further owne
 - 9 SCU foreign-branch rows;
 - 1 AUC row.
 
-The project does **not** claim these are 85 unique institutions.
+Current source-row states after the seven IB ownership decisions:
+
+- **35 eligible**;
+- **47 candidate**;
+- **3 excluded**.
+
+These are source rows, not a claim of 85 unique institutions.
+
+## D2.1 — Candidate universe completion progress
+
+`tools/data-acquisition/international/build_candidate_universe.py` now creates a presentation-neutral discovery package from acquired evidence.
+
+It produces:
+
+- `candidate-universe.jsonl` — one source/discovery row at a time;
+- `candidate-universe-summary.json` — source/state/family and bilingual coverage metrics;
+- `bilingual-name-gaps.jsonl` — explicit EN/AR naming gaps;
+- `discovery-overlap-review.jsonl` — cross-source normalized-name overlap hints for review.
+
+Safety contract:
+
+- no canonical institution creation;
+- no automatic merge;
+- no public projection;
+- normalized names are review hints only;
+- unique institution count remains intentionally unclaimed until D2.2 review.
+
+The next expansion of D2.1 must add the missing British/American and supporting discovery families without violating source terms.
 
 ## Supporting discovery/enrichment sources
 
 ### Edarabia
 
-Edarabia is registered as an approved supporting/commercial directory source.
+Edarabia is useful as a research/discovery index, but its current published terms prohibit systematic storage/reproduction/commercial reuse of its content without prior written permission.
 
-Use it for:
+Active policy:
 
-- discovering institutions/campuses missing from stronger source lists;
-- address/website/contact leads;
-- curriculum and fee leads;
-- profile-field coverage leads;
-- media discovery leads.
-
-Do not use it by itself to establish international eligibility, accreditation, regulatory status or final canonical fees. Important claims require stronger corroboration. Ratings/reviews are not canonical facts. Images remain discovery-only unless reuse rights are established independently.
+- do not bulk scrape or systematically import Edarabia page content;
+- use it to discover a school or a possible missing field;
+- re-source the actual fact from an official institution, regulator, accreditor or another permitted source;
+- retain at most a research/reference URL unless reuse permission is obtained;
+- do not import reviews/ratings;
+- do not copy/publish Edarabia images without independent rights.
 
 ### Other active supporting sources
 
@@ -190,52 +221,62 @@ Every eligible institution must eventually have one explicit media state, such a
 
 ## Current CI state
 
-The core EDU-DATA-2 contract, import package, review-only identity proposal pipeline and relational schema reference have passed CI in prior runs.
+The EDU-DATA-2 workflow now validates:
+
+- authoritative source snapshots;
+- Edarabia reference-only source policy;
+- deterministic source seed;
+- D2.1 candidate universe and bilingual-gap report;
+- provenance-safe import package;
+- review-only identity proposals;
+- migrations `001`, `004`, `005`, and `006` against a clean PostgreSQL/PostGIS reference service.
+
+The newest run triggered by the D2.1/bilingual-schema changes is the active validation gate and must be green before those changes are treated as accepted.
 
 ## Database completion work packages
 
-### D2.1 — Candidate universe completion
+### D2.1 — Candidate universe completion — **IN PROGRESS**
 
 Collect the widest defensible international-school/university candidate universe from authoritative and supporting sources and measure source overlap/gaps.
 
-### D2.2 — Identity and campus reconciliation
+### D2.2 — Identity and campus reconciliation — **STARTED / REVIEW-ONLY**
 
 Deduplicate cross-source identities, separate institutions from campuses, resolve provider/group relationships, preserve aliases and queue ambiguous cases.
 
-### D2.3 — EN/AR canonical localization
+### D2.3 — EN/AR canonical localization — **ARCHITECTURE IMPLEMENTED / CONTENT INCOMPLETE**
 
 Complete English and Arabic names and other localized profile text with source/origin/status metadata.
 
-### D2.4 — Profile enrichment
+### D2.4 — Profile enrichment — **NOT YET COMPLETE**
 
 Systematically attempt address, coordinates, website/contact, curricula, grades/ages, languages, accreditation, admissions, current/historical fees, facilities and higher-education programmes for every eligible institution.
 
-### D2.5 — Media completion
+### D2.5 — Media completion — **STARTED**
 
 Discover, reference and review useful logos/campus/facility media while preserving rights state and generating explicit placeholder requirements where necessary.
 
-### D2.6 — Completeness/conflict audit
+### D2.6 — Completeness/conflict audit — **ARCHITECTURE IMPLEMENTED / DATA AUDIT PENDING**
 
 Measure field coverage, freshness, EN/AR localization coverage, unresolved conflicts and media state per institution.
 
-### D2.7 — Portable database/export freeze
+### D2.7 — Portable database/export freeze — **NOT STARTED**
 
 Produce presentation-neutral canonical exports plus provenance, media manifest, review/conflict report and completeness report. This is the gate before choosing Astro vs Instatic.
 
 ## Immediate next actions
 
-1. Expand the candidate universe using Edarabia, British Council, Cognia/American accreditation sources, MOHESR and other approved source families.
-2. Reconcile all authoritative and supporting identities into institution/campus candidates.
-3. Complete the IB private/state ownership gate.
-4. Complete SCU/MOHESR foreign-university reconciliation and lifecycle status.
-5. Build the bilingual EN/AR canonical localization layer, including localization origin/status.
-6. Enrich every eligible institution from its official site and primary documents.
-7. Version admissions and fees by academic year/cycle rather than overwriting.
-8. Expand geography and coordinates through institution sources plus Overture/OSM cross-checking.
-9. Continue media discovery and rights review; record a terminal media state for every institution.
-10. Produce the first full field-coverage, bilingual-coverage, freshness/conflict and media-coverage reports.
-11. Generate a deterministic portable export.
-12. Only after steps 1–11 are complete, evaluate Astro vs Instatic and design the public presentation.
+1. Finish the current D2.1/bilingual-schema CI gate and repair anything that fails.
+2. Expand D2.1 with British Council discovery/contact evidence under its permitted use boundary.
+3. Add Cognia/other American accreditation candidates and verify the school model from primary sources.
+4. Reconcile MOHESR foreign-university evidence against SCU and assign lifecycle/review state.
+5. Continue IB private/state ownership verification for the remaining candidate rows.
+6. Use Edarabia only as a reference index to identify missing candidates, then re-source each candidate from permitted primary/authoritative sources.
+7. Build the first official-site enrichment queue for eligible/candidate institutions.
+8. Begin D2.2 canonical institution/campus review from the cross-source overlap report.
+9. Fill EN/AR naming gaps using official Arabic/English institution sources first; mark transliteration/editorial values explicitly.
+10. Continue media discovery/rights review and terminal media-state coverage.
+11. Produce field-coverage, bilingual-coverage, freshness/conflict and media-coverage reports.
+12. Generate a deterministic portable export only after the above is reviewed.
 
 ## Explicitly deferred during database completion
 
@@ -254,6 +295,7 @@ Produce presentation-neutral canonical exports plus provenance, media manifest, 
 - Do not confuse exam-centre/partner status with international-school eligibility.
 - Do not infer international status from branding words.
 - Do not let a commercial directory establish eligibility or override stronger evidence.
+- Respect source storage/reuse terms before systematic acquisition.
 - Do not invent institution facts, fees, rankings, accreditations or admissions data.
 - Do not publish media without a recorded rights basis.
 - Do not use Supabase for Edu Hub.
