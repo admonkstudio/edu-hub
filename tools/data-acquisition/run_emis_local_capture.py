@@ -2,13 +2,14 @@
 """One-command local handoff for MOE/EMIS contract capture + offline analysis.
 
 This wrapper performs only the safe D1.3 preparation gates:
-1. capture public EMIS page/form evidence;
+1. capture public EMIS page/form evidence with GET requests;
 2. discover bounded same-origin school-search endpoints from that evidence;
-3. analyze the saved evidence offline into an enumerator design contract.
+3. submit only the root page's top-level school-category navigation buttons;
+4. analyze the resulting saved search-form evidence offline.
 
 It packages only redacted/shareable evidence into one ZIP for handoff. Untouched
 raw HTML remains local and is never included in the bundle. The tool does not
-enumerate schools or submit search forms.
+select search filters, enumerate schools or follow result pagination.
 """
 from __future__ import annotations
 
@@ -23,8 +24,6 @@ from urllib.parse import urldefrag, urlparse
 EMIS_ORIGIN = "search.emis.gov.eg"
 SEED_TARGETS = [
     "https://search.emis.gov.eg/",
-    # Current government-school directory route, referenced by recent Egyptian
-    # school and academic sources. Keep historical routes as bounded fallbacks.
     "https://search.emis.gov.eg/search_schgov.aspx",
     "https://search.emis.gov.eg/search_schpriv.aspx",
     "https://search.emis.gov.eg/sch_data.aspx",
@@ -119,8 +118,6 @@ def build_shareable_bundle(output_dir: Path) -> Path:
             if candidate.exists():
                 shareable_files.append(candidate)
 
-    # De-duplicate in case redirects caused multiple page entries to resolve to
-    # the same evidence file.
     unique_files: list[Path] = []
     seen: set[Path] = set()
     for path in shareable_files:
@@ -141,47 +138,64 @@ def main() -> int:
     ap.add_argument("--output-dir", default="artifacts/emis-local-capture", type=Path)
     ap.add_argument("--timeout", type=float, default=45.0)
     ap.add_argument("--discovery-limit", type=int, default=12)
+    ap.add_argument("--max-root-buttons", type=int, default=6)
     args = ap.parse_args()
 
     repo_root = Path(__file__).resolve().parents[2]
     capture = repo_root / "tools" / "data-acquisition" / "emis_local_capture.py"
+    navigation_probe = repo_root / "tools" / "data-acquisition" / "emis_navigation_probe.py"
     analyzer = repo_root / "tools" / "data-acquisition" / "registry" / "analyze_emis_capture.py"
     output_dir = args.output_dir
     if not output_dir.is_absolute():
         output_dir = repo_root / output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Pass 1 deliberately includes the current government-school route plus the
-    # historical/private routes. This is still GET-only contract capture.
     targets = list(SEED_TARGETS)
     capture_rc = run(capture_command(capture, output_dir, args.timeout, targets))
     if capture_rc != 0:
         print(
-            f"EMIS capture did not produce any reachable page (exit {capture_rc}). "
+            f"EMIS GET capture did not produce any reachable page (exit {capture_rc}). "
             f"Diagnostic report, when available: {output_dir / 'capture-report.json'}",
             file=sys.stderr,
         )
         return capture_rc
 
-    # Pass 2 is only needed when the captured public HTML reveals additional
-    # same-origin school/search endpoints. No forms are submitted.
     first_report = load_report(output_dir)
     discovered = discover_targets(first_report, targets, args.discovery_limit)
-    if discovered != targets[: len(discovered)] or len(discovered) > len(targets):
-        extras = [url for url in discovered if url not in targets]
-        if extras:
-            print("Discovered additional EMIS contract endpoint(s):")
-            for url in extras:
-                print(f"  {url}")
-            targets = discovered
-            capture_rc = run(capture_command(capture, output_dir, args.timeout, targets))
-            if capture_rc != 0:
-                print(
-                    f"Expanded EMIS contract capture failed (exit {capture_rc}). "
-                    f"Review {output_dir / 'capture-report.json'}.",
-                    file=sys.stderr,
-                )
-                return capture_rc
+    extras = [url for url in discovered if url not in targets]
+    if extras:
+        print("Discovered additional EMIS contract endpoint(s):")
+        for url in extras:
+            print(f"  {url}")
+        targets = discovered
+        capture_rc = run(capture_command(capture, output_dir, args.timeout, targets))
+        if capture_rc != 0:
+            print(
+                f"Expanded EMIS GET contract capture failed (exit {capture_rc}). "
+                f"Review {output_dir / 'capture-report.json'}.",
+                file=sys.stderr,
+            )
+            return capture_rc
+
+    # The live directory uses ASP.NET submit buttons for category navigation.
+    # This bounded probe POSTs only those top-level buttons; it does not choose
+    # filters or submit a school search.
+    navigation_rc = run([
+        sys.executable,
+        str(navigation_probe),
+        "--output-dir",
+        str(output_dir),
+        "--timeout",
+        str(args.timeout),
+        "--max-buttons",
+        str(args.max_root_buttons),
+    ])
+    if navigation_rc != 0:
+        print(
+            f"Top-level EMIS navigation probe did not resolve a search page (exit {navigation_rc}). "
+            "The diagnostic bundle will still be produced.",
+            file=sys.stderr,
+        )
 
     analyze_rc = run([
         sys.executable,
@@ -190,14 +204,11 @@ def main() -> int:
         str(output_dir),
     ])
 
-    # Always create a safe bundle when capture + analyzer produced evidence,
-    # including blocked contracts. That lets the next diagnosis use the exact
-    # redacted evidence rather than screenshots or copied terminal text.
     archive_path = build_shareable_bundle(output_dir)
 
     if analyze_rc != 0:
         print(
-            f"Capture succeeded but the contract is not yet sufficient for adapter design (exit {analyze_rc}).",
+            f"Capture succeeded but the contract is not yet sufficient for pilot adapter design (exit {analyze_rc}).",
             file=sys.stderr,
         )
         print(f"Enumerator contract: {output_dir / 'enumerator-contract.json'}")
@@ -205,12 +216,12 @@ def main() -> int:
         print("Raw HTML remains local and is not included in the bundle.")
         return analyze_rc
 
-    print("EMIS D1.3 contract capture is ready for pilot-adapter implementation.")
+    print("EMIS D1.3 contract capture is ready for bounded pilot-adapter implementation.")
     print(f"Capture report: {output_dir / 'capture-report.json'}")
     print(f"Enumerator contract: {output_dir / 'enumerator-contract.json'}")
     print(f"Shareable handoff bundle: {archive_path}")
     print("Raw HTML remains local and is not included in the bundle.")
-    print("No school enumeration or form submission was performed.")
+    print("No school search, school enumeration or result pagination was performed.")
     return 0
 
 
