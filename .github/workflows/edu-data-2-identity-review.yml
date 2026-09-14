@@ -8,7 +8,9 @@ on:
       - 'tools/data-acquisition/international/build_authoritative_seed.py'
       - 'tools/data-acquisition/international/build_accreditor_expansion.py'
       - 'tools/data-acquisition/international/validate_identity_review_decisions.py'
+      - 'tools/data-acquisition/international/build_reviewed_canonical_artifacts.py'
       - 'tools/data-acquisition/international/seeds/identity-review-decisions-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/division-review-decisions-2026-09-15.json'
       - '.github/workflows/edu-data-2-identity-review.yml'
   workflow_dispatch:
 
@@ -17,7 +19,7 @@ permissions:
 
 jobs:
   review:
-    name: Validate reviewed cross-source identities and division scope
+    name: Validate reviewed cross-source identities and deterministic drafts
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,34 +31,83 @@ jobs:
           python -m py_compile tools/data-acquisition/international/build_authoritative_seed.py
           python -m py_compile tools/data-acquisition/international/build_accreditor_expansion.py
           python -m py_compile tools/data-acquisition/international/validate_identity_review_decisions.py
+          python -m py_compile tools/data-acquisition/international/build_reviewed_canonical_artifacts.py
       - name: Build deterministic base and accreditor-expanded universe
         run: |
           python tools/data-acquisition/international/build_authoritative_seed.py --output-dir artifacts/international
           python tools/data-acquisition/international/build_accreditor_expansion.py
       - name: Validate reviewed relationship decisions
         run: python tools/data-acquisition/international/validate_identity_review_decisions.py
-      - name: Assert D2.2 review safety contract
+      - name: Materialize reviewed canonical draft artifacts
+        run: python tools/data-acquisition/international/build_reviewed_canonical_artifacts.py
+      - name: Assert D2.2 review and materialization safety contract
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          p = Path('artifacts/international/identity-review/identity-review-summary.json')
-          summary = json.loads(p.read_text(encoding='utf-8'))
+
+          review_root = Path('artifacts/international/identity-review')
+          review = json.loads((review_root/'identity-review-summary.json').read_text(encoding='utf-8'))
+          assert review['source_universe_rows'] == 106
+          assert review['review_groups'] == 9
+          assert review['reviewed_source_rows'] == 20
+          assert review['same_institution_groups'] == 7
+          assert review['division_scoped_groups'] == 2
+          assert review['missing_source_rows'] == 0
+          assert review['name_drift_rows'] == 0
+          assert review['canonical_institutions_created'] == 0
+          assert review['canonical_merges_performed'] == 0
+          assert review['public_projection_rows_created'] == 0
+          assert review['database_mutation_performed'] is False
+
+          draft_root = Path('artifacts/international/reviewed-canonical-draft')
+          summary = json.loads((draft_root/'reviewed-canonical-draft-summary.json').read_text(encoding='utf-8'))
+          institutions = [json.loads(line) for line in (draft_root/'reviewed-institution-drafts.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          divisions = [json.loads(line) for line in (draft_root/'reviewed-school-division-drafts.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          campus_states = [json.loads(line) for line in (draft_root/'campus-review-state.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          queue = [json.loads(line) for line in (draft_root/'unreviewed-source-queue.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+
           assert summary['source_universe_rows'] == 106
-          assert summary['review_groups'] == 9
-          assert summary['reviewed_source_rows'] == 20
-          assert summary['same_institution_groups'] == 7
-          assert summary['division_scoped_groups'] == 2
-          assert summary['missing_source_rows'] == 0
-          assert summary['name_drift_rows'] == 0
-          assert summary['canonical_institutions_created'] == 0
-          assert summary['canonical_merges_performed'] == 0
+          assert summary['reviewed_identity_groups'] == len(institutions) == 9
+          assert summary['reviewed_source_memberships'] == 20
+          assert summary['draft_institution_records'] == 9
+          assert summary['division_scoped_identity_groups'] == 2
+          assert summary['draft_school_division_records'] == len(divisions) == 4
+          assert summary['campus_review_state_records'] == len(campus_states) == 9
+          assert summary['resolved_canonical_campuses'] == 0
+          assert summary['unreviewed_source_rows'] == len(queue) == 86
+          assert summary['unique_institutions_claimed_for_full_universe'] is None
+          assert summary['eligibility_selection_performed'] is False
+          assert summary['automatic_merges_performed'] == 0
+          assert summary['canonical_database_rows_written'] == 0
+          assert summary['runtime_database_mutation_performed'] is False
           assert summary['public_projection_rows_created'] == 0
-          assert summary['database_mutation_performed'] is False
-          print(json.dumps(summary, indent=2))
+
+          institution_ids = {row['draft_institution_id'] for row in institutions}
+          assert len(institution_ids) == 9
+          assert len({row['draft_school_division_id'] for row in divisions}) == 4
+          assert all(row['draft_institution_id'] in institution_ids for row in divisions)
+          assert all(row['canonical_database_write_performed'] is False for row in institutions)
+          assert all(row['public_projection_performed'] is False for row in institutions)
+          assert all(row['canonical_database_write_performed'] is False for row in divisions)
+          assert all(row['public_projection_performed'] is False for row in divisions)
+          assert all(row['campus_structure_state'] == 'not_yet_reviewed' for row in campus_states)
+          assert all(row['canonical_campus_created'] is False for row in campus_states)
+
+          expected_divisions = {
+              ('el-alsson-newgiza', 'american'),
+              ('el-alsson-newgiza', 'british'),
+              ('misr-language-schools', 'american'),
+              ('misr-language-schools', 'french'),
+          }
+          assert {(row['review_group_id'], row['division_key']) for row in divisions} == expected_divisions
+
+          print(json.dumps({'identity_review': review, 'reviewed_canonical_draft': summary}, indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
           name: edu-data-2-identity-review
-          path: artifacts/international/identity-review/
+          path: |
+            artifacts/international/identity-review/
+            artifacts/international/reviewed-canonical-draft/
           if-no-files-found: error
