@@ -51,6 +51,7 @@ jobs:
           assert len(ids) == len(set(ids))
           for required in (
               'ib_world_schools_egypt',
+              'uk_dfe_bso_egypt_2026_08',
               'french_homologation_2026_2027',
               'kmk_german_schools_2026_04',
               'scu_foreign_university_branches',
@@ -65,10 +66,15 @@ jobs:
           assert edarabia['auto_eligibility'] is False
           assert edarabia['acquisition_mode'] == 'manual_reference_only_due_terms'
           assert 'do_not_systematically_copy' in edarabia['storage_policy']
+          bso_source = next(row for row in registry['sources'] if row['source_id'] == 'uk_dfe_bso_egypt_2026_08')
+          assert bso_source['authority_class'] == 'foreign_government'
+          assert bso_source['expected_current_count'] == 11
+          assert bso_source['auto_eligibility'] is False
 
           seed_dir = Path('tools/data-acquisition/international/seeds')
           ib = json.loads((seed_dir/'ib-egypt-directory-2026-09-14.json').read_text(encoding='utf-8'))
           ib_detail = json.loads((seed_dir/'ib-detail-evidence-2026-09-14.json').read_text(encoding='utf-8'))
+          bso = json.loads((seed_dir/'uk-dfe-bso-egypt-2026-08-26.json').read_text(encoding='utf-8'))
           fr = json.loads((seed_dir/'french-homologation-egypt-2026-2027.json').read_text(encoding='utf-8'))
           de = json.loads((seed_dir/'german-kmk-egypt-2026-04.json').read_text(encoding='utf-8'))
           scu = json.loads((seed_dir/'scu-foreign-university-branches-2026-09-14.json').read_text(encoding='utf-8'))
@@ -79,6 +85,8 @@ jobs:
           assert len(ib_detail['records']) == ib_detail['records_count'] == 7
           assert ib_detail['eligible_private'] == 4
           assert ib_detail['excluded_state'] == 3
+          assert len(bso['records']) == bso['records_count'] == 11
+          assert bso['list_updated'] == '2026-08-26'
           assert len(fr['records']) == fr['records_count'] == 17
           assert len(de['records']) == de['records_count'] == 4
           assert len(scu['records']) == scu['records_count'] == 9
@@ -87,7 +95,7 @@ jobs:
           assert all(row['public_use_allowed'] is True for row in media['assets'])
           assert all(row['rights_basis'] for row in media['assets'])
           assert all(row['identity_match_state'] == 'verified_by_file_description' for row in media['assets'])
-          print(f"validated {len(ids)} registered sources, 85 source rows, 7 IB detail decisions and 5 reviewed media assets")
+          print(f"validated {len(ids)} registered sources, 96 source rows, 7 IB detail decisions and 5 reviewed media assets")
           PY
       - name: Test live-parser and scope boundaries
         run: python tools/data-acquisition/international/test_acquisition.py
@@ -116,9 +124,10 @@ jobs:
           from pathlib import Path
           p = Path('artifacts/international/authoritative-source-summary.json')
           data = json.loads(p.read_text(encoding='utf-8'))
-          assert data['source_rows'] == 85
+          assert data['source_rows'] == 96
+          assert data['source_counts']['uk_dfe_bso_egypt_2026_08'] == 11
           assert data['eligible_source_rows'] == 35
-          assert data['candidate_source_rows'] == 47
+          assert data['candidate_source_rows'] == 58
           assert data['excluded_source_rows'] == 3
           assert data['ib_detail_rows_applied'] == 7
           assert data['unique_institutions_claimed'] is None
@@ -128,18 +137,21 @@ jobs:
           assert data['ib_directory_country_summary_conflict']['review_required'] is True
 
           universe = json.loads(Path('artifacts/international/candidate-universe/candidate-universe-summary.json').read_text(encoding='utf-8'))
-          assert universe['source_record_count'] == 85
+          assert universe['source_record_count'] == 96
+          assert universe['source_counts']['uk_dfe_bso_egypt_2026_08'] == 11
+          assert universe['english_name_present'] == 96
+          assert universe['arabic_name_present'] == 9
+          assert universe['bilingual_name_gap_count'] == 87
           assert universe['unique_institutions_claimed'] is None
           assert universe['canonical_institutions_created'] == 0
           assert universe['automatic_merges_performed'] == 0
           assert universe['public_projection_rows_created'] == 0
           assert universe['presentation_runtime_dependency'] is None
-          assert universe['bilingual_name_gap_count'] > 0
 
           manifest = json.loads(Path('artifacts/international/import-package/manifest.json').read_text(encoding='utf-8'))
-          assert manifest['sources'] == 5
-          assert manifest['raw_records'] == 85
-          assert manifest['staging_candidates'] == 85
+          assert manifest['sources'] == 6
+          assert manifest['raw_records'] == 96
+          assert manifest['staging_candidates'] == 96
           assert manifest['reviewed_media_assets'] == 5
           assert manifest['canonical_institutions_created'] == 0
           assert manifest['identity_merges_performed'] == 0
@@ -228,4 +240,5 @@ jobs:
           echo "Authoritative snapshots are refreshed through browser-capable/source-appropriate acquisition paths."
           echo "IB currently returns HTTP 403 to GitHub-hosted direct Python requests, so a 403 is not treated as source absence."
           echo "Edarabia is reference-only under its published terms unless written reuse permission is obtained."
+          echo "UK DfE BSO is authoritative international-model evidence; private/independent ownership is still reviewed separately."
           echo "Live fetch scripts remain available for suitable environments, but deterministic CI uses dated evidence snapshots."
