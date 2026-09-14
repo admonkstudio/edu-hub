@@ -1,0 +1,62 @@
+name: EDU-DATA-2 Localization Evidence
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'tools/data-acquisition/international/build_localization_evidence.py'
+      - 'tools/data-acquisition/international/seeds/official-arabic-name-evidence-2026-09-15.json'
+      - '.github/workflows/edu-data-2-localization-evidence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate official Arabic-name evidence
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile localization builder
+        run: python -m py_compile tools/data-acquisition/international/build_localization_evidence.py
+      - name: Build localization review package
+        run: python tools/data-acquisition/international/build_localization_evidence.py
+      - name: Validate localization safety contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('artifacts/international/localization-evidence')
+          summary = json.loads((root/'localization-evidence-summary.json').read_text(encoding='utf-8'))
+          rows = [json.loads(line) for line in (root/'official-arabic-name-evidence.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+
+          assert summary['records'] == len(rows) == 4
+          assert summary['current_official_name_evidence'] == 2
+          assert summary['historical_official_name_evidence'] == 2
+          assert summary['canonical_localizations_created'] == 0
+          assert summary['automatic_translations_performed'] == 0
+          assert summary['public_projection_rows_created'] == 0
+          assert summary['database_mutation_performed'] is False
+          assert all(row['locale'] == 'ar-EG' for row in rows)
+          assert all(row['localization_origin'] == 'official_institution_source' for row in rows)
+          assert all(row['canonical_localization_created'] is False for row in rows)
+          assert all(row['automatic_translation_performed'] is False for row in rows)
+          assert {row['name_ar'] for row in rows} == {
+              'مدارس التربية الحديثة',
+              'المدرسة البريطانية الدولية بمدينتي',
+              'المدرسة البريطانية في الرحاب',
+              'مدرسة القاهرة الإنجليزية',
+          }
+          print(json.dumps(summary, ensure_ascii=False, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-localization-evidence
+          path: artifacts/international/localization-evidence/
+          if-no-files-found: error
