@@ -130,6 +130,14 @@ Record durable decisions here. Do not use this file for temporary task notes.
 
 **Decision:** Source-declared parent/child relationships enter staging as source-backed relationship proposals. They are not automatically accepted into `edu_core`, and CI must enforce zero automatic identity/relationship acceptance and zero public promotion.
 
+## 2026-09-14 — EMIS live-route availability and pilot scope
+
+**Decision:** A category-specific EMIS form may be used to validate reusable ASP.NET state/postback mechanics only within the scope actually observed. A healthy Special Education form does not unlock or count as government-school acquisition coverage.
+
+**Decision:** Government-school enumeration remains blocked whenever the government category route returns a server-side failure, even if the EMIS root or another category is healthy. The 62,690-school national target may only be evaluated against source rows acquired from the required official government-school identity source or an official export.
+
+**Decision:** Bounded EMIS contract probes may submit top-level category navigation and one explicit non-search dependent-control postback when necessary to reveal the search contract. They may not submit a school-search button, follow result pagination, enumerate school rows, mutate `edu_core`, or promote public records until a separately reviewed pilot gate is satisfied.
+
 ## Pending decisions
 
 - final public brand name
