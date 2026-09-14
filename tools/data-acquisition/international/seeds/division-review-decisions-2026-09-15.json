@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.2_school_division_reconciliation",
+  "divisions_count": 4,
+  "divisions": [
+    {
+      "review_group_id": "el-alsson-newgiza",
+      "division_key": "american",
+      "canonical_name_en": "El Alsson American International School",
+      "division_type": "curriculum_stream",
+      "curriculum_codes": ["american", "ib"],
+      "source_memberships": [
+        {
+          "source_id": "ib_world_schools_egypt",
+          "source_record_id": "ib_world_schools_egypt:b632ef67e346e687c532",
+          "source_scope": "american"
+        }
+      ],
+      "evidence_urls": [
+        "https://www.alsson.com/about/",
+        "https://www.alsson.com/about/the-story-of-el-alsson",
+        "https://ibo.org/programmes/find-an-ib-school/?SearchFields.Country=EG"
+      ],
+      "review_note": "Official El Alsson evidence identifies a distinct American school/section within the shared NewGiza institutional campus and states that the American school offers IBDP."
+    },
+    {
+      "review_group_id": "el-alsson-newgiza",
+      "division_key": "british",
+      "canonical_name_en": "El Alsson British International School",
+      "division_type": "curriculum_stream",
+      "curriculum_codes": ["british"],
+      "source_memberships": [
+        {
+          "source_id": "uk_dfe_bso_egypt_2026_08",
+          "source_record_id": "uk_dfe_bso_egypt_2026_08:589996a51baeed6c9f56",
+          "source_scope": "british"
+        }
+      ],
+      "evidence_urls": [
+        "https://www.alsson.com/about/",
+        "https://www.alsson.com/british/",
+        "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/133027"
+      ],
+      "review_note": "Official El Alsson and DfE evidence identifies the British school/section and its British Schools Overseas scope within the shared institutional identity."
+    },
+    {
+      "review_group_id": "misr-language-schools",
+      "division_key": "american",
+      "canonical_name_en": "Misr Language Schools - American Division",
+      "division_type": "curriculum_stream",
+      "curriculum_codes": ["american"],
+      "source_memberships": [
+        {
+          "source_id": "cognia_member_milestones_egypt_2026_2027",
+          "source_record_id": "cognia_member_milestones_egypt_2026_2027:6dee58e42173aaa96882",
+          "source_scope": "american"
+        }
+      ],
+      "evidence_urls": [
+        "https://mls-egypt.org/wp-content/uploads/2024/11/MLS-IBDP-Student-Parent-Handbook.pdf",
+        "https://www.cognia.org/member-milestones/"
+      ],
+      "review_note": "Official MLS handbook identifies an American Division established in 1999 and links its accreditation history to Cognia/AdvanceED."
+    },
+    {
+      "review_group_id": "misr-language-schools",
+      "division_key": "french",
+      "canonical_name_en": "Misr Language Schools - French Division",
+      "division_type": "curriculum_stream",
+      "curriculum_codes": ["french"],
+      "source_memberships": [
+        {
+          "source_id": "french_homologation_2026_2027",
+          "source_record_id": "3010007X",
+          "source_scope": "french"
+        }
+      ],
+      "evidence_urls": [
+        "https://frenchdivision.mls-egypt.org/",
+        "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054341397"
+      ],
+      "review_note": "Official MLS French Division evidence and French homologation UAI 3010007X apply to the French section rather than to every MLS curriculum stream."
+    }
+  ],
+  "safety": {
+    "canonical_database_rows_written": 0,
+    "public_projection_rows_created": 0,
+    "automatic_division_inference_performed": false
+  }
+}
