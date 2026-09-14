@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.2_explicit_discovered_identity_review",
+  "batch_id": "batch1-qualified-british-council-discoveries",
+  "review_method": "explicit_identity_review_after_separate_d2_1_eligibility_qualification",
+  "records_count": 2,
+  "records": [
+    {
+      "review_identity_key": "kings-school-the-crown",
+      "source_id": "british_council_partner_schools_egypt_2026_09",
+      "source_record_id": "bcps2026:kings-school-the-crown",
+      "source_name": "King's School The Crown",
+      "provisional_canonical_name_en": "King's School The Crown",
+      "decision": "confirmed_discovered_single_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://www.kingsschoolegypt.com/",
+        "https://www.kingsschoolegypt.com/kings-school-crown-granted-license-operate-ministry-education",
+        "https://www.isi.net/institutions/bso/king-s-school-the-crown-9665"
+      ],
+      "review_note": "The source membership is the qualified British Council discovery row, but the identity decision is supported independently by the current first-party school identity, its Ministry licensing evidence and the recognized ISI institution record. The review explicitly confirms this school identity; it does not infer uniqueness merely because no row in the original 106-source universe matched it."
+    },
+    {
+      "review_identity_key": "international-school-choueifat-cairo",
+      "source_id": "british_council_partner_schools_egypt_2026_09",
+      "source_record_id": "bcps2026:international-school-choueifat-cairo",
+      "source_name": "The International School of Choueifat, Cairo",
+      "provisional_canonical_name_en": "The International School of Choueifat - Cairo",
+      "decision": "confirmed_discovered_single_source_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://isccairo.sabis.net/",
+        "https://isccairo.sabis.net/school-news/the-international-school-of-choueifat-cairo-is-awarded-"
+      ],
+      "review_note": "The qualified British Council source row is linked to the current first-party ISC-Cairo identity in the SABIS network and its current Cognia re-accreditation notice. This explicit decision establishes the reviewed school identity without assuming uniqueness from absence of a matcher hit and without making any claim about other SABIS campuses in Egypt."
+    }
+  ],
+  "safety": {
+    "absence_of_match_treated_as_uniqueness_proof": false,
+    "unqualified_discovery_rows_entered_identity_review": false,
+    "automatic_identity_creation_performed": false,
+    "automatic_merges_performed": 0,
+    "canonical_database_rows_written": 0,
+    "runtime_database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
