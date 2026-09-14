@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "source_id": "msche_auc",
+  "snapshot_date": "2026-09-14",
+  "institution": {
+    "name_en": "The American University in Cairo",
+    "short_name": "AUC",
+    "scope_state": "eligible",
+    "scope_class": "international_independent_university",
+    "ownership_scope": "private_independent",
+    "country_code": "EG",
+    "city": "New Cairo",
+    "address": "AUC Avenue - P.O. Box 74 - New Cairo 11835, Egypt",
+    "phone": "+20 2 2615 1000",
+    "website": "https://www.aucegypt.edu/",
+    "international_evidence": [
+      {
+        "evidence_code": "msche_institutional_accreditation",
+        "publisher": "Middle States Commission on Higher Education",
+        "source_url": "https://www.msche.org/institution/0637/?pss=true",
+        "status": "Accredited",
+        "action_status": "Accreditation Reaffirmed",
+        "accreditation_granted_year": 1982,
+        "next_self_study": "2026-2027"
+      },
+      {
+        "evidence_code": "us_egypt_institutional_framework",
+        "publisher": "The American University in Cairo",
+        "source_url": "https://www.aucegypt.edu/about/accreditation",
+        "fact": "AUC operates under a 1975 protocol with the Egyptian government based on a 1962 Egypt-US cultural relations agreement, is incorporated in Delaware, and is licensed to grant degrees in the United States."
+      }
+    ]
+  },
+  "notes": "AUC is included because its international institutional status is substantive and independently evidenced by a recognized US institutional accreditor plus the institution's Egypt-US legal/accreditation framework; it is not included merely because of an international partnership or its name."
+}
