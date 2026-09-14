@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "source_id": "ib_world_schools_egypt",
+  "snapshot_date": "2026-09-15",
+  "integration_state": "captured_pending_deterministic_seed_integration",
+  "notes": "Third incremental batch of current official IB school-profile checks. PRIVATE classification is taken from the current official IB profile for each exact Egypt directory identity. This evidence is additive and preserves the foundational directory source identities.",
+  "records": [
+    {
+      "name": "Capital International Schools",
+      "ib_school_code": "061877",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "cis.capitalschools.edu.eg/",
+      "phone": "+201014088542",
+      "address": "Area 17 Kh. Narges, Moushir Ahmed Ismail street, Fifth Settlement, New Cairo, Cairo 11865, Egypt",
+      "source_url": "https://ibo.org/school/061877/"
+    },
+    {
+      "name": "Carleton College International School",
+      "ib_school_code": "062230",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.carletoncollege.net",
+      "phone": "+201270604011",
+      "address": "El Shorouk, 11871, Egypt",
+      "source_url": "https://ibo.org/school/062230/"
+    },
+    {
+      "name": "Deutsche Schule Beverly Hills Kairo",
+      "ib_school_code": "049352",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.bhs-egypt.com/",
+      "phone": null,
+      "address": "Beverly Hills Compound, Sheikh Zayed, 6th of October, Egypt",
+      "source_url": "https://ibo.org/programmes/find-an-ib-school/ibaem/d/deutsche-schule-beverly-hills-kairo/"
+    },
+    {
+      "name": "École Oasis Internationale",
+      "ib_school_code": "001852",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.oasisdemaadi.com/",
+      "phone": null,
+      "address": "Zahraa El Maadi, Quartier No 7 A et B, Cairo, Maadi 11435, Egypt",
+      "source_url": "https://ibo.org/fr/programmes/find-an-ib-school/ibaem/e1/ecole-oasis-internationale/"
+    },
+    {
+      "name": "Egyptian American School",
+      "ib_school_code": "062701",
+      "type": "PRIVATE",
+      "scope_state": "eligible",
+      "website": "www.easschool.com/",
+      "phone": null,
+      "address": "Ring road behind Nozha Airport, Alexandria 21522, Egypt",
+      "source_url": "https://ibo.org/fr/school/062701/"
+    }
+  ],
+  "records_count": 5,
+  "eligible_private": 5,
+  "excluded_state": 0
+}
