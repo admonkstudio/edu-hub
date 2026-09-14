@@ -16,11 +16,17 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 ## 2026-08-18 — Platform
 
-**Decision:** Astro + TypeScript remains the approved frontend/application direction.
+**Decision:** Astro + TypeScript remains an approved frontend/application direction.
 
-**Decision:** PostgreSQL is the operational source of truth.
+**Superseded:** The previous decision naming Supabase as the initial database/auth/storage platform is no longer active.
 
-**Decision:** Supabase is the approved initial database/auth/storage platform direction, with PostGIS for geographic needs.
+**Decision (2026-09-14):** Edu Hub will not use Supabase.
+
+**Decision (2026-09-14):** The product should be implemented as either Astro-first or Instatic-first. Instatic is the approved self-hosted CMS/publisher option. A hybrid Astro + Instatic stack is allowed only if there is a clear product need and one canonical data owner is defined.
+
+**Decision (2026-09-14):** The data/research layer must remain portable and independent of Supabase-specific database, auth, storage, RLS, Edge Functions or APIs.
+
+**Decision (2026-09-14):** The relational SQL model remains a canonical domain/reference model, but the physical runtime may use Instatic's self-hosted database/storage, SQLite, directly attached PostgreSQL, or owned static/generated data consumed by Astro.
 
 **Decision:** Arabic and English are first-class locales from launch, initially `ar-EG` and `en-EG`.
 
@@ -42,11 +48,11 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 **Decision:** Published pages must not hotlink source-site images as an operational dependency.
 
-**Decision:** Identical media binaries should be content-addressed/deduplicated while preserving every source-to-media provenance link.
+**Decision:** Identical media binaries should be content-addressed/deduplicated where the selected runtime supports it while preserving every source-to-media provenance link.
 
 ## 2026-09-13 — Evidence architecture retained
 
-**Decision:** The enforced data path remains:
+**Decision:** The enforced logical data path remains:
 
 `external source -> edu_raw -> edu_staging -> edu_core -> public projection -> website`
 
@@ -55,6 +61,8 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 **Decision:** Identity validity is separate from profile completeness. Missing fees, media or contact fields do not justify invented values.
 
 **Decision:** Conflicting assertions remain review work until resolved.
+
+**Decision:** If Instatic/SQLite/static artifacts are selected, the logical raw/staging/core boundaries must still be preserved even if the physical storage implementation differs from the PostgreSQL reference schemas.
 
 ## 2026-09-14 — Scope reset to international education
 
@@ -86,6 +94,18 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 **Decision:** Public/state international-school initiatives remain excluded unless the project owner later changes scope.
 
+## 2026-09-14 — Edarabia source policy
+
+**Decision:** Edarabia is an approved supporting/commercial directory source for discovery and enrichment leads.
+
+**Decision:** Edarabia may contribute candidate names, addresses, websites, curriculum leads, fee leads, profile completeness hints and media discovery leads.
+
+**Decision:** Edarabia does not establish international eligibility, accreditation, regulatory status or canonical fees by itself. Important Edarabia-derived facts must be corroborated by a regulator, accreditor or official institution source before canonical promotion.
+
+**Decision:** Edarabia ratings/reviews are user-generated/editorial signals, not canonical factual evidence.
+
+**Decision:** Edarabia images are discovery/provenance candidates only. They must not be republished unless an independent reuse right is established.
+
 ## 2026-09-14 — Higher-education boundary
 
 **Decision:** Recognized foreign university branches are included.
@@ -112,15 +132,17 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 **Decision:** Create a new active branch `edu-data-2-international-registry` rather than destructively rewriting the historical national-registry branch.
 
-**Decision:** The clean database extends the evidence layers with explicit providers, campuses, international eligibility, curricula, accreditations, contacts, fees, admissions, higher-education structures and rights-aware media metadata.
+**Decision:** The clean data model extends the evidence layers with explicit providers, campuses, international eligibility, curricula, accreditations, contacts, fees, admissions, higher-education structures and rights-aware media metadata.
 
 **Decision:** Legacy V7 data is not bulk-promoted into the clean registry. Only legacy rows matched to an EDU-DATA-2 eligible institution may contribute supporting assertions.
 
-**Decision:** Edu Hub must use a dedicated Supabase/PostgreSQL project. Ask Kalam database projects may not receive Edu Hub data.
+**Superseded:** Edu Hub no longer requires a dedicated Supabase project.
+
+**Decision:** Ask Kalam infrastructure remains unrelated and must not receive Edu Hub data.
 
 ## 2026-09-14 — SEO/publication boundary retained
 
-**Decision:** A database record does not automatically become an indexable page.
+**Decision:** A database/content record does not automatically become an indexable page.
 
 **Decision:** Arbitrary filter combinations do not automatically generate SEO pages.
 
@@ -128,9 +150,10 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 ## Pending decisions
 
-- dedicated Edu Hub Supabase organization/project provisioning;
+- Astro-first vs Instatic-first final implementation choice;
+- if Instatic-first: SQLite vs directly attached PostgreSQL based on real scale/query requirements;
 - final public brand name/domain;
-- final hosting provider/Astro adapter;
+- final Astro hosting adapter if Astro is selected;
 - final visual identity/design system;
 - final map provider;
 - final analytics/consent stack;
