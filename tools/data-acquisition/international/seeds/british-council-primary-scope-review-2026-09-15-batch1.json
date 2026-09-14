@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.1_british_council_primary_scope_review",
+  "batch_id": "batch1-high-confidence-primary-resourcing",
+  "review_method": "british_council_discovery_then_primary_or_recognized_evidence_review",
+  "records_count": 2,
+  "records": [
+    {
+      "source_record_id": "bcps2026:kings-school-the-crown",
+      "source_name": "King's School The Crown",
+      "decision": "eligible",
+      "decision_confidence": "high",
+      "scope_class": "international_school",
+      "ownership_scope": "private_independent",
+      "curriculum_codes": ["british"],
+      "website": "https://www.kingsschoolegypt.com/",
+      "evidence_urls": [
+        "https://www.kingsschoolegypt.com/",
+        "https://www.kingsschoolegypt.com/kings-school-crown-granted-license-operate-ministry-education",
+        "https://www.isi.net/institutions/bso/king-s-school-the-crown-9665"
+      ],
+      "eligibility_basis": [
+        "current_first_party_private_school_identity",
+        "current_first_party_ministry_license_to_operate_and_teach_british_national_curriculum",
+        "recognized_bso_inspectorate_institution_record"
+      ],
+      "review_note": "The British Council row is discovery evidence only. Current first-party evidence identifies King's School The Crown as a premium private school, records its Egyptian Ministry of Education license to operate and teach the British National Curriculum, and describes its Cambridge/British Council inspection/registration pathway. The Independent Schools Inspectorate also maintains a current BSO institution record for the same school and address. Eligibility is granted from that combined primary/recognized evidence, not from Partner School status."
+    },
+    {
+      "source_record_id": "bcps2026:international-school-choueifat-cairo",
+      "source_name": "The International School of Choueifat, Cairo",
+      "decision": "eligible",
+      "decision_confidence": "high",
+      "scope_class": "international_school",
+      "ownership_scope": "private_independent",
+      "curriculum_codes": ["international", "british", "american"],
+      "website": "https://isccairo.sabis.net/",
+      "evidence_urls": [
+        "https://isccairo.sabis.net/",
+        "https://isccairo.sabis.net/school-news/the-international-school-of-choueifat-cairo-is-awarded-"
+      ],
+      "eligibility_basis": [
+        "current_first_party_independent_international_school_identity",
+        "current_first_party_current_cognia_reaccreditation_evidence",
+        "international_external_examination_pathways"
+      ],
+      "review_note": "The British Council row is discovery evidence only. ISC-Cairo's current first-party site explicitly describes the school as a fully accredited, co-educational, English-medium independent day school in the global SABIS network, with British and US external examination pathways. A current school accreditation notice dated 9 April 2025 records Cognia re-accreditation for another five years following a Cognia Performance Accreditation and Engagement Review. Eligibility is therefore based on current independent international-school identity and accreditation evidence, not Partner School status."
+    }
+  ],
+  "safety": {
+    "partner_status_treated_as_international_eligibility": false,
+    "unreviewed_british_council_leads_promoted": false,
+    "automatic_identity_creation_performed": false,
+    "automatic_merges_performed": 0,
+    "canonical_database_rows_written": 0,
+    "public_projection_rows_created": 0
+  }
+}
