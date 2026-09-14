@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.2_known_distinct_identity_review",
+  "pairs_count": 2,
+  "pairs": [
+    {
+      "decision_id": "europa-schule-neu-kairo-vs-europaschule-kairo",
+      "decision": "distinct_institutions_with_current_collaboration",
+      "decision_confidence": "high",
+      "left": {
+        "source_id": "ib_world_schools_egypt",
+        "source_record_id": "ib_world_schools_egypt:547be8be3aa3c4dc5765",
+        "source_name": "Europa Schule Neu Kairo"
+      },
+      "right": {
+        "source_id": "kmk_german_schools_2026_04",
+        "source_record_id": "kmk_german_schools_2026_04:6cffd932022f11807370",
+        "source_name": "Europaschule Kairo"
+      },
+      "evidence_urls": [
+        "https://esnk.org/overview/",
+        "https://www.kmk.org/fileadmin/Dateien/veroeffentlichungen_beschluesse/2026/2026_04_00-Uebersicht-Deutsche-Auslandsschulen.pdf"
+      ],
+      "review_note": "Europa-Schule Neu Kairo's current first-party page explicitly describes a partnership with Europa Schule Kairo through which ESNK students may pursue the German Abitur. That relationship proves two distinct institutions rather than spelling variants of one school."
+    },
+    {
+      "decision_id": "lycee-moliere-alexandria-vs-international-school-egypt-new-cairo",
+      "decision": "distinct_institutions_with_name_provider_collision",
+      "decision_confidence": "high",
+      "left": {
+        "source_id": "french_homologation_2026_2027",
+        "source_record_id": "3010017H",
+        "source_name": "Lycée Molière (International School of Egypt)"
+      },
+      "right": {
+        "source_id": "ib_world_schools_egypt",
+        "source_record_id": "ib_world_schools_egypt:baaf773e3cd0172202d0",
+        "source_name": "The International School of Egypt"
+      },
+      "evidence_urls": [
+        "https://aefe.gouv.fr/fr/etablissements/lycee-moliere-international-school-egypt",
+        "https://ise.edu.eg/",
+        "https://isegypt.org/"
+      ],
+      "review_note": "AEFE identifies Lycée Molière in Alexandria. The current ise.edu.eg site is an Alexandria education-management provider called International Schools of Egypt and lists Lycée Molière among its portfolio. isegypt.org is a separate school identity in New Cairo named The International School of Egypt. The shared wording must not cause a canonical merge."
+    }
+  ],
+  "safety": {
+    "automatic_negative_match_inference_performed": false,
+    "automatic_merges_performed": 0,
+    "canonical_database_rows_written": 0,
+    "runtime_database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
