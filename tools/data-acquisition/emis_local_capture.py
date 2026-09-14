@@ -38,7 +38,9 @@ USER_AGENT = (
     "(+https://github.com/admonkstudio/edu-hub; public-source-contract-capture)"
 )
 
-POSTBACK_RE = re.compile(r"__doPostBack\(['\"]([^'\"]+)['\"]", re.I)
+# ASP.NET may serialize __doPostBack targets either with ordinary quotes or
+# backslash-escaped quotes inside onclick JavaScript strings.
+POSTBACK_RE = re.compile(r"__doPostBack\(\s*\\?['\"]([^\\'\"]+)", re.I)
 ENDPOINT_RE = re.compile(
     r"['\"]([^'\"]+\.(?:aspx|asmx|ashx|json|php)(?:\?[^'\"]*)?)['\"]",
     re.I,
