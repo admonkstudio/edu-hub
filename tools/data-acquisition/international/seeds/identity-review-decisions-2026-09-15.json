@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.2_identity_and_division_reconciliation",
+  "review_method": "source_backed_agent_review_no_canonical_mutation",
+  "groups_count": 9,
+  "groups": [
+    {
+      "review_group_id": "narmer-american-college",
+      "provisional_canonical_name_en": "Narmer American College",
+      "decision": "same_institution",
+      "decision_confidence": "high",
+      "source_records": [
+        {"source_id": "ib_world_schools_egypt", "source_record_id": "ib_world_schools_egypt:7ed99890b9f93db518d3", "source_name": "Narmer American College"},
+        {"source_id": "cognia_member_milestones_egypt_2026_2027", "source_record_id": "cognia_member_milestones_egypt_2026_2027:258f97ab14aec6fbf25f", "source_name": "Narmer American College"}
+      ],
+      "evidence_urls": [
+        "https://www.nac.edu.eg/college/",
+        "https://ibo.org/school/051886/",
+        "https://www.cognia.org/member-milestones/"
+      ],
+      "review_note": "Exact cross-source name plus current official school/IB evidence. Cognia evidence is accreditation scope, not a separate institution."
+    },
+    {
+      "review_group_id": "british-international-school-cairo",
+      "provisional_canonical_name_en": "The British International School, Cairo",
+      "decision": "same_institution",
+      "decision_confidence": "high",
+      "source_records": [
+        {"source_id": "ib_world_schools_egypt", "source_record_id": "ib_world_schools_egypt:7200922ae1972e8f7a80", "source_name": "British International School, Cairo"},
+        {"source_id": "uk_dfe_bso_egypt_2026_08", "source_record_id": "uk_dfe_bso_egypt_2026_08:1c4851b3e1934c5f99cc", "source_name": "British International School - Cairo"}
+      ],
+      "evidence_urls": [
+        "https://www.bisc.edu.eg/about-bisc-208330-809872.html",
+        "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/132606"
+      ],
+      "review_note": "Official BISC site identifies the school as both an IB World School and a British Schools Overseas inspected school; source punctuation variants resolve to one institution."
+    },
+    {
+      "review_group_id": "cairo-american-college",
+      "provisional_canonical_name_en": "Cairo American College",
+      "decision": "same_institution",
+      "decision_confidence": "high",
+      "source_records": [
+        {"source_id": "ib_world_schools_egypt", "source_record_id": "ib_world_schools_egypt:98474c26000ac987d201", "source_name": "Cairo American College"},
+        {"source_id": "cis_international_accreditation_egypt", "source_record_id": "cis_international_accreditation_egypt:d16ab561b7456b2d4d40", "source_name": "Cairo American College"}
+      ],
+      "evidence_urls": [
+        "https://www.cacegypt.org/",
+        "https://ibo.org/school/000708/",
+        "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/re-accredited-cairo-american-college-egypt"
+      ],
+      "review_note": "Exact name match supported by current official institution, IB and CIS evidence."
+    },
+    {
+      "review_group_id": "cairo-english-school",
+      "provisional_canonical_name_en": "Cairo English School",
+      "decision": "same_institution",
+      "decision_confidence": "high",
+      "source_records": [
+        {"source_id": "ib_world_schools_egypt", "source_record_id": "ib_world_schools_egypt:915367503c39a1e5c4c5", "source_name": "Cairo English School"},
+        {"source_id": "cis_international_accreditation_egypt", "source_record_id": "cis_international_accreditation_egypt:0ddc1985dbaaa9918e97", "source_name": "Cairo English School"}
+      ],
+      "evidence_urls": [
+        "https://www.cesegypt.com/",
+        "https://ibo.org/en/school/004939/",
+        "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/re-accredited-cairo-english-school-egypt"
+      ],
+      "review_note": "Exact name match supported by current official institution, IB and CIS evidence."
+    },
+    {
+      "review_group_id": "modern-english-school-cairo",
+      "provisional_canonical_name_en": "Modern English School Cairo",
+      "decision": "same_institution",
+      "decision_confidence": "high",
+      "source_records": [
+        {"source_id": "ib_world_schools_egypt", "source_record_id": "ib_world_schools_egypt:9338770aad2392b2f1a1", "source_name": "Modern English School Cairo"},
+        {"source_id": "uk_dfe_bso_egypt_2026_08", "source_record_id": "uk_dfe_bso_egypt_2026_08:aa775e9baad11d8b6ae2", "source_name": "Modern English School Cairo"}
+      ],
+      "evidence_urls": [
+        "https://www.mescairo.com/",
+        "https://ibo.org/en/school/002857/",
+        "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/141507"
+      ],
+      "review_note": "Exact name plus matching official website identity across current IB and DfE BSO evidence."
+    },
+    {
+      "review_group_id": "new-cairo-british-international-school",
+      "provisional_canonical_name_en": "New Cairo British International School",
+      "decision": "same_institution",
+      "decision_confidence": "high",
+      "source_records": [
+        {"source_id": "ib_world_schools_egypt", "source_record_id": "ib_world_schools_egypt:1288a68fecb01362bc70", "source_name": "New Cairo British International School"},
+        {"source_id": "uk_dfe_bso_egypt_2026_08", "source_record_id": "uk_dfe_bso_egypt_2026_08:69e9fbf1ccce64cd591b", "source_name": "New Cairo British International School"},
+        {"source_id": "cis_international_accreditation_egypt", "source_record_id": "cis_international_accreditation_egypt:8ca9dc5843190638cc14", "source_name": "NCBIS - New Cairo British International School"}
+      ],
+      "evidence_urls": [
+        "https://ncbis.co.uk/",
+        "https://ibo.org/fr/programmes/find-an-ib-school/ibaem/n/new-cairo-british-international-school/",
+        "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/141436",
+        "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/re-accredited-ncbis-new-cairo-british-international-school-egypt"
+      ],
+      "review_note": "IB, DfE/GIAS and CIS names resolve to NCBIS; current official website confirms the institutional identity."
+    },
+    {
+      "review_group_id": "evolution-international-school-newgiza",
+      "provisional_canonical_name_en": "Evolution International School - NewGiza",
+      "decision": "same_institution",
+      "decision_confidence": "high",
+      "source_records": [
+        {"source_id": "ib_world_schools_egypt", "source_record_id": "ib_world_schools_egypt:608ef73c78427b33df48", "source_name": "Evolution International School - NewGiza"},
+        {"source_id": "cis_international_accreditation_egypt", "source_record_id": "cis_international_accreditation_egypt:eaac72bb1a3907e96769", "source_name": "Evolution International School"}
+      ],
+      "evidence_urls": [
+        "https://eisng.lvng.net/",
+        "https://www-prod.ibo.org/school/061134/",
+        "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/re-accredited-evolution-international-school-egypt"
+      ],
+      "review_note": "The NewGiza suffix is a source/name variant for the same current institution represented by IB, the official site and CIS."
+    },
+    {
+      "review_group_id": "el-alsson-newgiza",
+      "provisional_canonical_name_en": "El Alsson British and American International School",
+      "decision": "same_institution_with_division_scoped_evidence",
+      "decision_confidence": "high",
+      "source_records": [
+        {"source_id": "ib_world_schools_egypt", "source_record_id": "ib_world_schools_egypt:b632ef67e346e687c532", "source_name": "El Alsson American International School", "division_scope": "american"},
+        {"source_id": "uk_dfe_bso_egypt_2026_08", "source_record_id": "uk_dfe_bso_egypt_2026_08:589996a51baeed6c9f56", "source_name": "El Alsson British & American International School", "division_scope": "british"}
+      ],
+      "evidence_urls": [
+        "https://www.alsson.com/",
+        "https://www.alsson.com/about/",
+        "https://www.alsson.com/about/the-story-of-el-alsson",
+        "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/133027"
+      ],
+      "review_note": "Official El Alsson evidence describes one institutional community/campus with distinct British and American schools/sections. IB evidence applies to the American stream while BSO evidence applies to the British school; neither should create a duplicate institution or be overstated institution-wide."
+    },
+    {
+      "review_group_id": "misr-language-schools",
+      "provisional_canonical_name_en": "Misr Language Schools",
+      "decision": "same_institution_with_division_scoped_evidence",
+      "decision_confidence": "high",
+      "source_records": [
+        {"source_id": "ib_world_schools_egypt", "source_record_id": "ib_world_schools_egypt:25b19086ef070fca207a", "source_name": "Misr Language Schools", "division_scope": "ib_or_institution_source_scope_needs_field_mapping"},
+        {"source_id": "french_homologation_2026_2027", "source_record_id": "3010007X", "source_name": "MISR Language School - Mlf", "division_scope": "french"},
+        {"source_id": "cognia_member_milestones_egypt_2026_2027", "source_record_id": "cognia_member_milestones_egypt_2026_2027:6dee58e42173aaa96882", "source_name": "Misr Language Schools- American Division", "division_scope": "american"}
+      ],
+      "evidence_urls": [
+        "https://mls-egypt.org/",
+        "https://frenchdivision.mls-egypt.org/",
+        "https://mls-egypt.org/wp-content/uploads/2024/11/MLS-IBDP-Student-Parent-Handbook.pdf",
+        "https://ibo.org/en/school/051897",
+        "https://www.cognia.org/member-milestones/",
+        "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054341397"
+      ],
+      "review_note": "Official MLS evidence explicitly describes one school/institution with National, British, American, French and other divisions. French homologation and Cognia evidence are division-scoped; these source rows must reconcile under one institution while retaining separate division-level authorization and profile facts."
+    }
+  ],
+  "safety": {
+    "canonical_institutions_created": 0,
+    "canonical_merges_performed": 0,
+    "public_projection_rows_created": 0,
+    "database_mutation_performed": false,
+    "review_decisions_are_relationship_evidence_not_database_merges": true
+  }
+}
