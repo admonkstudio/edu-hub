@@ -47,6 +47,7 @@ jobs:
               'french_homologation_2026_2027',
               'kmk_german_schools_2026_04',
               'scu_foreign_university_branches',
+              'msche_auc',
               'legacy_v7_archive',
           ):
               assert required in ids
@@ -57,12 +58,14 @@ jobs:
           fr = json.loads((seed_dir/'french-homologation-egypt-2026-2027.json').read_text(encoding='utf-8'))
           de = json.loads((seed_dir/'german-kmk-egypt-2026-04.json').read_text(encoding='utf-8'))
           scu = json.loads((seed_dir/'scu-foreign-university-branches-2026-09-14.json').read_text(encoding='utf-8'))
+          auc = json.loads((seed_dir/'auc-international-evidence-2026-09-14.json').read_text(encoding='utf-8'))
           assert len(ib['schools']) == ib['directory_count_observed'] == 54
           assert ib['count_conflict_requires_review'] is True
           assert len(fr['records']) == fr['records_count'] == 17
           assert len(de['records']) == de['records_count'] == 4
           assert len(scu['records']) == scu['records_count'] == 9
-          print(f"validated {len(ids)} registered sources and 84 source snapshot rows")
+          assert auc['institution']['scope_state'] == 'eligible'
+          print(f"validated {len(ids)} registered sources and 85 source snapshot rows")
           PY
       - name: Test live-parser and scope boundaries
         run: python tools/data-acquisition/international/test_acquisition.py
@@ -85,8 +88,8 @@ jobs:
           from pathlib import Path
           p = Path('artifacts/international/authoritative-source-summary.json')
           data = json.loads(p.read_text(encoding='utf-8'))
-          assert data['source_rows'] == 84
-          assert data['eligible_source_rows'] == 30
+          assert data['source_rows'] == 85
+          assert data['eligible_source_rows'] == 31
           assert data['candidate_source_rows'] == 54
           assert data['unique_institutions_claimed'] is None
           assert data['identity_reconciliation_required'] is True
