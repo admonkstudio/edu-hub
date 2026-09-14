@@ -47,10 +47,12 @@ Institutions and commercial participants are secondary audiences attracted by pa
 
 ## Platform direction
 
-- Astro + TypeScript
-- PostgreSQL as source of truth
-- Supabase as the initial database/auth/storage platform
-- PostGIS for geographic capability
+- **No Supabase dependency**
+- Astro + TypeScript when the public product needs a coded application layer
+- Instatic CMS as the approved self-hosted CMS/static-publishing option
+- choose Astro-first or Instatic-first; do not create a hybrid by default
+- relational domain model with portable owned data/evidence artifacts
+- Instatic SQLite or directly attached PostgreSQL may be used if Instatic is selected; Astro may use owned static/generated data or a direct database only when needed
 - Arabic and English from launch (`ar-EG`, `en-EG`)
 - evidence-first international eligibility
 - field/source provenance for important facts
@@ -61,14 +63,22 @@ Institutions and commercial participants are secondary audiences attracted by pa
 
 ```text
 external source
-→ edu_raw
-→ edu_staging
-→ edu_core
+→ raw evidence
+→ staging/reconciliation
+→ reviewed canonical data
 → public projection
-→ website
+→ Astro or Instatic
 ```
 
+The current `edu_raw`, `edu_staging`, and `edu_core` SQL schemas are the canonical relational reference implementation of these boundaries. The selected runtime may adapt the physical storage while preserving the same evidence/review/publication contract.
+
 Public pages never depend on live third-party source APIs after acquisition, and raw/staging evidence is never published directly.
+
+## Source policy
+
+Primary/regulatory/accreditation/institution-owned evidence has priority.
+
+Commercial directories such as Edarabia are useful for discovery and enrichment leads — for example fees, curriculum, locations, websites and media discovery — but they do not establish international eligibility or canonical facts without corroboration.
 
 ## Project control
 
