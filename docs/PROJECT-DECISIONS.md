@@ -136,7 +136,13 @@ Record durable decisions here. Do not use this file for temporary task notes.
 
 **Decision:** Government-school enumeration remains blocked whenever the government category route returns a server-side failure, even if the EMIS root or another category is healthy. The 62,690-school national target may only be evaluated against source rows acquired from the required official government-school identity source or an official export.
 
-**Decision:** Bounded EMIS contract probes may submit top-level category navigation and one explicit non-search dependent-control postback when necessary to reveal the search contract. They may not submit a school-search button, follow result pagination, enumerate school rows, mutate `edu_core`, or promote public records until a separately reviewed pilot gate is satisfied.
+**Decision:** Bounded EMIS contract probes may submit top-level category navigation and non-search dependent-control postbacks only when necessary to reveal the source contract. They may not submit a school-search button, follow result pagination, enumerate school rows, mutate `edu_core`, or promote public records until a separately reviewed pilot gate is satisfied.
+
+**Decision:** The 2026-09-14 Egypt-local diagnostic exhausted all three observed non-placeholder Special Education type postbacks. Every postback was accepted, every response preserved the selected state, all dependent governorate/stage selects remained empty, and every response exposed the ministry-side page-load error. This is classified as a live source/application data-loading blocker rather than an unresolved client-side postback-format problem.
+
+**Decision:** Do not repeat the same Special Education hydration diagnostic without materially new source behavior. Routine monitoring must use only the lightweight top-level EMIS health recheck. A recovered government route triggers a fresh contract capture and review; it does not automatically authorize enumeration.
+
+**Decision:** While the live government route is unhealthy, the official machine-readable MOE/EMIS export is the primary D1.3 acquisition path. Secondary directories remain ineligible to substitute for official national school coverage.
 
 ## Pending decisions
 
