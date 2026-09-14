@@ -5,12 +5,12 @@ This deliberately never auto-accepts a merge. It finds plausible duplicate
 source rows so a human can decide whether they represent the same institution,
 a campus of the same institution, or unrelated entities with similar names.
 
-Version 2 deliberately treats curriculum/model words such as British, English,
-American and International as non-distinctive. A fuzzy proposal now needs at
-least one distinctive shared token unless the full normalized name, an official
-identifier or a normalized domain is an exact match. This prevents clusters of
-unrelated international schools from being proposed merely because they share
-model words.
+Version 2 deliberately treats curriculum/model and generic naming words such as
+British, English, American, International, New, Modern and Future as
+non-distinctive. A fuzzy proposal needs at least one distinctive shared token
+unless the full normalized name, an official identifier or a normalized domain
+is an exact match. This prevents clusters of unrelated international schools
+from being proposed merely because they share generic model words.
 """
 from __future__ import annotations
 
@@ -24,7 +24,9 @@ STOP = {
     "school", "schools", "international", "college", "university", "the",
     "of", "in", "egypt", "branch", "lycee", "ecole", "de", "du", "la",
     "le", "mlf", "cairo", "alexandria", "british", "english", "american",
-    "german", "french", "bilingual", "academy", "education",
+    "german", "french", "bilingual", "academy", "education", "new", "modern",
+    "future", "royal", "language", "languages", "global", "city", "national",
+    "private", "public",
 }
 
 
@@ -64,10 +66,7 @@ def similarity(left: dict, right: dict) -> tuple[float, dict]:
         and left.get("normalized_domain") == right.get("normalized_domain")
     )
 
-    # Generic international-school vocabulary is not enough to create a review
-    # proposal. Exact full names, official IDs and domains remain strong signals.
-    distinctive_overlap = bool(shared)
-    if not (exact_name or exact_official_id or same_domain or distinctive_overlap):
+    if not (exact_name or exact_official_id or same_domain or shared):
         score = 0.0
         generic_only_rejected = True
     else:
