@@ -58,15 +58,19 @@ Evidence from institutions such as Misr Language Schools and El Alsson proves th
 
 Therefore a curriculum division is **not** automatically a separate institution and division-specific authorization must **not** be flattened onto the whole institution.
 
-The reference hierarchy is now:
+The reference hierarchy is:
 
 `provider -> institution -> campus -> school division`
 
 `infra/owned-data/007_school_divisions.sql` passed clean-schema and idempotency CI in **EDU-DATA-2 School Division Schema run 34898999314**.
 
-## Accepted source universe and eligibility state
+## Current accepted source universe and eligibility state
 
 ### Deterministic authoritative/strong base — 96 source rows
+
+The foundational 96-row builder is preserved and reproducible. A deterministic additive IB detail overlay now applies five more current PRIVATE IB profile decisions while preserving all 96 source identities.
+
+Source families remain:
 
 - 54 IB Egypt rows;
 - 11 UK DfE British Schools Overseas rows;
@@ -75,11 +79,13 @@ The reference hierarchy is now:
 - 9 SCU foreign-university-branch rows;
 - 1 AUC/MSCHE row.
 
-Current accepted source-row states:
+**Current accepted source-row states after the IB batch2 overlay:**
 
-- **40 eligible**;
-- **53 candidate**;
+- **45 eligible**;
+- **48 candidate**;
 - **3 excluded**.
+
+The pre-overlay foundational state remains reproducibly 40/53/3. The additive overlay changes only the five exact IB rows verified by current official profile evidence; it does not change any source record ID.
 
 These are source records, not 96 claimed unique institutions.
 
@@ -90,10 +96,10 @@ Separate current/recent accreditor evidence adds:
 - 6 CIS Egypt accreditation rows;
 - 4 Cognia 2026–2027 milestone rows.
 
-Current accepted combined states:
+**Current accepted combined states after the IB batch2 overlay:**
 
-- **40 eligible**;
-- **63 candidate**;
+- **45 eligible**;
+- **58 candidate**;
 - **3 excluded**.
 
 English source-row naming evidence: **106/106**.
@@ -108,16 +114,17 @@ No full-universe unique institution count is claimed and fuzzy matching never au
 
 - 54 Egypt directory rows captured.
 - IB country summary reported 55 on the same snapshot date; the discrepancy remains explicit.
-- The accepted deterministic seed currently applies 12 detail/ownership decisions:
-  - **9 PRIVATE / eligible**;
+- **17 source-backed detail/ownership decisions are now accepted across the foundational snapshots plus the batch2 overlay:**
+  - **14 PRIVATE / eligible**;
   - **3 STATE / excluded**.
-- A second current verification batch was captured on 2026-09-15 for **5 additional PRIVATE schools**:
+- The second accepted private batch contains:
   - AIA School;
   - Al-Hoda International School;
   - American International School in Egypt;
   - American International School in Egypt West Campus;
   - Bedayia International School.
-- That second batch is checked in as `ib-detail-evidence-2026-09-15-batch2.json` with `integration_state=captured_pending_deterministic_seed_integration`. It does **not** yet change the accepted 40/53/3 base counts; integration will occur as one dedicated deterministic-seed contract update.
+- `apply_ib_detail_batch2.py` updates only those five exact existing IB source rows, preserves their source IDs, and promotes them from candidate to eligible using current official IB PRIVATE evidence.
+- The overlay is fully downstream-tested against the accreditor-expanded universe and the existing D2.2 identity-review contracts.
 
 ### UK DfE / British Schools Overseas
 
@@ -146,9 +153,16 @@ No full-universe unique institution count is claimed and fuzzy matching never au
 
 Status: **IN PROGRESS / PRINCIPAL AUTHORITATIVE-ACCREDITOR EXPANSION COMPLETE**
 
-The deterministic builders produce both the 96-row base and 106-row accreditor-expanded discovery/reconciliation universe with zero canonical creation, zero automatic merge and zero public projection.
+The data pipeline now has two reproducible layers:
 
-British Council Partner Schools is the next broad supporting discovery source. Its September 2026 Egypt PDF contains **19 pages**. The file is browser-accessible, while GitHub-hosted direct Python retrieval returns HTTP 403. The approved adapter accepts a browser/local file via `--pdf-path`; partner/attached-centre status remains discovery/contact evidence only.
+1. foundational deterministic 96-row source build;
+2. accepted deterministic IB batch2 overlay, yielding the current 45/48/3 source-state distribution without changing source identities.
+
+The upgraded base can be combined with CIS/Cognia to produce the accepted **106-row / 45 eligible / 58 candidate / 3 excluded** discovery/reconciliation universe.
+
+`EDU-DATA-2 IB Detail Batch 2` run **34900583919** passed the complete downstream contract: foundational build, five-row overlay, accreditor expansion, candidate universe, D2.2 identity validation, reviewed canonical draft materialization and safety assertions.
+
+British Council Partner Schools remains the next broad supporting discovery source. Its September 2026 Egypt PDF contains **19 pages** and is browser-accessible. GitHub-hosted direct Python retrieval returns HTTP 403, so the approved adapter supports a browser/local PDF path. Partner/attached-centre status remains discovery/contact evidence only.
 
 ## D2.2 — Identity, campus and division reconciliation
 
@@ -169,7 +183,7 @@ El Alsson and Misr Language Schools resolve as one institutional identity each w
 
 ### Deterministic reviewed-canonical draft materialization
 
-`tools/data-acquisition/international/build_reviewed_canonical_artifacts.py` now converts only explicit D2.2 review decisions into portable build artifacts using deterministic UUIDv5 identifiers.
+`tools/data-acquisition/international/build_reviewed_canonical_artifacts.py` converts only explicit D2.2 review decisions into portable build artifacts using deterministic UUIDv5 identifiers.
 
 Current artifact result:
 
@@ -184,7 +198,7 @@ Current artifact result:
 - **0 resolved canonical campuses** — no campus is invented from institution identity evidence;
 - **86 unreviewed source rows** retained in the D2.2 review queue;
 - full-universe unique institution count remains intentionally unclaimed;
-- eligibility selection is not performed by this identity materialization step;
+- eligibility selection is not performed by identity materialization;
 - **0 automatic merges**;
 - **0 canonical database rows written**;
 - **0 runtime database mutation**;
@@ -198,7 +212,7 @@ Build outputs:
 - `unreviewed-source-queue.jsonl`
 - `reviewed-canonical-draft-summary.json`
 
-**EDU-DATA-2 Identity Review run 34900009375 passed.** It compiled the builders, rebuilt the 106-row universe, validated the 9 relationship groups, materialized the deterministic drafts, asserted the 9/20/4/9/86 counts and uploaded the complete review artifact.
+**Identity Review run 34900009375 passed.** The subsequent upgraded IB batch2 workflow also revalidated the same 9/20/4/9/86 D2.2 contract against the current 106-row universe.
 
 These artifacts are reviewed portable drafts, not runtime database writes or public records.
 
@@ -273,8 +287,9 @@ The final portable package will contain canonical entities, bilingual localizati
 
 Key accepted runs:
 
-- Core International Registry: **34899223939** — green for current accepted 96-row/40-53-3 base, source registry, matcher and import safety checks;
-- Accreditor Expansion: **34898150474** — green for the accepted 106-row CIS/Cognia-expanded universe;
+- Core International Registry foundational contract: **34900305899** — green; foundational 96-row build remains reproducible;
+- Accreditor Expansion foundational contract: **34900289955** — green;
+- IB Detail Batch 2 upgraded contract: **34900583919** — green for 96 rows at 45/48/3 and downstream 106 rows at 45/58/3;
 - Localization Evidence: **34897451220** — green;
 - Official Site Enrichment: **34898574887** — green;
 - School Division Schema: **34898999314** — green including clean apply and idempotent re-apply;
@@ -282,19 +297,18 @@ Key accepted runs:
 
 ## Immediate next actions
 
-1. Integrate `ib-detail-evidence-2026-09-15-batch2.json` into the deterministic authoritative seed in one dedicated count/CI update; expected effect if unchanged by review is five IB rows moving from candidate to eligible.
+1. Continue IB private/state detail checks for the remaining unresolved IB directory rows, using the same exact-row additive integration pattern.
 2. Continue D2.2 source-backed identity review beyond the first 20 source memberships; prioritize obvious cross-source overlaps and parent/campus relationships.
 3. Review campus structure for the 9 first materialized institutions instead of assuming one campus per identity.
-4. Continue IB private/state detail checks for the remaining unresolved IB directory rows.
-5. Acquire the 19-page British Council PDF through the permitted browser/local route and run the existing discovery adapter.
-6. Expand official-site D2.4 enrichment from 8 institutions toward every eligible identity.
-7. Add current fee schedules only from current official sources; preserve older schedules historically.
-8. Expand official Arabic names and revalidate historical Arabic-name evidence.
-9. Reconcile SCU/MOHESR foreign-university identities and lifecycle state.
-10. Expand geography/coordinates using institution evidence plus Overture/OSM cross-checks.
-11. Continue media rights review and assign a terminal media state per reviewed identity.
-12. Produce the first canonicalization-aware factual/EN/AR/media completeness report.
-13. Freeze a deterministic portable export only after those review gates are satisfied.
+4. Acquire the 19-page British Council PDF through the permitted browser/local route and run the discovery adapter; use its rows only as discovery/contact evidence.
+5. Expand official-site D2.4 enrichment from 8 institutions toward every eligible identity.
+6. Add current fee schedules only from current official sources; preserve older schedules historically.
+7. Expand official Arabic names and revalidate historical Arabic-name evidence.
+8. Reconcile SCU/MOHESR foreign-university identities and lifecycle state.
+9. Expand geography/coordinates using institution evidence plus Overture/OSM cross-checks.
+10. Continue media rights review and assign a terminal media state per reviewed identity.
+11. Produce the first canonicalization-aware factual/EN/AR/media completeness report.
+12. Freeze a deterministic portable export only after those review gates are satisfied.
 
 ## Deferred during database completion
 
