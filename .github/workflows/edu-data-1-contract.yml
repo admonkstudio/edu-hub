@@ -116,11 +116,19 @@ jobs:
             --output artifacts/edu-data-1/mohesr_private_institutes.jsonl \
             --report artifacts/edu-data-1/mohesr_private_institutes_report.json \
             --page-text artifacts/edu-data-1/mohesr_private_page.txt
-      - name: Build SCU-MOHESR reconciliation proposals
+      - name: Acquire current MOHESR technical hierarchy
+        run: |
+          python tools/data-acquisition/scrape_mohesr_technical.py \
+            --parents-output artifacts/edu-data-1/mohesr_technological_colleges.jsonl \
+            --institutes-output artifacts/edu-data-1/mohesr_technical_institutes.jsonl \
+            --report artifacts/edu-data-1/mohesr_technical_report.json
+      - name: Build SCU-MOHESR reconciliation and hierarchy proposals
         run: |
           python tools/data-acquisition/registry/reconcile_higher_ed.py \
             --scu-csv tools/data-acquisition/seeds/scu_higher_ed_snapshot.csv \
             --mohesr-private artifacts/edu-data-1/mohesr_private_institutes.jsonl \
+            --mohesr-technical-parents artifacts/edu-data-1/mohesr_technological_colleges.jsonl \
+            --mohesr-technical-institutes artifacts/edu-data-1/mohesr_technical_institutes.jsonl \
             --out-dir artifacts/edu-data-1/higher-ed-reconciliation
       - name: Validate reconciliation remains proposal-only
         run: |
@@ -134,19 +142,21 @@ jobs:
               raise SystemExit('SCU private-institute reconciliation input unexpectedly small')
           if int(data.get('mohesr_sector_occurrences', 0)) < 170:
               raise SystemExit('MOHESR private-institute reconciliation input unexpectedly small')
-          if data.get('automatic_identity_acceptances') != 0:
-              raise SystemExit('Reconciliation must not auto-accept identities')
+          if int(data.get('technical_parent_source_rows', 0)) != 8:
+              raise SystemExit('MOHESR technical hierarchy must contain exactly 8 source parent colleges')
+          if int(data.get('technical_institute_source_rows', 0)) != 44:
+              raise SystemExit('MOHESR technical hierarchy must contain exactly 44 source institutes')
+          if int(data.get('technical_hierarchy_source_backed_proposals', 0)) != 44:
+              raise SystemExit('Every acquired technical institute must retain a source-backed parent proposal')
+          if int(data.get('technical_hierarchy_invalid_links', -1)) != 0:
+              raise SystemExit('MOHESR technical hierarchy contains unresolved parent-link integrity errors')
+          if data.get('automatic_identity_acceptances') != 0 or data.get('automatic_relationship_acceptances') != 0:
+              raise SystemExit('Reconciliation must not auto-accept identities or hierarchy relationships')
           if data.get('edu_core_rows_created') != 0 or data.get('core_mutation_performed') is not False:
               raise SystemExit('Reconciliation must not mutate edu_core')
           if data.get('public_promotion_performed') is not False:
               raise SystemExit('Reconciliation must not promote public data')
           PY
-      - name: Acquire current MOHESR technical hierarchy
-        run: |
-          python tools/data-acquisition/scrape_mohesr_technical.py \
-            --parents-output artifacts/edu-data-1/mohesr_technological_colleges.jsonl \
-            --institutes-output artifacts/edu-data-1/mohesr_technical_institutes.jsonl \
-            --report artifacts/edu-data-1/mohesr_technical_report.json
       - name: Probe Al-Azhar live adapter with a bounded sample
         run: |
           python tools/data-acquisition/scrape_azhar.py \
