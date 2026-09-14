@@ -28,7 +28,7 @@ Edu Hub is an Admonk-owned independent bilingual education discovery and knowled
 
 Phase 1 includes private/independent international schools, private/independent IB World Schools, recognized foreign-national/international-school models, recognized foreign university branches and internationally chartered/accredited independent higher-education institutions whose international status is substantive.
 
-Egyptian public schools/universities, the historical EMIS/MOSS national targets and ordinary language/exam-centre institutions without sufficient international-status evidence remain out of active scope.
+Egyptian public schools/universities, historical EMIS/MOSS national targets and ordinary language/exam-centre institutions without sufficient international-status evidence remain out of active scope.
 
 Canonical contracts:
 
@@ -52,7 +52,7 @@ Reference migrations:
 - `006_bilingual_completion.sql` — EN/AR provenance, aliases, levels, facilities, admissions requirements, media localization, evidence assertions and completeness metrics;
 - `007_school_divisions.sql` — first-class pre-university curriculum/language/phase divisions below institution/campus identity.
 
-The reviewed hierarchy is:
+Reviewed hierarchy:
 
 `provider -> institution -> campus -> school division`
 
@@ -62,7 +62,7 @@ Division-specific accreditation, curriculum, admissions, fees and contacts are n
 
 ### Foundational source universe — 96 rows
 
-Source families remain:
+Source families:
 
 - 54 IB Egypt rows;
 - 11 UK DfE British Schools Overseas rows;
@@ -73,27 +73,29 @@ Source families remain:
 
 The original deterministic foundational builder remains reproducibly **40 eligible / 53 candidate / 3 excluded**.
 
-Four accepted incremental IB detail batches (`batch2` through `batch5`) overlay **20 exact existing IB source rows** without changing source IDs or ordering.
+Eight accepted incremental IB detail batches (`batch2` through `batch9`) overlay **42 exact existing IB source rows** without changing source IDs or ordering.
 
 **Current accepted 96-row state after all incremental IB overlays:**
 
-- **60 eligible**;
-- **33 candidate**;
+- **82 eligible**;
+- **11 candidate**;
 - **3 excluded**.
+
+The remaining 11 foundational candidates are the BSO source rows whose private/independent ownership/scope gate is deliberately separate; they are not unresolved IB ownership rows.
 
 These are source records, not a claim of 96 unique institutions.
 
 ### Accreditor-expanded D2.1 universe — 106 rows
 
-Supporting strong accreditor evidence adds:
+Supporting accreditor evidence adds:
 
 - 6 CIS Egypt accreditation rows;
 - 4 Cognia 2026–2027 milestone rows.
 
-**Current accepted combined state after all incremental IB overlays:**
+**Current accepted combined state:**
 
-- **60 eligible**;
-- **43 candidate**;
+- **82 eligible**;
+- **21 candidate**;
 - **3 excluded**.
 
 English source-row naming evidence: **106/106**.
@@ -102,31 +104,39 @@ Pre-reconciliation Arabic-name gaps: **97**.
 
 No full-universe unique institution count is claimed. Fuzzy matching never authorizes a canonical merge.
 
-## International Baccalaureate progress
+## International Baccalaureate — direct ownership review complete
 
 The captured Egypt directory contains **54 source rows**.
 
-The historical 2026-09-14 country-summary snapshot reported 55 while the directory returned 54; that discrepancy remains preserved as historical evidence. A current 2026-09-15 observation of the official IB Egypt country page reports **54 IB World Schools**, matching the captured directory count. Historical source observations are preserved rather than rewritten.
+The historical 2026-09-14 country-summary snapshot reported 55 while the directory returned 54; that discrepancy remains preserved as historical evidence. A current 2026-09-15 observation of the official IB Egypt country page reports **54 IB World Schools**, matching the captured directory count. Historical observations are preserved rather than rewritten.
 
-**Accepted IB ownership/detail decisions: 32 of 54 source rows**
+**Direct current IB ownership/type detail review is now complete for all 54 captured directory identities:**
 
-- **29 PRIVATE / eligible**;
+- **51 PRIVATE / eligible**;
 - **3 STATE / excluded**;
-- **22 remain unresolved by direct ownership/detail review**.
+- **0 unresolved direct IB ownership rows**.
 
-Foundational detail snapshots account for 12 decisions. Incremental batches 2–5 add 20 further exact-row PRIVATE decisions.
+Foundational detail snapshots account for 12 decisions. Incremental batches 2–9 add the remaining **42 exact-row PRIVATE decisions**.
 
-The scalable incremental path is implemented in `tools/data-acquisition/international/apply_ib_detail_batches.py`. It:
+`tools/data-acquisition/international/apply_ib_detail_batches.py`:
 
 - discovers checked-in `ib-detail-evidence-*-batch*.json` files in deterministic filename order;
 - requires exact identities already present in the 54-row IB directory snapshot;
-- rejects the same identity appearing in multiple incremental batches;
-- upgrades only unresolved candidate rows using reviewed current detail evidence;
+- rejects an identity appearing in multiple incremental batches;
+- upgrades only unresolved candidate rows using current reviewed detail evidence;
 - preserves every `source_record_id` and source ordering;
 - keeps the foundational snapshot independently reproducible;
 - performs zero identity merge, canonical database write or public promotion.
 
-Incremental IB Details run **34901104277** passed with batches 2–5 and revalidated the upgraded 96-row universe, 106-row accreditor-expanded universe, D2.2 identity decisions and reviewed-canonical draft safety contract.
+**Incremental IB Details run 34901947722 passed** with the complete set of batches 2–9 and revalidated:
+
+- 96-row upgraded base at **82/11/3**;
+- 106-row accreditor-expanded universe at **82/21/3**;
+- D2.2 identity-review decisions;
+- reviewed canonical draft materialization;
+- zero merge/database/public-mutation safety boundaries.
+
+This closes the direct IB PRIVATE/STATE verification subtask. Remaining IB work is enrichment, identity/campus reconciliation, localization, media and freshness—not ownership classification of the 54 captured rows.
 
 ## Other authoritative/source-family progress
 
@@ -134,7 +144,7 @@ Incremental IB Details run **34901104277** passed with batches 2–5 and revalid
 
 - 11 current Egypt BSO records from the list updated 2026-08-26.
 - All 11 have matched GIAS details with URNs, official names, open status and available address/age/contact/inspection fields.
-- BSO is strong British/international-school-model evidence; private/independent ownership remains a separate gate.
+- BSO is strong British/international-school-model evidence; private/independent ownership remains a separate review gate.
 
 ### French and German
 
@@ -155,11 +165,15 @@ Incremental IB Details run **34901104277** passed with batches 2–5 and revalid
 
 ## D2.1 — Candidate universe completion
 
-Status: **IN PROGRESS / PRINCIPAL AUTHORITATIVE-ACCREDITOR EXPANSION COMPLETE**
+Status: **IN PROGRESS — IB OWNERSHIP COMPLETE / BSO AND SUPPORTING DISCOVERY REMAIN**
 
-The pipeline keeps the foundational 96-row build independently reproducible while applying source-dated ownership/detail evidence as exact-identity overlays. The accepted upgraded source state is currently 96 rows at **60/33/3** and 106 rows at **60/43/3**.
+The current source universe has comprehensive direct PRIVATE/STATE review for every captured IB row. The principal remaining candidate-source work is:
 
-British Council Partner Schools remains the next broad supporting discovery source. The September 2026 Egypt PDF is **19 pages** and is browser-accessible. GitHub-hosted direct Python retrieval returns HTTP 403, so the approved adapter supports a browser/local PDF path. Partner/attached-centre status remains discovery/contact evidence only and never grants international eligibility by itself.
+- resolve the 11 BSO source rows through the separate ownership/identity gate and cross-source reconciliation;
+- process British Council Partner Schools as discovery/contact evidence;
+- continue permitted supporting-source gap detection without allowing supporting evidence to establish eligibility alone.
+
+The British Council September 2026 Egypt PDF is **19 pages** and browser-accessible. GitHub-hosted direct Python retrieval returns HTTP 403, so the approved adapter supports a browser/local PDF path. Partner/attached-centre status never grants international eligibility by itself.
 
 ## D2.2 — Identity, campus and division reconciliation
 
@@ -190,25 +204,22 @@ El Alsson and Misr Language Schools are one institutional identity each with sep
 
 ### Current-campus review
 
-A separate source-backed campus package now reviews **at least one current operating location for all 9 reviewed institutional identities**.
+A separate source-backed campus package reviews **at least one current operating location for all 9 reviewed institutional identities**.
 
-`tools/data-acquisition/international/build_reviewed_campus_artifacts.py` uses the same deterministic UUIDv5 namespace as the identity draft builder and emits:
+`tools/data-acquisition/international/build_reviewed_campus_artifacts.py` emits:
 
 - **9 reviewed current-campus draft records**;
-- **9 campus-structure review records**;
-- exact alignment with all 9 reviewed institution draft IDs;
+- **9 campus-structure review records** aligned to the reviewed institution IDs;
 - **0 campus structures marked complete**;
-- **0 records claiming that additional current campuses have been ruled out**;
+- **0 records claiming additional current campuses are ruled out**;
 - **0 inferred additional campuses**;
 - **0 canonical campus rows written**;
 - **0 runtime database mutation**;
 - **0 public projection**.
 
-The campus structure state is deliberately `at_least_one_current_campus_reviewed_structure_not_exhaustive`. This replaces the earlier blanket `not_yet_reviewed` state with positive current-location evidence while still refusing to pretend the full campus topology is known.
+The campus state is `at_least_one_current_campus_reviewed_structure_not_exhaustive`. Historical locations such as El Alsson's pre-2017 site are not silently modeled as current campuses.
 
-Current campus evidence includes the NewGiza campus for El Alsson, the shared Cairo-El Fayoum Desert Road campus evidence for Misr Language Schools, and source-backed current locations for the other seven first-reviewed identities. Historical locations such as El Alsson's pre-2017 site are not silently presented as current campuses.
-
-Campus Review run **34901485863** passed the complete campus evidence/alignment/safety contract.
+Campus Review run **34901485863** passed.
 
 ## D2.3 — EN/AR localization
 
@@ -270,18 +281,17 @@ Key accepted runs:
 
 - Foundational Core International Registry: **34900305899** — green;
 - Foundational Accreditor Expansion: **34900289955** — green;
-- IB Batch2 compatibility pipeline: **34900583919** — green;
-- Scalable Incremental IB Details through batches 2–5: **34901104277** — green; current 96-row state **60/33/3**, current 106-row state **60/43/3**;
+- Scalable Incremental IB Details, complete ownership review: **34901947722** — green; 96-row state **82/11/3**, 106-row state **82/21/3**;
 - Localization Evidence: **34897451220** — green;
 - Official Site Enrichment: **34898574887** — green;
 - School Division Schema: **34898999314** — green;
 - Identity Review + deterministic draft materialization: **34900009375** — green;
-- Current Campus Review: **34901485863** — green for 9 reviewed current-campus evidence drafts with 0 exhaustive campus claims.
+- Current Campus Review: **34901485863** — green for 9 source-backed current-campus drafts with 0 exhaustive campus claims.
 
 ## Immediate next actions
 
-1. Continue direct IB PRIVATE/STATE verification for the remaining **22** unresolved IB directory rows through the scalable incremental overlay pipeline.
-2. Continue D2.2 cross-source identity review beyond the first 20 memberships, prioritizing obvious overlaps and true parent/campus relationships.
+1. Resolve the remaining **11 foundational BSO candidate rows** through source-backed ownership/identity review; do not infer private status from BSO status alone.
+2. Continue D2.2 cross-source identity review beyond the first 20 memberships; prioritize BSO/IB/French/German/CIS/Cognia overlaps and true parent/campus relationships.
 3. Continue campus-structure research beyond the first evidenced location per reviewed identity; only mark topology complete when sources support that conclusion.
 4. Acquire/process the 19-page British Council PDF through the permitted browser/local path; keep its rows at discovery/contact evidence level.
 5. Expand official-site D2.4 enrichment from 8 institutions toward every eligible reviewed identity.
