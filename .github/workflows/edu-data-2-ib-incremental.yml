@@ -68,33 +68,30 @@ jobs:
           root = Path('artifacts/international/ib-incremental')
           overlay = json.loads((root/'ib-incremental-summary.json').read_text(encoding='utf-8'))
           applied = [json.loads(line) for line in (root/'ib-incremental-applied.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          seed_dir = Path('tools/data-acquisition/international/seeds')
+          batch_paths = sorted(seed_dir.glob('ib-detail-evidence-*-batch*.json'), key=lambda p: p.name)
+          batches = [json.loads(path.read_text(encoding='utf-8')) for path in batch_paths]
+          expected_detail_rows = sum(len(batch['records']) for batch in batches)
+          expected_names = {row['name'] for batch in batches for row in batch['records']}
 
           assert overlay['foundational_source_rows'] == 96
-          assert overlay['incremental_batch_count'] == 2
-          assert overlay['incremental_detail_rows'] == overlay['applied_rows'] == len(applied) == 10
+          assert overlay['incremental_batch_count'] == len(batch_paths) == len(batches)
+          assert overlay['incremental_detail_rows'] == overlay['applied_rows'] == len(applied) == expected_detail_rows
+          assert len(expected_names) == expected_detail_rows
           assert overlay['source_record_ids_changed'] == 0
           assert overlay['before_scope_states'] == {'candidate': 53, 'eligible': 40, 'excluded': 3}
-          assert overlay['after_scope_states'] == {'candidate': 43, 'eligible': 50, 'excluded': 3}
-          assert overlay['accepted_ib_detail_rows_after_overlay'] == 22
+          assert overlay['after_scope_states'] == {
+              'candidate': 53 - expected_detail_rows,
+              'eligible': 40 + expected_detail_rows,
+              'excluded': 3,
+          }
+          assert overlay['accepted_ib_detail_rows_after_overlay'] == 12 + expected_detail_rows
           assert overlay['unique_institutions_claimed'] is None
           assert overlay['identity_merges_performed'] == 0
           assert overlay['canonical_institutions_created'] == 0
           assert overlay['database_mutation_performed'] is False
           assert overlay['public_projection_rows_created'] == 0
-          assert [row['records'] for row in overlay['batches']] == [5, 5]
-
-          expected_names = {
-              'AIA School',
-              'Al-Hoda International School',
-              'American International School in Egypt',
-              'American International School in Egypt West Campus',
-              'Bedayia International School',
-              'Capital International Schools',
-              'Carleton College International School',
-              'Deutsche Schule Beverly Hills Kairo',
-              'École Oasis Internationale',
-              'Egyptian American School',
-          }
+          assert sum(row['records'] for row in overlay['batches']) == expected_detail_rows
           assert {row['name_en'] for row in applied} == expected_names
           assert all(row['previous_scope_state'] == 'candidate' for row in applied)
           assert all(row['new_scope_state'] == 'eligible' for row in applied)
@@ -107,8 +104,8 @@ jobs:
 
           universe = json.loads((root/'candidate-universe/candidate-universe-summary.json').read_text(encoding='utf-8'))
           assert universe['source_record_count'] == 106
-          assert universe['scope_or_lead_state_counts']['eligible'] == 50
-          assert universe['scope_or_lead_state_counts']['candidate'] == 53
+          assert universe['scope_or_lead_state_counts']['eligible'] == 40 + expected_detail_rows
+          assert universe['scope_or_lead_state_counts']['candidate'] == 63 - expected_detail_rows
           assert universe['scope_or_lead_state_counts']['excluded'] == 3
           assert universe['english_name_present'] == 106
           assert universe['arabic_name_present'] == 9
