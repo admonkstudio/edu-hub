@@ -99,26 +99,31 @@ The goal is identity coverage before profile completeness. Missing fees, contact
 
 - Official 2025/26 target remains 62,690 schools.
 - The official Egyptian Schools Directory remains the required primary identity source.
-- GitHub-hosted/web acquisition environments still time out against the directory, but an Egypt-local run on 2026-09-14 proved `https://search.emis.gov.eg/` is healthy from an Egypt network with ASP.NET state fields present.
-- The first local diagnostic established that direct GETs to `search_schgov.aspx`, `search_schpriv.aspx` and `sch_data.aspx` return HTTP 500 rather than exposing a usable search contract.
-- The root page exposes six ASP.NET submit buttons for government, private, special-education, sports, military and experimental schools. Category navigation therefore depends on root-form POST state rather than ordinary anchor navigation.
-- A second Egypt-local bundle proved all six category buttons can be submitted through the live root contract. Exactly one category currently reaches a healthy search page: **Special Education** at `search_schSpecialEdu.aspx`.
-- Government, private, sports, military and experimental category navigations currently end at server-side HTTP 500 responses. These failures are now treated as source availability failures, not as missing scraper logic.
-- The accessible Special Education page exposes the expected ASP.NET search architecture and two dependent selects: governorate (`DDList_mud`) and stage (`DDList_stage`). Both are initially empty and the page explicitly requires a school-type radio postback first.
-- The analyzer now ranks this navigated search form above the root launcher, identifies its scope as `special_education`, and explicitly prevents that evidence from unblocking government-school enumeration.
-- `emis_control_hydration_probe.py` now performs at most one whitelisted, non-placeholder radio-button `__doPostBack` on an already-reached search form in order to hydrate dependent selects. It does not submit the school-search button.
-- The one-command local wrapper now runs GET capture -> category navigation -> optional dependent-control hydration -> offline analysis -> redacted shareable ZIP.
-- Navigation diagnostics no longer retry away HTTP 500 statuses, so current category-route failures remain explicit evidence in `capture-report.json`.
-- Escaped ASP.NET `__doPostBack` handlers are now recognized in captured field contracts.
-- Dedicated CI enforces the navigation, hydration and category-scope safety boundaries. A healthy Special Education contract may be used to validate reusable ASP.NET mechanics, but it can never be relabelled as government-school coverage.
-- No school search, result pagination, school-row enumeration, `edu_core` mutation or public promotion is authorized by the current EMIS tools.
+- GitHub-hosted/web acquisition environments still time out against the directory, but Egypt-local runs on 2026-09-14 proved `https://search.emis.gov.eg/` is reachable with valid ASP.NET state fields.
+- Direct GETs to `search_schgov.aspx`, `search_schpriv.aspx` and `sch_data.aspx` do not expose a usable contract.
+- The root page exposes six ASP.NET submit buttons for government, private, special-education, sports, military and experimental/language schools; category navigation therefore depends on root-form POST state.
+- Fresh root state was used before every category submission. Government, private, sports, military and experimental/language category navigations currently end in HTTP 500 responses.
+- Special Education is the only category that currently reaches a search-form page, at `search_schSpecialEdu.aspx`.
+- That form exposes dependent governorate (`DDList_mud`) and stage (`DDList_stage`) selects plus exactly three non-placeholder school-type radio postbacks.
+- A final bounded Egypt-local diagnostic submitted **all three** observed school-type postbacks independently with fresh sessions and fresh ASP.NET state: `تربية فكرية`, `مكفوفين وضعاف بصر`, and `صم وضعاف سمع`.
+- All three postbacks were technically accepted and returned HTTP 200 with the selected radio state preserved, but all three left governorate/stage empty and displayed the ministry-side message `خطأ اثناء محاولة تحميل الصفحة`.
+- Final hydration result: 3 controls discovered, 3 submitted, 3 HTTP-success responses, 0 pages with populated selects, 0 populated selects, and 3 pages with visible EMIS load errors.
+- This exhausts the current safe client-side contract diagnostic. The blocker is classified as a live source/application data-loading failure, not an unresolved postback-format issue.
+- `docs/EMIS-LIVE-FAILURE-EVIDENCE-2026-09-14.md` is the canonical evidence note for this state.
+- Do not repeat the same Special Education hydration diagnostic unless the source changes materially.
+- `emis_health_recheck.py` is now the lightweight recovery detector. It checks only the root and top-level category routes and can recommend a fresh contract capture if the government route returns cleanly; it never authorizes enumeration itself.
+- Government-school enumeration remains blocked. A healthy government route must first be freshly recaptured and reviewed before any small pilot can be implemented.
+- The official machine-readable MOE/EMIS export request is now the primary D1.3 acquisition path while the live route is unhealthy.
+- No school search, result pagination, school-row enumeration, `edu_core` mutation or public promotion was performed during these diagnostics.
 - Secondary directories must not be relabelled as complete MOE coverage.
 
-### MOSS nurseries — D1.4 blocker
+### MOSS nurseries — D1.4
 
 - Official national target remains 48,225 nurseries.
-- The national census universe is confirmed, but a complete row-level public export is not currently available in the acquisition pipeline.
-- Accepted resolution paths are official data sharing/export or the announced public nursery map/platform when row-level data is exposed.
+- MOSS continues to publish the 48,225 national count from the comprehensive nursery census.
+- Official ministry material states that a digital early-childhood platform/nursery map is being developed from the census database and is intended to expose family-facing fields including nearest nursery, licensing status, capacity and fees.
+- That row-level public map/export is not yet present in the current acquisition pipeline, so D1.4 remains an official data-sharing/export track rather than a secondary-directory substitution.
+- `docs/requests/MOSS-NURSERY-DATA-REQUEST-AR.md` remains the prepared official request for the row-level registry and associated code/data dictionary.
 
 ## Infrastructure state
 
@@ -129,12 +134,12 @@ The goal is identity coverage before profile completeness. Missing fees, contact
 ## Immediate next actions
 
 1. Treat D1.2 higher-education acquisition/reconciliation plumbing as implemented and keep unresolved identity decisions review-only.
-2. Pull the current D1.3 branch and rerun `python tools/data-acquisition/run_emis_local_capture.py` from the proven Egypt-reachable machine. The wrapper will now attempt exactly one safe Special Education control-hydration postback after category navigation.
-3. Review the regenerated `emis-local-capture-bundle.zip`. If the Special Education governorate/stage selects populate, use that evidence only to finalize a reusable ASP.NET state/postback engine; keep government national enumeration blocked.
-4. Re-test the government category on every local capture. Only a healthy government search form may unlock the bounded government-school pilot.
-5. Once government form access returns, implement only a small governorate/administration pilot and validate native source IDs, ASP.NET dependencies, pagination, failed combinations and duplicate IDs before any national run.
-6. Validate unique official school-source coverage against the 62,690-school 2025/26 target without substituting Special Education or secondary-directory counts.
-7. Continue D1.4 MOSS official data-request/public-map track for the 48,225-nursery universe.
+2. Stop repeating the exhausted Special Education hydration diagnostic. Use `python tools/data-acquisition/emis_health_recheck.py` only as a lightweight periodic recovery check.
+3. Pursue the official machine-readable MOE/EMIS export using `docs/requests/MOE-EMIS-DATA-REQUEST-AR.md`; preserve any received file unchanged with provenance and checksum before staging.
+4. If the government EMIS route becomes cleanly reachable, perform a fresh contract capture and review it before implementing only a small governorate/administration pilot.
+5. Validate unique official school-source coverage against the 62,690-school 2025/26 target; do not substitute Special Education or secondary-directory counts.
+6. Advance D1.4 through the prepared MOSS request while monitoring the announced official nursery-map platform for row-level access.
+7. Validate any future MOSS row-level source against the 48,225-nursery national target and preserve licensing/location provenance.
 8. Provision a dedicated Edu Hub PostgreSQL/Supabase environment before importing the national registry into an operational hosted database.
 9. Only after identity coverage stabilizes, begin D1.5 broad enrichment and completeness improvement.
 
