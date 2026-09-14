@@ -7,7 +7,7 @@ Last updated: 2026-09-14
 ```text
 00 Open                  APPROVED
 01 Discover              APPROVED
-02 Align + Audit         REOPENED / APPROVED FOR NEW SCOPE
+02 Align + Audit         APPROVED FOR INTERNATIONAL SCOPE
 03 Define                APPROVED — INTERNATIONAL EDUCATION ONLY
 04 Content + Structure   IN PROGRESS — INTERNATIONAL REGISTRY
 05 Creative Direction    DEFERRED DURING DATA FOUNDATION
@@ -20,35 +20,25 @@ Last updated: 2026-09-14
 
 ## Current product state
 
-Edu Hub is an Admonk-owned independent education discovery and knowledge platform for Egypt.
+Edu Hub is an Admonk-owned independent bilingual education discovery and knowledge platform focused initially on **international education in Egypt**.
 
 Primary audience:
 
 1. Parents
 2. Students
 
-The product scope changed materially on 2026-09-14. **Edu Hub is no longer attempting to build Egypt's complete public education registry.** The active product now focuses on high-quality international education in Egypt.
+Active Phase 1 includes private/independent international schools, private/independent IB World Schools, recognized foreign-national/international school models, recognized foreign university branches, internationally chartered/accredited independent higher-education institutions whose international status is substantive, and their campuses/eligible early-years sections.
 
-### Active Phase 1 institution scope
-
-- private/independent international schools;
-- private/independent IB World Schools;
-- recognized British, American, French, German, Canadian and comparable international-school models;
-- foreign university branch campuses recognized in Egypt;
-- internationally chartered/accredited independent institutions such as AUC when international status is substantively evidenced;
-- campuses and early-years sections belonging to eligible institutions.
-
-### Explicitly out of active scope
+Explicitly out of active scope:
 
 - Egyptian public schools;
 - Egyptian public universities;
-- the 62,690-school national EMIS coverage objective;
-- the 48,225-nursery MOSS coverage objective;
-- ordinary Egyptian private/language schools without sufficient international-status evidence;
-- Egyptian universities that only have foreign partnerships/dual degrees/exchanges;
-- commercial-directory-only identities.
+- the 62,690-school EMIS national target;
+- the 48,225-nursery MOSS national target;
+- ordinary language schools/exam centres without sufficient international-status evidence;
+- Egyptian universities whose only international dimension is a partnership, exchange, dual degree or validated programme.
 
-The old national-registry work is preserved as historical evidence and optional future expansion material. It is not deleted, but it is no longer allowed to drive the current roadmap.
+Historical national-registry work remains preserved on `edu-data-1-national-registry` and in Git history. It is not an active product dependency.
 
 ## Active milestone
 
@@ -60,133 +50,143 @@ Branch: `edu-data-2-international-registry`
 
 Canonical contract: `docs/EDU-DATA-2-INTERNATIONAL-REGISTRY.md`
 
-Architecture remains:
+Architecture:
 
-`external source -> edu_raw -> edu_staging -> edu_core -> public projection`
+`external source -> edu_raw -> edu_staging -> edu_core -> public projection -> website`
 
-No source is read live at page-render time after acquisition.
+No public page may depend on a live third-party source after acquisition.
 
-## Work completed for the scope reset
+## Completed scope reset / cleanup
 
-### Clean branch / source-of-truth reset
+### Source of truth
 
-- Created `edu-data-2-international-registry` from the completed national-registry evidence branch.
-- The old `edu-data-1-national-registry` branch remains available as historical work.
-- EDU-DATA-2 eligibility rules now distinguish `candidate`, `eligible`, `excluded`, and `needs_review` institutions.
-- International eligibility is based on source evidence rather than institution naming or marketing language.
+- `README.md`, `docs/PROJECT-BRIEF.md`, `docs/PROJECT-DECISIONS.md`, `docs/PROJECT-STATUS.md` and the milestone contract now reflect the international-only scope.
+- International scope states are explicit: `candidate`, `eligible`, `excluded`, `needs_review`.
+- International eligibility must be evidenced; names/marketing language cannot establish eligibility.
+- British Council attached/partner status, Overture, OSM, V7 and commercial directories are supporting/discovery evidence only.
 
 ### Clean relational database foundation
 
-`infra/owned-data/005_international_registry.sql` now extends the existing evidence architecture with explicit international-registry structures for:
+`infra/owned-data/005_international_registry.sql` extends the evidence architecture with:
 
-- provider/group identity;
+- providers/groups;
 - bilingual institution localizations;
-- international eligibility and eligibility evidence;
-- geography and campuses with PostGIS;
-- curricula and certificates;
-- languages of instruction;
+- international eligibility + evidence;
+- locations and campuses with PostGIS;
+- curricula/certificates/languages;
 - accreditation/authorization bodies and institution accreditations;
 - contacts;
 - academic-year fee schedules and fee items;
 - admissions cycles;
-- higher-education academic units and programmes;
-- media rights/license metadata.
+- academic units and programmes;
+- media license/creator/attribution/rights-evidence metadata.
 
-The schema preserves field/source evidence instead of overwriting facts without provenance.
+CI applies migrations `001`, `004`, and `005` to a clean PostGIS PostgreSQL service and asserts the international schema contract.
 
-### Authoritative source registry
+## Authoritative evidence acquired / prepared
 
-`tools/data-acquisition/international/source_registry.json` defines the active acquisition universe and whether each source is strong eligibility evidence or supporting evidence.
+### International Baccalaureate
 
-Current priority sources include:
+- Live Egypt-filtered IB directory snapshot contains **54 school rows** across three pages.
+- The IB country summary reported **55 schools** on the same date; the 54/55 discrepancy is preserved as a review flag rather than fabricating a record.
+- The checked-in snapshot preserves names, IB programmes and listed languages for all 54 rows.
+- All 54 remain `candidate` until each school type/ownership is confirmed; public/state schools will be excluded from the active scope.
+- A live acquisition adapter remains available, but IB blocks GitHub-hosted direct Python requests with HTTP 403; deterministic CI therefore validates dated source evidence rather than treating the hosted-runner response as source absence.
 
-- International Baccalaureate (IB);
-- SCU foreign university branches;
-- MOHESR international/foreign branches;
-- French Ministry homologation list;
-- German KMK/ZfA recognized schools;
-- Cognia and MSCHE where applicable;
-- British Council Partner Schools as discovery/support evidence;
-- official institution websites;
-- Overture/OSM for geography;
-- Wikimedia Commons for licensed media;
-- V7 only as retained supporting/discovery evidence for matching eligible entities.
+### French homologation
 
-### Initial repeatable acquisition
+- Official French 2026–2027 homologation evidence is captured for **17 Egypt source rows** with UAI identifiers, city, levels, homologated classes and stream limitations.
+- These rows are strong international-programme eligibility evidence, with any French-stream-only limitation retained explicitly.
 
-New tools:
+### German recognition
 
-- `tools/data-acquisition/international/acquire_ib_egypt.py`
-  - acquires the complete current Egypt IB World School set;
-  - current official source count is expected to be 54;
-  - private schools become strong international-scope candidates;
-  - public/state IB schools are retained as excluded evidence, not deleted;
-  - stores programme/language/contact/source metadata and source hashes;
-  - performs no database/public mutation.
+- Official April 2026 KMK evidence is captured for **4 recognized German schools abroad in Egypt**, including recognition dates.
 
-- `tools/data-acquisition/international/acquire_scu_foreign_branches.py`
-  - acquires the current SCU foreign-university branch set;
-  - current SCU count is expected to be 9;
-  - treats SCU recognition as strong eligibility evidence;
-  - performs no database/public mutation.
+### Higher education
 
-- `.github/workflows/edu-data-2-international-registry.yml`
-  - validates the source registry and parser safety contract;
-  - acquires the IB and SCU authoritative seed;
-  - uploads the resulting JSONL/summary artifact;
-  - explicitly verifies zero database mutation and zero public promotion during acquisition.
+- Current SCU evidence is captured for **9 recognized foreign university branches**.
+- AUC is independently captured as an `eligible` international independent university using current MSCHE institutional accreditation plus AUC's Egypt/US institutional framework evidence.
+- MOHESR reconciliation remains to be completed; any branch present in one regulator source but absent in another remains review-only.
 
-## Data/media policy
+### Current deterministic authoritative seed
 
-### Facts
+`tools/data-acquisition/international/build_authoritative_seed.py` currently builds **85 source rows**:
 
-- Missing information remains unknown/null.
-- Fees/admissions are versioned by academic year rather than overwritten.
-- Curriculum/accreditation status must retain source and validity evidence.
-- British Council Partner School status alone does not prove that a school belongs in the active international registry.
+- 54 IB candidate source rows;
+- 17 French eligible source rows;
+- 4 German eligible source rows;
+- 9 SCU foreign-branch eligible source rows;
+- 1 AUC eligible source row.
 
-### Media
+Current source-row state before cross-source identity reconciliation:
 
-Publication-safe media priority:
+- **31 eligible source rows**;
+- **54 candidate source rows**;
+- unique institution count intentionally not claimed yet because French/German/IB overlaps and campus relationships still require reconciliation.
 
-1. institution-supplied media with permission;
-2. Wikimedia Commons/openly licensed media with license/creator/attribution stored;
-3. verified institution-claim uploads in a later phase;
-4. original Edu Hub/Admonk media.
+## Import and identity safety
 
-Institution website/social images can be retained as media candidates/provenance, but public reuse remains disabled until rights are established.
+`tools/data-acquisition/international/prepare_import_package.py` now converts the deterministic seed into a provenance-safe package containing:
 
-If no safe photo exists, the public interface uses the institution's English name on a designed placeholder instead of copyrighted hotlinks or scraped images.
+- source definitions;
+- 85 source-shaped raw records with stable hashes;
+- 85 staging candidates;
+- reviewed media metadata;
+- checksums/manifest.
 
-## Infrastructure state
+The package creates **zero canonical institutions**, performs **zero merges** and creates **zero public projection rows**.
 
-A dedicated Edu Hub PostgreSQL/Supabase project still does **not** exist in the connected Supabase organization.
+`tools/data-acquisition/international/plan_identity_reconciliation.py` creates cross-source duplicate/campus proposals using conservative name evidence. Every proposal is `needs_review`; auto-accept is prohibited.
 
-The two connected projects are Ask Kalam projects and must not receive Edu Hub data.
+## Media state
 
-All EDU-DATA-2 migrations/acquisition contracts are therefore being prepared and validated in Git first. Creating the dedicated project requires explicit organization/cost confirmation before provisioning.
+Media publication remains rights-aware.
+
+Automatic Commons discovery records license/provenance candidates but never authorizes them automatically. A separate reviewed seed currently contains **5 publication-safe Wikimedia assets** whose Commons descriptions identify the institution/campus and whose reuse basis was recorded:
+
+- American International School in Egypt — campus image — CC BY-SA 4.0;
+- British International School, Cairo — image released to public domain;
+- Cairo English School — CC BY-SA 4.0;
+- AUC Tahrir/Downtown — CC BY-SA 3.0/compatible source declarations;
+- AUC New Cairo — CC BY-SA 3.0.
+
+Attribution/share-alike obligations are retained in the media metadata. Institution website/social media may be stored as discovery candidates but is not publication-safe without a defensible rights basis. When no safe image exists, the UI uses a designed placeholder with the institution's English name.
+
+## Current CI state
+
+The prior complete EDU-DATA-2 run at commit `3dfe62f5652001c51c87eda1bb1d1d9487657486` passed successfully.
+
+The newest run for the import-package + review-only identity proposal contract is currently being validated. Do not treat it as green until all jobs finish.
+
+## Infrastructure state / only provisioning blocker
+
+A dedicated Edu Hub PostgreSQL/Supabase project still does **not** exist.
+
+The connected Supabase organization currently exposes Ask Kalam projects only; those projects must not receive Edu Hub data.
+
+The schema, authoritative seed, reviewed media metadata and import package are ready to move into a dedicated project after explicit organization selection and cost approval.
 
 ## Immediate next actions
 
-1. Validate the new EDU-DATA-2 CI run and inspect the first authoritative IB + SCU artifact.
-2. Add/reconcile MOHESR foreign-university branch evidence with the SCU set.
-3. Acquire the Egypt subset of the French 2026–2027 homologation list.
-4. Acquire the current German KMK/ZfA Egypt school set.
-5. Add Cognia/US accreditation evidence for American/international schools where available.
-6. Ingest the September 2026 British Council Partner Schools PDF as discovery/contact evidence, but do not automatically promote every attached centre.
-7. Match the resulting authoritative candidates against V7/Overture/OSM to fill coordinates, alternate names and known websites without allowing those supporting sources to establish eligibility alone.
-8. Enrich each eligible institution from its official website: campuses, contacts, curricula, grades/ages, admissions, fees, programmes and official media candidates.
-9. Discover publication-safe media from Wikimedia Commons/open licenses; retain other institution-site media only as rights-unreviewed candidates.
-10. Provision a dedicated Edu Hub Supabase/PostgreSQL project, apply migrations `001` through `005`, and import only EDU-DATA-2 evidence/candidates into the clean operational environment.
-11. Deduplicate institution vs campus identities and review `needs_review` records before generating the first public projection.
+1. Finish/repair the current EDU-DATA-2 CI run if needed.
+2. Provision a **dedicated Edu Hub Supabase/PostgreSQL project** after the owner selects the Supabase organization and explicitly approves the reported provisioning cost.
+3. Apply migrations `001`, `004`, `005` to that clean project.
+4. Import the 85 raw/staging source rows and reviewed-media metadata; do not create canonical identities until reconciliation review.
+5. Complete cross-source institution/campus reconciliation and resolve the IB public/private ownership gate.
+6. Reconcile MOHESR foreign-university evidence against the SCU set.
+7. Ingest the September 2026 British Council Partner Schools PDF as discovery/contact evidence only.
+8. Add Cognia/other American accreditation evidence and verify the international-school model from official institution sources.
+9. Enrich eligible institutions from official websites: campuses, coordinates, contacts, curricula, grades/ages, admissions, current fees, facilities, academic units/programmes and source-backed descriptions.
+10. Match eligible/candidate identities to Overture/OSM/Wikidata/V7 for coordinates, aliases and supporting evidence without allowing those sources to establish eligibility alone.
+11. Continue rights-safe media discovery/review and build the first representative public projection only after canonical identity review.
 
 ## Non-negotiable constraints
 
 - Do not reintroduce full Egyptian public-school/university coverage without a new owner decision.
 - Do not confuse exam-centre/partner status with international-school eligibility.
-- Do not infer international status from a name containing `International`, `British`, `American`, etc.
-- Do not silently turn foreign partnerships into international-university identities.
-- Do not invent institution facts, fees, rankings, accreditations or admission details.
+- Do not infer international status from branding words.
+- Do not turn foreign partnerships into international-university identities.
+- Do not invent institution facts, fees, rankings, accreditations or admissions data.
 - Do not publish media without a recorded rights basis.
 - Do not import Edu Hub data into Ask Kalam infrastructure.
 - Do not publish directly from `edu_raw` or `edu_staging`.
