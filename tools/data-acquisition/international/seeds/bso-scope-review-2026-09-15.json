@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "source_id": "uk_dfe_bso_egypt_2026_08",
+  "work_package": "D2.1_bso_private_independent_scope_review",
+  "review_method": "source_backed_manual_review_no_identity_merge",
+  "records_count": 11,
+  "records": [
+    {
+      "name": "British School of Alexandria",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:640c5d704081dbe4a375",
+      "scope_state": "eligible",
+      "ownership_scope": "independent_not_for_profit",
+      "evidence_method": "current_dfe_bso_plus_independent_charity_governance",
+      "evidence_urls": [
+        "https://www.get-information-schools.service.gov.uk/Establishments/Establishment/Details/132609",
+        "https://register-of-charities.charitycommission.gov.uk/charity-search"
+      ],
+      "review_note": "Current DfE/GIAS identifies the school as an open British School Overseas. Current Charity Commission filing evidence describes The British School of Alexandria as an independent charity belonging to no wider charitable-company organisation. This satisfies the independent/non-public ownership gate without inferring a commercial owner."
+    },
+    {
+      "name": "El Alsson British International School",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:589996a51baeed6c9f56",
+      "scope_state": "eligible",
+      "ownership_scope": "private_independent",
+      "evidence_method": "current_dfe_bso_plus_first_party_private_school_history",
+      "evidence_urls": [
+        "https://www.get-information-schools.service.gov.uk/Establishments/Establishment/Details/133027",
+        "https://www.alsson.com/about/the-story-of-el-alsson"
+      ],
+      "review_note": "El Alsson's current first-party history states that the school was established as a private English school licensed by the Egyptian Ministry of Education. The current BSO row is division-scoped British evidence within the already reviewed El Alsson institutional identity."
+    },
+    {
+      "name": "Egypt British International School",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:257054225b1b6daa112d",
+      "scope_state": "eligible",
+      "ownership_scope": "independent_board_governed",
+      "evidence_method": "current_dfe_bso_plus_first_party_independent_board_governance",
+      "evidence_urls": [
+        "https://www.get-information-schools.service.gov.uk/Establishments/Establishment/Details/150804",
+        "https://isc.edu.eg/isc/",
+        "https://www.isc.edu.eg/ebis/about-ebis/"
+      ],
+      "review_note": "Current DfE/GIAS identifies EBIS as an open British School Overseas. Current first-party ISC evidence identifies EBIS as one of the independently governed ISC schools under its own President, Legal Representative and Board of Directors, rather than an Egyptian public-school operator. The review records independent board governance and does not invent a shareholder/proprietor name."
+    },
+    {
+      "name": "Gulf English School",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:9fdefb19abfebe356ac7",
+      "scope_state": "eligible",
+      "ownership_scope": "private_independent",
+      "evidence_method": "current_bso_inspection_plus_first_party_ownership_statement",
+      "evidence_urls": [
+        "https://www.get-information-schools.service.gov.uk/Establishments/Establishment/Details/151907",
+        "https://www.gescairo.com/ChairmanoftheBoard.asp",
+        "https://www.gescairo.com/pdf/BSO%20report%20-%20Gulf%20English%20School%2C%20Cairo%20-%2011.02.2025%20-%20final.pdf"
+      ],
+      "review_note": "The school's first-party governance page states that the Al-Sayegh family, IES and the Dajani family are partners in ownership of Gulf English School Cairo. The 2025 BSO report identifies Ghada Dajani as Chair of board/Proprietor."
+    },
+    {
+      "name": "Maadi British International School",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:908bc386064d1339c4ed",
+      "scope_state": "eligible",
+      "ownership_scope": "independent_not_for_profit",
+      "evidence_method": "current_bso_inspection_not_for_profit_ngo",
+      "evidence_urls": [
+        "https://www.get-information-schools.service.gov.uk/Establishments/Establishment/Details/132603",
+        "https://mbisegypt.com/wp-content/uploads/2025/04/BSO-report-Maadi-British-International-School-Cairo-Egypt-12.01.2025-final-1.pdf",
+        "https://mbisegypt.com/about-us/"
+      ],
+      "review_note": "The January 2025 BSO inspection report states that MBIS is registered as a not-for-profit non-governmental organisation. The current school site independently describes MBIS as a non-for-profit international school."
+    },
+    {
+      "name": "Modern English School Cairo",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:aa775e9baad11d8b6ae2",
+      "scope_state": "eligible",
+      "ownership_scope": "private_independent",
+      "evidence_method": "reviewed_identity_link_to_current_private_ib_detail",
+      "evidence_urls": [
+        "https://www.get-information-schools.service.gov.uk/Establishments/Establishment/Details/141507",
+        "https://ibo.org/en/school/002857/",
+        "https://www.mescairo.com/"
+      ],
+      "review_note": "The current BSO source row is already reviewed as the same institution as the IB source identity for Modern English School Cairo. Current accepted IB detail evidence classifies that identity PRIVATE. BSO accreditation and private ownership are preserved as separate evidence assertions."
+    },
+    {
+      "name": "British International School, Cairo",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:1c4851b3e1934c5f99cc",
+      "scope_state": "eligible",
+      "ownership_scope": "independent_not_for_profit",
+      "evidence_method": "current_first_party_independent_fee_financed_not_for_profit",
+      "evidence_urls": [
+        "https://www.get-information-schools.service.gov.uk/Establishments/Establishment/Details/132606",
+        "https://www.bisc.edu.eg/faq.html",
+        "https://www.bisc.edu.eg/about-bisc.html"
+      ],
+      "review_note": "BISC's current first-party FAQ explicitly states that it is completely independent, fee-financed and a not-for-profit society. This directly satisfies the independent/non-public gate."
+    },
+    {
+      "name": "New Cairo British International School",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:69e9fbf1ccce64cd591b",
+      "scope_state": "eligible",
+      "ownership_scope": "private_independent",
+      "evidence_method": "reviewed_identity_link_to_current_private_ib_detail",
+      "evidence_urls": [
+        "https://www.get-information-schools.service.gov.uk/Establishments/Establishment/Details/141436",
+        "https://ibo.org/fr/programmes/find-an-ib-school/ibaem/n/new-cairo-british-international-school/",
+        "https://ncbis.co.uk/"
+      ],
+      "review_note": "The current BSO source row is already reviewed as the same institution as the current IB source identity for NCBIS. Accepted IB detail evidence classifies that identity PRIVATE. The BSO and IB evidence remain separate source assertions under one reviewed identity."
+    },
+    {
+      "name": "Repton School Cairo",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:7ed8dcbc72c59dc98e18",
+      "scope_state": "eligible",
+      "ownership_scope": "private_independent_partnership",
+      "evidence_method": "current_dfe_bso_plus_first_party_private_operator_partnership",
+      "evidence_urls": [
+        "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/152532",
+        "https://reptoncairo.org/repton-family/",
+        "https://merge-plus.com/"
+      ],
+      "review_note": "Current Repton first-party evidence places Repton Cairo in the Repton international family. Merge Plus Education, the current Cairo operating partner surfaced by Repton's own current recruitment pages, describes its business as investing in and operating private education. This satisfies the private/independent operator gate without treating the UK Repton relationship as ownership by itself."
+    },
+    {
+      "name": "The Royal British International School",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:93c3c5b5c0c24d256c43",
+      "scope_state": "eligible",
+      "ownership_scope": "private_independent",
+      "evidence_method": "bso_proprietor_company_governance",
+      "evidence_urls": [
+        "https://www.get-information-schools.service.gov.uk/Establishments/Establishment/Details/150546",
+        "https://royalbritish.edu.eg/wp-content/uploads/2023/12/BSO-report-Royal-British-International-School-Cairo-14.05.2023-final-1-1-1.pdf"
+      ],
+      "review_note": "BSO inspection evidence identifies Mr Amr Kamal as Chair of board/Proprietor and describes the school board as representing the proprietor company. Current DfE/GIAS continues to list the same school as open and currently BSO-accredited."
+    },
+    {
+      "name": "Uppingham Cairo",
+      "source_record_id": "uk_dfe_bso_egypt_2026_08:893750040e5cefccc569",
+      "scope_state": "eligible",
+      "ownership_scope": "private_independent_partnership",
+      "evidence_method": "current_isi_proprietor_plus_parent_school_partnership",
+      "evidence_urls": [
+        "https://reports.isi.net/DownloadReport.aspx?r=ORC9582_20250203.pdf&s=9582&t=c",
+        "https://www.uppingham.co.uk/about/uppingham-cairo",
+        "https://uppinghamcairo.com/about/"
+      ],
+      "review_note": "The 2025 ISI BSO report names New Era Education as proprietor. Current Uppingham UK evidence confirms New Era Education as Uppingham's Egypt partner and identifies Uppingham Cairo as its first overseas school in the Uppingham Group."
+    }
+  ],
+  "summary": {
+    "reviewed_rows": 11,
+    "eligible_rows": 11,
+    "excluded_rows": 0,
+    "needs_review_rows": 0
+  },
+  "safety": {
+    "source_record_ids_changed": 0,
+    "identity_merges_performed": 0,
+    "canonical_database_rows_written": 0,
+    "runtime_database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
