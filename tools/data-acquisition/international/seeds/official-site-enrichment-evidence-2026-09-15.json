@@ -30,10 +30,12 @@
         "admissions_email": "admissions@ncbis.co.uk",
         "age_min_years": 3,
         "age_max_years": 18,
+        "curriculum_evidence": ["English National Curriculum"],
         "bso_status": "current"
       },
       "source_urls": [
         "https://ncbis.co.uk/",
+        "https://ncbis.co.uk/primary/academic-ethos/",
         "https://ncbis.co.uk/admissions/welcome-from-admissions/",
         "https://ncbis.co.uk/contact/",
         "https://www.get-information-schools.service.gov.uk/Establishments/Establishment/Details/141436"
@@ -109,10 +111,12 @@
         "admissions_phone": "+201050385588 / +201060039353",
         "education_range": "PS to Year 12",
         "admissions_status_source_text": "Admissions are open",
+        "curriculum_evidence": ["British curriculum", "National Curriculum of England"],
         "facilities_evidence": ["Playground", "Science Lab", "Football field", "Makerspace"]
       },
       "source_urls": [
         "https://www.tbs-cairo.com/",
+        "https://www.tbs-cairo.com/Why-TBS",
         "https://www.tbs-cairo.com/admissions/"
       ]
     },
