@@ -34,7 +34,7 @@
       "decision_confidence": "high",
       "scope_class": "international_school",
       "ownership_scope": "private_independent",
-      "curriculum_codes": ["international", "british", "american"],
+      "curriculum_codes": ["british", "american"],
       "website": "https://isccairo.sabis.net/",
       "evidence_urls": [
         "https://isccairo.sabis.net/",
