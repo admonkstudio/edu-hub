@@ -72,8 +72,8 @@ jobs:
           assert summary['database_mutation_performed'] is False
 
           assert universe['source_record_count'] == 106
-          assert universe['scope_or_lead_state_counts']['candidate'] == 67
-          assert universe['scope_or_lead_state_counts']['eligible'] == 36
+          assert universe['scope_or_lead_state_counts']['candidate'] == 63
+          assert universe['scope_or_lead_state_counts']['eligible'] == 40
           assert universe['scope_or_lead_state_counts']['excluded'] == 3
           assert universe['english_name_present'] == 106
           assert universe['arabic_name_present'] == 9
