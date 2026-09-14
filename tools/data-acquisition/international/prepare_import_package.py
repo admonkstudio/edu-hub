@@ -22,6 +22,7 @@ SEED_DIR = HERE / "seeds"
 
 SOURCE_META = {
     "ib_world_schools_egypt": ("International Baccalaureate - Egypt World Schools", "international_authorizer"),
+    "uk_dfe_bso_egypt_2026_08": ("UK Department for Education - Accredited British Schools Overseas in Egypt", "foreign_government"),
     "french_homologation_2026_2027": ("French Ministry - Homologated French Schools Abroad 2026-2027", "foreign_government"),
     "kmk_german_schools_2026_04": ("KMK German Schools Abroad - Egypt", "foreign_government"),
     "scu_foreign_university_branches": ("Supreme Council of Universities - International University Branches", "egyptian_regulator"),
