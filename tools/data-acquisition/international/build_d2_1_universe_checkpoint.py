@@ -3,14 +3,14 @@
 
 The historical reviewed universe contains the four Cognia milestone rows. The
 complete Cognia Egypt registry supersedes those four rows for *universe-count*
-purposes while the exact-name reviewed scope decisions are carried forward to
-the corresponding registry rows. This is source-family supersession, not an
-identity merge: all other Cognia registry rows remain supporting candidates.
+purposes while exact-name reviewed scope decisions are carried forward to the
+corresponding registry rows. This is source-family supersession, not an identity
+merge: all other Cognia registry rows remain supporting candidates.
 
-A current Canadian offshore-school evidence family is then added independently.
-Those rows are authoritative source evidence, not unique-institution claims;
-known cross-source overlap (for example Royal Canadian School) and BCCIS
-East/West topology remain D2.2 identity/campus review work.
+Current Canadian offshore-school and German Schools Abroad (ZfA/DAS) evidence
+families are then added independently. Their rows are authoritative source
+evidence, not unique-institution claims. Known cross-source overlaps remain D2.2
+identity/campus/division work.
 
 The output is still a source/lead universe. It never claims a unique institution
 count and never writes canonical/public/database state.
@@ -28,6 +28,7 @@ MILESTONE_SOURCE = "cognia_member_milestones_egypt_2026_2027"
 REGISTRY_SOURCE = "cognia_accreditation_registry_egypt_2026_09_15"
 REGISTRY_URL = "https://home.cognia.org/registry"
 CANADIAN_SOURCE = "cicic_canadian_offshore_schools_egypt_2026_09_15"
+ZFA_DAS_SOURCE = "zfa_german_schools_abroad_egypt_2026_09_15"
 
 
 def read_jsonl(path: Path) -> list[dict]:
@@ -45,12 +46,14 @@ def build(
     cognia_registry: Path,
     milestone_seed: Path,
     canadian_seed: Path,
+    zfa_das_seed: Path,
     output_dir: Path,
 ) -> dict:
     previous = read_jsonl(previous_universe)
     registry = json.loads(cognia_registry.read_text(encoding="utf-8"))
     milestone = json.loads(milestone_seed.read_text(encoding="utf-8"))
     canadian = json.loads(canadian_seed.read_text(encoding="utf-8"))
+    zfa_das = json.loads(zfa_das_seed.read_text(encoding="utf-8"))
 
     if registry.get("source_result_count") != 256 or registry.get("extracted_record_count") != 256:
         raise RuntimeError("Expected the verified 256-row Cognia Egypt registry extraction")
@@ -178,13 +181,78 @@ def build(
             "known_existing_source_identity_hint": source.get("known_existing_source_identity_hint"),
         })
 
+    pre_zfa_source_counts = Counter(str(row.get("source_id") or "unknown") for row in current)
+    pre_zfa_state_counts = Counter(str(row.get("scope_state") or row.get("lead_state") or "candidate") for row in current)
+    if len(current) != 590:
+        raise RuntimeError(f"Expected 590 pre-ZfA source/lead rows, got {len(current)}")
+    if pre_zfa_source_counts[CANADIAN_SOURCE] != 6:
+        raise RuntimeError("Pre-ZfA universe does not contain all six Canadian offshore-school rows")
+    if pre_zfa_state_counts != Counter({"supporting_candidate": 466, "eligible": 121, "excluded": 3}):
+        raise RuntimeError(f"Unexpected pre-ZfA scope/lead counts: {dict(pre_zfa_state_counts)}")
+
+    if zfa_das.get("source_id") != ZFA_DAS_SOURCE:
+        raise RuntimeError(f"Unexpected ZfA DAS source id: {zfa_das.get('source_id')}")
+    zfa_records = zfa_das.get("records", [])
+    if zfa_das.get("records_count") != 7 or len(zfa_records) != 7:
+        raise RuntimeError("Expected seven current ZfA German Schools Abroad rows in Egypt")
+    zfa_ids = [str(row.get("source_record_id") or "") for row in zfa_records]
+    if not all(zfa_ids) or len(set(zfa_ids)) != 7:
+        raise RuntimeError("ZfA source record ids must be seven unique non-empty values")
+    if any(row.get("scope_state") != "eligible" for row in zfa_records):
+        raise RuntimeError("Every current ZfA DAS Egypt row must remain scope-eligible")
+    hurghada = [row for row in zfa_records if "hurghada" in normalize(row.get("name"))]
+    if len(hurghada) != 1:
+        raise RuntimeError("Expected exactly one Hurghada row in current ZfA DAS source family")
+    lifecycle = hurghada[0].get("kmk_sek_i_lifecycle") or {}
+    if lifecycle.get("last_conducted_school_year") != "2024/2025":
+        raise RuntimeError("Hurghada KMK Sek-I lifecycle must preserve last-conducted 2024/2025 evidence")
+    if lifecycle.get("current_sek_i_exam_authorization_after_2024_2025") != "not_asserted":
+        raise RuntimeError("Hurghada must not assert current Sek-I exam authorization after 2024/2025")
+
+    for source in zfa_records:
+        normalized = normalize(source.get("name"))
+        current.append({
+            "discovery_record_id": source.get("source_record_id"),
+            "source_id": ZFA_DAS_SOURCE,
+            "source_record_id": source.get("source_record_id"),
+            "source_url": zfa_das.get("source_url"),
+            "source_snapshot_date": zfa_das.get("snapshot_date"),
+            "entity_family": "pre_university",
+            "institution_type": "international_school",
+            "name_en": source.get("name"),
+            "name_ar": None,
+            "city": source.get("city"),
+            "scope_state": "eligible",
+            "scope_class": "international_school",
+            "lead_state": None,
+            "strong_evidence": source.get("strong_evidence"),
+            "website": source.get("website"),
+            "email": source.get("email"),
+            "storage_policy": "current_german_schools_abroad_directory_evidence",
+            "normalized_name_en": normalized or None,
+            "normalized_name_ar": None,
+            "discovery_cluster_key": f"en:{normalized}" if normalized else None,
+            "cluster_is_review_hint_only": True,
+            "record_role": "current_federal_german_school_abroad_network_evidence",
+            "canonical_identity_created": False,
+            "automatic_merge_performed": False,
+            "scope_decision_origin": "current_zfa_german_school_abroad_directory",
+            "additional_current_kmk_evidence": source.get("additional_current_kmk_evidence"),
+            "institution_primary_evidence": source.get("institution_primary_evidence"),
+            "kmk_sek_i_lifecycle": source.get("kmk_sek_i_lifecycle"),
+            "current_gib_2026_status": source.get("current_gib_2026_status"),
+            "known_existing_source_identity_hint": source.get("known_existing_source_identity_hint"),
+        })
+
     source_counts = Counter(str(row.get("source_id") or "unknown") for row in current)
     state_counts = Counter(str(row.get("scope_state") or row.get("lead_state") or "candidate") for row in current)
-    if len(current) != 590:
-        raise RuntimeError(f"Expected 590 current source/lead rows, got {len(current)}")
+    if len(current) != 597:
+        raise RuntimeError(f"Expected 597 current source/lead rows, got {len(current)}")
     if source_counts[CANADIAN_SOURCE] != 6:
         raise RuntimeError("Current universe does not contain all six Canadian offshore-school rows")
-    if state_counts != Counter({"supporting_candidate": 466, "eligible": 121, "excluded": 3}):
+    if source_counts[ZFA_DAS_SOURCE] != 7:
+        raise RuntimeError("Current universe does not contain all seven ZfA DAS Egypt rows")
+    if state_counts != Counter({"supporting_candidate": 466, "eligible": 128, "excluded": 3}):
         raise RuntimeError(f"Unexpected current scope/lead counts: {dict(state_counts)}")
 
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -208,20 +276,38 @@ def build(
         }, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
+    (output_dir / "zfa-german-schools-abroad-source-family.json").write_text(
+        json.dumps({
+            "source_id": ZFA_DAS_SOURCE,
+            "records_count": len(zfa_records),
+            "source_record_ids": zfa_ids,
+            "unique_institutions_claimed": None,
+            "current_das_membership_is_distinct_from_current_exam_authorization": True,
+            "hurghada_sek_i_last_conducted_school_year": "2024/2025",
+            "known_cross_source_identity_hints_are_review_only": True,
+            "canonical_institutions_created": 0,
+            "automatic_identity_merges_performed": 0,
+            "database_mutation_performed": False,
+            "public_projection_rows_created": 0,
+        }, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
     summary = {
-        "schema_version": 2,
+        "schema_version": 3,
         "built_at": datetime.now(timezone.utc).isoformat(),
         "work_package": "D2.1_expanded_source_lead_universe_checkpoint",
         "foundational_authoritative_seed_rows": 96,
         "historical_classified_strong_rows": 106,
         "previous_reviewed_source_lead_rows": len(previous),
         "pre_canadian_current_source_lead_rows": 584,
+        "pre_zfa_current_source_lead_rows": 590,
         "british_council_rows": source_counts.get("british_council_partner_schools_egypt_2026_09", 0),
         "cognia_full_registry_rows": source_counts[REGISTRY_SOURCE],
         "cognia_milestone_rows_superseded": len(superseded),
         "cognia_new_rows_beyond_milestone_subset": source_counts[REGISTRY_SOURCE] - len(superseded),
         "canadian_authorized_offshore_school_rows": source_counts[CANADIAN_SOURCE],
+        "zfa_german_schools_abroad_rows": source_counts[ZFA_DAS_SOURCE],
         "current_source_lead_rows": len(current),
         "source_counts": dict(sorted(source_counts.items())),
         "scope_or_lead_state_counts": dict(sorted(state_counts.items())),
@@ -229,6 +315,7 @@ def build(
         "cognia_registry_rows_auto_granted_eligibility": 0,
         "scope_decisions_carried_forward_by_exact_source_family_supersession": len(superseded),
         "canadian_rows_auto_identity_merged": 0,
+        "zfa_rows_auto_identity_merged": 0,
         "canonical_institutions_created": 0,
         "automatic_identity_merges_performed": 0,
         "database_mutation_performed": False,
@@ -249,9 +336,10 @@ def main() -> int:
     parser.add_argument("--cognia-registry", type=Path, default=Path("artifacts/international/cognia-egypt-registry/cognia-egypt-registry.json"))
     parser.add_argument("--milestone-seed", type=Path, default=Path("tools/data-acquisition/international/seeds/cognia-egypt-milestones-2026-2027.json"))
     parser.add_argument("--canadian-seed", type=Path, default=Path("tools/data-acquisition/international/seeds/canadian-offshore-schools-egypt-2026-09-15.json"))
+    parser.add_argument("--zfa-das-seed", type=Path, default=Path("tools/data-acquisition/international/seeds/zfa-german-schools-abroad-egypt-2026-09-15.json"))
     parser.add_argument("--output-dir", type=Path, default=Path("artifacts/international/d2-1-universe-checkpoint"))
     args = parser.parse_args()
-    build(args.previous_universe, args.cognia_registry, args.milestone_seed, args.canadian_seed, args.output_dir)
+    build(args.previous_universe, args.cognia_registry, args.milestone_seed, args.canadian_seed, args.zfa_das_seed, args.output_dir)
     return 0
 
 
