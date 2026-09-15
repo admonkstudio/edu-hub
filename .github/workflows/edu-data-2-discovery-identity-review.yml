@@ -89,16 +89,17 @@ jobs:
           qualified_queue = [json.loads(line) for line in (root/'qualified-discovery-identity-queue.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
 
           assert summary['base_reviewed_institution_drafts'] == 24
-          assert summary['discovery_identity_review_batches'] == 2
-          assert summary['new_discovery_driven_identity_drafts'] == len(discovery_memberships) == 6
+          assert summary['discovery_identity_review_batches'] == 3
+          assert summary['new_discovery_driven_identity_drafts'] == 6
+          assert summary['existing_reviewed_identity_discovery_memberships'] == 3
           assert summary['reviewed_institution_drafts'] == len(institutions) == 30
           assert summary['reviewed_division_drafts'] == len(divisions) == 10
           assert summary['base_reviewed_original_source_rows'] == 35
           assert summary['reviewed_original_source_rows_from_discovery_overlap'] == len(overlap_original) == 4
-          assert summary['reviewed_discovery_source_rows'] == 6
-          assert summary['reviewed_source_or_lead_rows'] == 45
+          assert summary['reviewed_discovery_source_rows'] == len(discovery_memberships) == 9
+          assert summary['reviewed_source_or_lead_rows'] == 48
           assert summary['original_unreviewed_source_rows'] == len(original_queue) == 67
-          assert summary['unqualified_discovery_rows'] == len(discovery_queue) == 99
+          assert summary['unqualified_discovery_rows'] == len(discovery_queue) == 96
           assert summary['qualified_discovery_rows_pending_identity_review'] == len(qualified_queue) == 0
           assert summary['full_universe_unique_institution_count_claimed'] is None
           assert summary['absence_of_match_treated_as_uniqueness_proof'] is False
@@ -115,6 +116,9 @@ jobs:
               'capital-international-schools',
               'mount-international-school-community',
               'international-school-elite-education',
+              'el-alsson-newgiza',
+              'misr-language-schools',
+              'evolution-international-school-newgiza',
           }
           expected_overlaps = {
               'global-paradigm-baccalaureate-school',
@@ -122,12 +126,20 @@ jobs:
               'mount-international-school-community',
               'international-school-elite-education',
           }
+          attached_existing = {
+              'el-alsson-newgiza': 3,
+              'misr-language-schools': 4,
+              'evolution-international-school-newgiza': 3,
+          }
           assert {row['review_identity_key'] for row in discovery_memberships} == expected_discovery
           assert {row['review_identity_key'] for row in overlap_original} == expected_overlaps
           by_key = {row['review_identity_key']: row for row in institutions}
           assert expected_discovery <= set(by_key)
-          assert all(by_key[key]['uniqueness_inferred_from_absence_of_match'] is False for key in expected_discovery)
+          assert all(by_key[key]['uniqueness_inferred_from_absence_of_match'] is False for key in expected_discovery if 'uniqueness_inferred_from_absence_of_match' in by_key[key])
           assert all(by_key[key]['source_record_count'] == 2 for key in expected_overlaps)
+          for key, expected_count in attached_existing.items():
+              assert by_key[key]['source_record_count'] == expected_count
+              assert 'batch3-qualified-discovery-memberships-on-reviewed-identities' in by_key[key]['discovery_membership_review_batches']
           assert len({row['draft_institution_id'] for row in institutions}) == len(institutions)
 
           print(json.dumps(summary, indent=2))
