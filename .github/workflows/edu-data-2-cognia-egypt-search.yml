@@ -1,0 +1,68 @@
+name: EDU-DATA-2 Cognia Egypt Registry Search
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'tools/data-acquisition/international/capture_cognia_egypt_registry_search.py'
+      - '.github/workflows/edu-data-2-cognia-egypt-search.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    name: Capture official Cognia Egypt registry search
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser dependency
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Compile capture tool
+        run: python -m py_compile tools/data-acquisition/international/capture_cognia_egypt_registry_search.py
+      - name: Query Egypt through the public Cognia registry
+        run: python tools/data-acquisition/international/capture_cognia_egypt_registry_search.py
+      - name: Assert official-query and safety boundaries
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('artifacts/international/cognia-egypt-search/cognia-egypt-search.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+          assert data['work_package'] == 'D2.1_cognia_egypt_registry_search_capture'
+          assert data['country'] == 'Egypt'
+          assert data['official_registry_query_performed'] is True
+          assert data['initial_response_status'] == 200
+          assert data['xas_response_count'] > 0
+          assert data['official_registry_rows_promoted'] == 0
+          assert data['international_eligibility_granted'] == 0
+          assert data['canonical_institutions_created'] == 0
+          assert data['automatic_merges_performed'] == 0
+          assert data['database_mutation_performed'] is False
+          assert data['public_projection_rows_created'] == 0
+          assert (
+              len(data['table_rows']) > 0
+              or len(data['role_rows']) > 0
+              or len(data['candidate_result_containers']) > 0
+              or 'Egypt' in data['body_text_after_search']
+          )
+          print(json.dumps({
+              'table_rows': len(data['table_rows']),
+              'role_rows': len(data['role_rows']),
+              'candidate_result_containers': len(data['candidate_result_containers']),
+              'xas_response_count': data['xas_response_count'],
+              'errors': data['errors'],
+          }, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-cognia-egypt-search
+          path: artifacts/international/cognia-egypt-search/
+          if-no-files-found: error
