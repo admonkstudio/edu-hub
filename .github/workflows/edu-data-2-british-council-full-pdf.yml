@@ -18,14 +18,14 @@ permissions:
 
 jobs:
   coverage:
-    name: Browser-download and diff the complete September 2026 PDF
+    name: Download and diff the complete September 2026 PDF
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install browser and PDF dependencies
+      - name: Install acquisition and PDF dependencies
         run: |
           pip install playwright requests pdfplumber
           python -m playwright install --with-deps chromium
@@ -35,7 +35,7 @@ jobs:
           python -m py_compile tools/data-acquisition/international/acquire_british_council_partner_schools.py
           python -m py_compile tools/data-acquisition/international/build_british_council_browser_discovery.py
           python -m py_compile tools/data-acquisition/international/build_british_council_full_pdf_coverage.py
-      - name: Download the official PDF through Chromium
+      - name: Download the official PDF through bounded official-source acquisition
         run: python tools/data-acquisition/international/download_british_council_pdf_browser.py --timeout-ms 10000
       - name: Extract all ruled-table rows from the downloaded PDF
         run: |
@@ -58,12 +58,14 @@ jobs:
           coverage = json.loads((root/'coverage/british-council-full-pdf-coverage-summary.json').read_text(encoding='utf-8'))
           reviewed = json.loads(Path('artifacts/international/british-council-browser-discovery/british-council-browser-summary.json').read_text(encoding='utf-8'))
 
-          assert download['capture_mode'] == 'headless_chromium_browser_acquisition'
+          assert download['capture_mode'] == 'official_pdf_resilient_acquisition'
           assert download['discovery_mode'] in {
-              'landing_page_discovery',
+              'landing_page_discovery_http1',
+              'landing_page_discovery_browser',
               'pinned_official_url_after_landing_failure',
           }
           assert download['retrieval_mode'] in {
+              'curl_http1_cookie_referer',
               'browser_navigation_response',
               'same_context_fetch',
           }
