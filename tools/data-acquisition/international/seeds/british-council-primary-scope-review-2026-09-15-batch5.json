@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.1_british_council_primary_scope_review",
+  "batch_id": "batch5-current-reviewed-bso-identity-overlap",
+  "review_method": "british_council_discovery_then_primary_or_recognized_evidence_review",
+  "records_count": 1,
+  "records": [
+    {
+      "source_record_id": "bcps2026:egypt-british-international-school-new-cairo",
+      "source_name": "Egypt British International School",
+      "decision": "eligible",
+      "decision_confidence": "high",
+      "scope_class": "international_school",
+      "ownership_scope": "private_independent",
+      "curriculum_codes": ["british"],
+      "website": "http://www.isc.edu.eg/ebis/",
+      "evidence_urls": [
+        "https://www.get-information-schools.service.gov.uk/Establishments/Establishment/Details/150804",
+        "https://www.gov.uk/government/publications/british-schools-overseas-inspection-reports/british-schools-overseas-accredited-schools-inspection-reports",
+        "http://www.isc.edu.eg/ebis/"
+      ],
+      "eligibility_basis": [
+        "current_open_dfe_british_school_overseas",
+        "current_bso_accreditation",
+        "existing_reviewed_private_independent_ownership_scope"
+      ],
+      "review_note": "British Council Partner School status is not the eligibility basis. Current DfE/GIAS lists Egypt British International School as an open British School Overseas at the New Cairo address (URN 150804), with its record confirmed 30 June 2026 and last inspection 19 May 2026. The current DfE accredited-schools list also includes the school. The existing BSO scope and D2.2 identity review already establish the private/independent school identity; this discovery row adds provenance only."
+    }
+  ],
+  "safety": {
+    "partner_status_treated_as_international_eligibility": false,
+    "unreviewed_british_council_leads_promoted": false,
+    "automatic_identity_creation_performed": false,
+    "automatic_merges_performed": 0,
+    "canonical_database_rows_written": 0,
+    "public_projection_rows_created": 0
+  }
+}
