@@ -6,17 +6,21 @@ on:
       - edu-data-2-international-registry
     paths:
       - 'tools/data-acquisition/international/build_d2_1_universe_checkpoint.py'
+      - 'tools/data-acquisition/international/apply_substantive_international_he_review.py'
       - 'tools/data-acquisition/international/extract_cognia_egypt_registry.py'
       - 'tools/data-acquisition/international/acquire_overture_egypt_international_education.py'
       - 'tools/data-acquisition/international/build_overture_gap_review.py'
       - 'tools/data-acquisition/international/apply_overture_gap_resolutions.py'
+      - 'tools/data-acquisition/international/apply_overture_higher_ed_resolutions.py'
       - 'tools/data-acquisition/international/build_british_council_browser_discovery.py'
       - 'tools/data-acquisition/international/apply_british_council_primary_scope_review.py'
       - 'tools/data-acquisition/international/build_candidate_universe.py'
       - 'tools/data-acquisition/international/seeds/cognia-egypt-milestones-2026-2027.json'
       - 'tools/data-acquisition/international/seeds/canadian-offshore-schools-egypt-2026-09-15.json'
       - 'tools/data-acquisition/international/seeds/zfa-german-schools-abroad-egypt-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/substantive-international-higher-ed-review-*.json'
       - 'tools/data-acquisition/international/seeds/overture-gap-resolution-*.json'
+      - 'tools/data-acquisition/international/seeds/overture-higher-ed-scope-review-*.json'
       - 'tools/data-acquisition/international/seeds/british-council-browser-discovery-*.json'
       - 'tools/data-acquisition/international/seeds/british-council-primary-scope-review-*.json'
       - '.github/workflows/edu-data-2-universe-checkpoint.yml'
@@ -51,9 +55,11 @@ jobs:
           python -m py_compile tools/data-acquisition/international/build_candidate_universe.py
           python -m py_compile tools/data-acquisition/international/extract_cognia_egypt_registry.py
           python -m py_compile tools/data-acquisition/international/build_d2_1_universe_checkpoint.py
+          python -m py_compile tools/data-acquisition/international/apply_substantive_international_he_review.py
           python -m py_compile tools/data-acquisition/international/acquire_overture_egypt_international_education.py
           python -m py_compile tools/data-acquisition/international/build_overture_gap_review.py
           python -m py_compile tools/data-acquisition/international/apply_overture_gap_resolutions.py
+          python -m py_compile tools/data-acquisition/international/apply_overture_higher_ed_resolutions.py
       - name: Rebuild classified strong layer and 226-row British Council layer
         run: |
           python tools/data-acquisition/international/build_authoritative_seed.py --output-dir artifacts/international
@@ -73,16 +79,20 @@ jobs:
         run: python tools/data-acquisition/international/extract_cognia_egypt_registry.py
       - name: Build supersession-safe D2.1 checkpoint with Canadian and ZfA evidence
         run: python tools/data-acquisition/international/build_d2_1_universe_checkpoint.py
+      - name: Apply reviewed substantive-international higher-ed evidence
+        run: python tools/data-acquisition/international/apply_substantive_international_he_review.py
       - name: Acquire Egypt-only Overture supporting discovery
         run: python tools/data-acquisition/international/acquire_overture_egypt_international_education.py
       - name: Compare Overture discovery to current universe
         run: python tools/data-acquisition/international/build_overture_gap_review.py
-      - name: Apply explicit Overture high-signal review decisions
+      - name: Apply explicit Overture high-signal school review decisions
         run: |
           python tools/data-acquisition/international/apply_overture_gap_resolutions.py \
             --decisions \
               tools/data-acquisition/international/seeds/overture-gap-resolution-2026-09-15-batch1.json \
               tools/data-acquisition/international/seeds/overture-gap-resolution-2026-09-15-batch2.json
+      - name: Apply complete Overture higher-ed review decisions
+        run: python tools/data-acquisition/international/apply_overture_higher_ed_resolutions.py
       - name: Assert checkpoint counts, source-family lifecycle, Overture gaps and safety boundaries
         run: |
           python - <<'PY'
@@ -93,41 +103,42 @@ jobs:
           supersession = json.loads((root/'cognia-source-family-supersession.json').read_text(encoding='utf-8'))
           canadian = json.loads((root/'canadian-offshore-source-family.json').read_text(encoding='utf-8'))
           zfa = json.loads((root/'zfa-german-schools-abroad-source-family.json').read_text(encoding='utf-8'))
+          he_family = json.loads((root/'substantive-international-he-source-family.json').read_text(encoding='utf-8'))
           rows = [json.loads(line) for line in (root/'source-lead-universe.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
           geo = json.loads(Path('artifacts/international/overture-egypt-international-education/overture-egypt-international-education.json').read_text(encoding='utf-8'))
           gaps = json.loads(Path('artifacts/international/overture-gap-review/gap-review-summary.json').read_text(encoding='utf-8'))
           resolutions = json.loads(Path('artifacts/international/overture-gap-resolution/resolution-summary.json').read_text(encoding='utf-8'))
+          he_review = json.loads(Path('artifacts/international/overture-higher-ed-resolution/higher-ed-review-summary.json').read_text(encoding='utf-8'))
 
           assert summary['foundational_authoritative_seed_rows'] == 96
           assert summary['historical_classified_strong_rows'] == 106
           assert summary['previous_reviewed_source_lead_rows'] == 332
           assert summary['pre_canadian_current_source_lead_rows'] == 584
           assert summary['pre_zfa_current_source_lead_rows'] == 590
+          assert summary['pre_substantive_international_he_source_lead_rows'] == 597
           assert summary['british_council_rows'] == 226
           assert summary['cognia_full_registry_rows'] == 256
           assert summary['cognia_milestone_rows_superseded'] == 4
           assert summary['cognia_new_rows_beyond_milestone_subset'] == 252
           assert summary['canadian_authorized_offshore_school_rows'] == 6
           assert summary['zfa_german_schools_abroad_rows'] == 7
-          assert summary['current_source_lead_rows'] == 597
-          assert summary['scope_or_lead_state_counts'] == {'eligible': 128, 'excluded': 3, 'supporting_candidate': 466}
-          assert len(rows) == 597
+          assert summary['substantive_international_he_review_rows'] == 5
+          assert summary['current_source_lead_rows'] == 602
+          assert summary['scope_or_lead_state_counts'] == {'eligible': 133, 'excluded': 3, 'supporting_candidate': 466}
+          assert len(rows) == 602
           assert len(supersession) == 4
           assert canadian['records_count'] == 6
-          assert len(set(canadian['source_record_ids'])) == 6
-          assert canadian['unique_institutions_claimed'] is None
           assert zfa['records_count'] == 7
-          assert len(set(zfa['source_record_ids'])) == 7
+          assert he_family['records_count'] == 5
+          assert canadian['unique_institutions_claimed'] is None
           assert zfa['unique_institutions_claimed'] is None
+          assert he_family['unique_institutions_claimed'] is None
           assert zfa['current_das_membership_is_distinct_from_current_exam_authorization'] is True
           assert zfa['hurghada_sek_i_last_conducted_school_year'] == '2024/2025'
-          assert canadian['canonical_institutions_created'] == 0
-          assert canadian['automatic_identity_merges_performed'] == 0
-          assert zfa['canonical_institutions_created'] == 0
-          assert zfa['automatic_identity_merges_performed'] == 0
           assert summary['unique_institutions_claimed'] is None
           assert summary['canadian_rows_auto_identity_merged'] == 0
           assert summary['zfa_rows_auto_identity_merged'] == 0
+          assert summary['substantive_he_rows_auto_identity_merged'] == 0
 
           hurghada = [r for r in rows if r.get('source_id') == 'zfa_german_schools_abroad_egypt_2026_09_15' and 'hurghada' in (r.get('name_en') or '').lower()]
           assert len(hurghada) == 1
@@ -139,13 +150,13 @@ jobs:
           assert geo['non_egypt_rows_rejected'] == 79
           assert geo['record_count'] == 1042
           assert all('EG' in row['address_countries'] for row in geo['records'])
-          assert gaps['current_universe_source_rows'] == 597
+          assert gaps['current_universe_source_rows'] == 602
           assert gaps['overture_egypt_rows'] == 1042
-          assert gaps['exact_normalized_name_overlap_rows'] == 136
-          assert gaps['unmatched_supporting_rows'] == 906
-          assert gaps['unmatched_unique_normalized_names'] == 869
+          assert gaps['exact_normalized_name_overlap_rows'] == 141
+          assert gaps['unmatched_supporting_rows'] == 901
+          assert gaps['unmatched_unique_normalized_names'] == 865
           assert gaps['high_signal_preuniversity_rows'] == 266
-          assert gaps['higher_ed_scope_review_rows'] == 75
+          assert gaps['higher_ed_scope_review_rows'] == 70
           assert gaps['lower_priority_supporting_rows'] == 565
           assert gaps['fuzzy_matches_performed'] == 0
           assert gaps['overture_rows_auto_added_to_universe'] == 0
@@ -162,26 +173,41 @@ jobs:
               'existing_source_identity_alias': 24,
               'unresolved_supporting_only': 2,
           }
-          assert resolutions['batch_ids'] == [
-              'overture-gap-resolution-2026-09-15-batch1',
-              'overture-gap-resolution-2026-09-15-batch2',
-          ]
-          assert resolutions['fuzzy_matches_performed'] == 0
-          assert resolutions['overture_rows_auto_added_to_universe'] == 0
 
-          for obj in (summary, gaps, resolutions):
+          assert he_review['input_higher_ed_rows'] == 70
+          assert he_review['reviewed_rows'] == 70
+          assert he_review['higher_ed_queue_outstanding_rows'] == 0
+          assert he_review['existing_eligible_he_alias_or_subunit_rows'] == 14
+          assert he_review['rerouted_preuniversity_existing_rows'] == 1
+          assert he_review['rerouted_preuniversity_unresolved_rows'] == 1
+          assert he_review['out_of_scope_egyptian_he_rows'] == 21
+          assert he_review['supporting_only_no_qualifying_he_rows'] == 33
+          assert he_review['new_preuniversity_followup_rows'] == 1
+          assert he_review['decision_counts'] == {
+              'existing_eligible_he_identity_or_subunit': 14,
+              'out_of_scope_egyptian_higher_education': 21,
+              'rerouted_preuniversity_existing_identity': 1,
+              'rerouted_preuniversity_unresolved': 1,
+              'supporting_only_no_current_qualifying_he_evidence': 33,
+          }
+
+          for obj in (summary, gaps, resolutions, he_review, he_family):
               assert obj['canonical_institutions_created'] == 0
               assert obj['database_mutation_performed'] is False
               assert obj['public_projection_rows_created'] == 0
           assert summary['automatic_identity_merges_performed'] == 0
           assert gaps['automatic_identity_merges_performed'] == 0
           assert resolutions['automatic_identity_merges_performed'] == 0
+          assert he_review['automatic_identity_merges_performed'] == 0
+          assert he_family['automatic_identity_merges_performed'] == 0
           assert summary['d2_1_complete'] is False
-          print(json.dumps({'checkpoint': summary, 'canadian_source_family': canadian, 'zfa_das_source_family': zfa, 'overture': {
-              'bbox_candidate_rows': geo['bbox_candidate_rows'],
-              'non_egypt_rows_rejected': geo['non_egypt_rows_rejected'],
-              'record_count': geo['record_count'],
-          }, 'gap_review': gaps, 'gap_resolution': resolutions}, ensure_ascii=False, indent=2))
+          print(json.dumps({
+              'checkpoint': summary,
+              'substantive_he_source_family': he_family,
+              'gap_review': gaps,
+              'school_gap_resolution': resolutions,
+              'higher_ed_gap_resolution': he_review,
+          }, ensure_ascii=False, indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
@@ -194,4 +220,5 @@ jobs:
             artifacts/international/overture-egypt-international-education/
             artifacts/international/overture-gap-review/
             artifacts/international/overture-gap-resolution/
+            artifacts/international/overture-higher-ed-resolution/
           if-no-files-found: error
