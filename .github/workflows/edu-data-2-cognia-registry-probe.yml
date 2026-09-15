@@ -1,0 +1,59 @@
+name: EDU-DATA-2 Cognia Registry Probe
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'tools/data-acquisition/international/probe_cognia_registry_browser.py'
+      - '.github/workflows/edu-data-2-cognia-registry-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    name: Probe public Cognia accreditation registry
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser dependency
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Compile probe
+        run: python -m py_compile tools/data-acquisition/international/probe_cognia_registry_browser.py
+      - name: Probe public registry
+        run: python tools/data-acquisition/international/probe_cognia_registry_browser.py
+      - name: Assert discovery-only safety boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('artifacts/international/cognia-registry-probe/cognia-registry-probe.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+          assert data['work_package'] == 'D2.1_cognia_registry_public_browser_probe'
+          assert data['requested_url'] == 'https://home.cognia.org/registry'
+          assert data['database_mutation_performed'] is False
+          assert data['public_projection_rows_created'] == 0
+          assert data['international_eligibility_granted'] == 0
+          assert data['canonical_institutions_created'] == 0
+          assert data['automatic_merges_performed'] == 0
+          assert data['network_response_count'] > 0
+          print(json.dumps({
+              'final_url': data['final_url'],
+              'title': data['title'],
+              'controls': len(data['controls']),
+              'links': len(data['links']),
+              'network_response_count': data['network_response_count'],
+          }, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-cognia-registry-probe
+          path: artifacts/international/cognia-registry-probe/
+          if-no-files-found: error
