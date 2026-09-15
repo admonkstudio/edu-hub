@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.2_explicit_discovered_identity_review",
+  "batch_id": "batch4-qualified-discovery-memberships-on-reviewed-bso-identities",
+  "review_method": "explicit_additive_source_membership_after_separate_d2_1_eligibility_and_existing_d2_2_identity_review",
+  "records_count": 2,
+  "records": [
+    {
+      "review_identity_key": "british-school-alexandria",
+      "source_id": "british_council_partner_schools_egypt_2026_09",
+      "source_record_id": "bcps2026:british-school-of-alexandria",
+      "source_name": "The British School of Alexandria",
+      "provisional_canonical_name_en": "The British School of Alexandria",
+      "decision": "confirmed_discovery_membership_of_existing_reviewed_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://www.get-information-schools.service.gov.uk/Establishments/Establishment/Details/132609",
+        "https://www.gov.uk/government/publications/british-schools-overseas-inspection-reports/british-schools-overseas-accredited-schools-inspection-reports",
+        "https://bsalex.net"
+      ],
+      "review_note": "The British Council row exactly resolves to the already reviewed The British School of Alexandria identity through current DfE/GIAS BSO evidence and the same school website/address context. This is an additive discovery membership only; it creates no second institution and does not claim campus-topology completeness."
+    },
+    {
+      "review_identity_key": "uppingham-cairo",
+      "source_id": "british_council_partner_schools_egypt_2026_09",
+      "source_record_id": "bcps2026:uppingham-cairo",
+      "source_name": "Uppingham Cairo",
+      "provisional_canonical_name_en": "Uppingham Cairo",
+      "decision": "confirmed_discovery_membership_of_existing_reviewed_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://www.gov.uk/government/publications/british-schools-overseas-inspection-reports/british-schools-overseas-accredited-schools-inspection-reports",
+        "https://uppinghamcairo.com/about/",
+        "https://uppinghamcairo.com/"
+      ],
+      "review_note": "Current BSO and first-party evidence resolves the British Council discovery row to the already reviewed Uppingham Cairo identity. The discovery membership adds provenance only and creates no new institution, provider or campus record."
+    }
+  ],
+  "safety": {
+    "absence_of_match_treated_as_uniqueness_proof": false,
+    "unqualified_discovery_rows_entered_identity_review": false,
+    "automatic_identity_creation_performed": false,
+    "automatic_merges_performed": 0,
+    "canonical_database_rows_written": 0,
+    "runtime_database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
