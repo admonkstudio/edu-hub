@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.2_explicit_discovered_identity_review",
+  "batch_id": "batch3-qualified-discovery-memberships-on-reviewed-identities",
+  "review_method": "explicit_additive_source_membership_after_separate_d2_1_eligibility_and_existing_d2_2_identity_review",
+  "records_count": 3,
+  "records": [
+    {
+      "review_identity_key": "el-alsson-newgiza",
+      "source_id": "british_council_partner_schools_egypt_2026_09",
+      "source_record_id": "bcps2026:alsson-international-school-haraniya",
+      "source_name": "Alsson International School Haraniya",
+      "provisional_canonical_name_en": "El Alsson British and American International School",
+      "decision": "confirmed_discovery_membership_of_existing_reviewed_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://www.alsson.com/",
+        "https://ibo.org/programmes/find-an-ib-school/ibaem2/e/el-alsson-american-international-school/",
+        "https://www.alsson.com/about/the-story-of-el-alsson"
+      ],
+      "review_note": "Current first-party and IB evidence resolves the British Council El Alsson naming to the already reviewed El Alsson institutional identity. The discovery label includes Haraniya, but it is attached only as source provenance; it does not recreate Haraniya as a current campus because the accepted campus review separately treats the former site as historical."
+    },
+    {
+      "review_identity_key": "misr-language-schools",
+      "source_id": "british_council_partner_schools_egypt_2026_09",
+      "source_record_id": "bcps2026:misr-language-schools",
+      "source_name": "Misr Language Schools",
+      "provisional_canonical_name_en": "Misr Language Schools",
+      "decision": "confirmed_discovery_membership_of_existing_reviewed_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://mls-egypt.org/",
+        "https://ibo.org/en/school/051897",
+        "https://frenchdivision.mls-egypt.org/"
+      ],
+      "review_note": "The exact British Council name resolves to the already reviewed Misr Language Schools identity through current first-party and IB evidence. The added membership does not change the existing division-scoped treatment of French, American, British, IB or national evidence."
+    },
+    {
+      "review_identity_key": "evolution-international-school-newgiza",
+      "source_id": "british_council_partner_schools_egypt_2026_09",
+      "source_record_id": "bcps2026:new-giza-international-school-evolution",
+      "source_name": "New Giza International School-Evolution",
+      "provisional_canonical_name_en": "Evolution International School - NewGiza",
+      "decision": "confirmed_discovery_membership_of_existing_reviewed_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://eisng.lvng.net/",
+        "https://www-prod.ibo.org/school/061134/",
+        "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/re-accredited-evolution-international-school-egypt"
+      ],
+      "review_note": "The British Council New Giza/Evolution naming resolves to the already reviewed Evolution International School - NewGiza identity through current first-party, IB and CIS evidence. The source membership is additive provenance only and creates no second institution."
+    }
+  ],
+  "safety": {
+    "absence_of_match_treated_as_uniqueness_proof": false,
+    "unqualified_discovery_rows_entered_identity_review": false,
+    "automatic_identity_creation_performed": false,
+    "automatic_merges_performed": 0,
+    "canonical_database_rows_written": 0,
+    "runtime_database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
