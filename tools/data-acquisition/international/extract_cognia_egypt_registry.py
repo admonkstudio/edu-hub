@@ -151,7 +151,7 @@ def extract(output: Path, timeout_ms: int) -> dict:
                       const row = document.querySelector(selector);
                       return row && row.innerText !== previous;
                     }""",
-                    {"selector": ROW_SELECTOR, "previous": first_row_before},
+                    arg={"selector": ROW_SELECTOR, "previous": first_row_before},
                     timeout=timeout_ms,
                 )
                 page.wait_for_timeout(500)
