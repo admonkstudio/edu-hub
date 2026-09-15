@@ -72,7 +72,7 @@ Reference: `tools/data-acquisition/international/seeds/substantive-international
 
 **Decision:** Current ZfA DAS membership is distinct from current exam authorization. Deutsche Schule Hurghada retains current DAS evidence while the checked KMK Sek-I lifecycle records last conducted year `2024/2025`; no later Sek-I authorization is asserted.
 
-**Decision:** Accepted D2.1 run **`35021093103`** establishes the current **604 source/evidence row** checkpoint: **135 eligible / 466 supporting / 3 excluded**. `604` is not a unique-institution count.
+**Decision:** Accepted D2.1 run **`35021835175`** establishes the current **604 source/evidence row** checkpoint: **135 eligible / 466 supporting / 3 excluded**. `604` is not a unique-institution count.
 
 ## 9. Supporting discovery qualification is evidence-separated
 
@@ -113,6 +113,8 @@ Reference: `tools/data-acquisition/international/seeds/mansoura-college-topology
 **Decision:** Normalized-name or fuzzy similarity may generate review hints only; it never authorizes a canonical merge.
 
 **Decision:** No pipeline may auto-create canonical institutions, auto-merge source identities, auto-infer campus completeness or auto-publish raw/staging data. Exact source keys/Overture IDs are required for checked-in gap-resolution decisions.
+
+**Decision:** Duplicate Overture place rows are not automatically deduplicated. When current evidence shows they describe the same provider/campus area, each place row remains explicit review evidence until D2.2 makes a topology decision.
 
 ## 13. OSM and geospatial discovery
 
@@ -158,9 +160,11 @@ Reference: `docs/SOURCE-USAGE-POLICY.md`.
 
 **Decision:** Overture higher-education review and Mansoura College topology are complete and must not be restarted absent changed evidence/regression.
 
-**Decision:** Three high-signal school batches are accepted. Run **35021093103** proves **41 reviewed / 39 resolved-explained / 2 unresolved / 225 unreviewed / 227 outstanding** from the 266-row high-signal school queue.
+**Decision:** Four high-signal school batches are accepted. Run **35021835175** proves **50 reviewed / 48 resolved-explained / 2 unresolved / 216 unreviewed / 218 outstanding** from the 266-row high-signal school queue.
 
-**Decision:** The exact next D2.1 task is the remaining **227 high-signal school rows**, processed in small deterministic evidence-backed batches, followed by V7 read-only gap comparison, Edarabia reference-only pass and institution/operator primary-source exhaustion.
+**Decision:** Batch 4 preserves provider/division distinctions for El Alsson, Forsan and Manhattan; treats the two Manhattan Overture rows separately rather than auto-deduplicating; preserves Choueifat New Cairo and 6 October as distinct branch-level aliases; and resolves Royal British and DSBK through current government-authoritative source families.
+
+**Decision:** The exact next D2.1 task is the remaining **218 high-signal school rows**, processed in small deterministic evidence-backed batches, followed by V7 read-only gap comparison, Edarabia reference-only pass and institution/operator primary-source exhaustion.
 
 **Decision:** AIA International School is not currently mapped to the known Alexandria AIA source identity because the Overture row is located in New Cairo while current authoritative AIA evidence is in Alexandria. It remains separate research work unless current evidence resolves the discrepancy.
 
