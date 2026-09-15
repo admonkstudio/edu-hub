@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "review_package": "substantive_international_higher_education_scope_review",
+  "scope_rule": "Egyptian legal incorporation or private-university classification does not by itself exclude an institution when separate current evidence establishes substantive binational, intergovernmental, transnational, or international-organizational status. Foreign partnership, branding, validation, or dual-degree arrangements alone remain insufficient.",
+  "records_count": 5,
+  "records": [
+    {
+      "source_id": "reviewed_he_giu_substantive_international_2026_09_15",
+      "source_record_id": "giu",
+      "name_en": "German International University",
+      "institution_type": "international_higher_education_institution",
+      "scope_state": "eligible",
+      "scope_class": "substantive_international_higher_education",
+      "strong_evidence": "scu_international_framework_category_plus_german_egyptian_establishment_agreement_and_transnational_education_status",
+      "evidence_urls": [
+        "https://scu.eg/educational-institutions-with-international-and-framework-agreements/",
+        "https://giu-uni.de/en/about-giu/establishment.aspx",
+        "https://www2.daad.de/der-daad/daad-aktuell/de/76028-erste-deutsche-haw-am-nil/"
+      ],
+      "review_note": "Current SCU places GIU under institutions with international/framework agreements; GIU and DAAD describe its German-Egyptian establishment and transnational/foreign-university status."
+    },
+    {
+      "source_id": "reviewed_he_guc_binational_2026_09_15",
+      "source_record_id": "guc",
+      "name_en": "German University in Cairo",
+      "institution_type": "binational_private_university",
+      "scope_state": "eligible",
+      "scope_class": "substantive_international_higher_education",
+      "strong_evidence": "daad_binational_transnational_university_plus_primary_binational_governance_evidence",
+      "evidence_urls": [
+        "https://www.daad.de/de/infos-services-fuer-hochschulen/weiterfuehrende-infos-zu-daad-foerderprogrammen/guc/",
+        "https://guc.edu.eg/en/about_guc/",
+        "https://scu.eg/accredited-private-universities/"
+      ],
+      "review_note": "GUC is Egyptian private in legal form, but DAAD currently treats it as a binational/transnational university and its German institutional participation is substantive rather than a name-only partnership."
+    },
+    {
+      "source_id": "reviewed_he_ufe_franco_egyptian_2026_09_15",
+      "source_record_id": "ufe",
+      "name_en": "French University in Egypt",
+      "institution_type": "franco_egyptian_nonprofit_university",
+      "scope_state": "eligible",
+      "scope_class": "substantive_international_higher_education",
+      "strong_evidence": "intergovernmental_franco_egyptian_university_with_dual_ministry_supervision_and_french_degree_pathways",
+      "evidence_urls": [
+        "https://ufe.edu.eg/about-ufe-2/",
+        "https://www.egypte.campusfrance.org/fr/l-universite-francaise-d-egypte-ufe"
+      ],
+      "review_note": "UFE is a national non-profit university operating under dual Egyptian/French higher-education supervision and strengthened by an intergovernmental agreement."
+    },
+    {
+      "source_id": "reviewed_he_bue_uk_egypt_2026_09_15",
+      "source_record_id": "bue",
+      "name_en": "The British University in Egypt",
+      "institution_type": "binational_model_private_university",
+      "scope_state": "eligible",
+      "scope_class": "substantive_international_higher_education",
+      "strong_evidence": "egypt_uk_intergovernmental_establishment_plus_uk_validated_dual_award_structure",
+      "evidence_urls": [
+        "https://www.bue.edu.eg/leadership-structure",
+        "https://www.bue.edu.eg/academic-services/academic-regulations-bue",
+        "https://scu.eg/accredited-private-universities/"
+      ],
+      "review_note": "BUE is Egyptian private in legal form but states that it was established following an Egypt-UK intergovernmental agreement and operates UK-validated dual-award programmes."
+    },
+    {
+      "source_id": "reviewed_he_aastmt_arab_league_2026_09_15",
+      "source_record_id": "aastmt",
+      "name_en": "Arab Academy for Science, Technology and Maritime Transport",
+      "institution_type": "regional_international_organization_higher_education",
+      "scope_state": "eligible",
+      "scope_class": "substantive_international_higher_education",
+      "strong_evidence": "arab_league_specialized_organization_establishment_plus_scu_international_framework_category",
+      "evidence_urls": [
+        "https://scu.eg/educational-institutions-with-international-and-framework-agreements/",
+        "https://aast.edu/en/sdg/contenttemp.php?page_id=100019"
+      ],
+      "review_note": "AASTMT is a specialized organization of the League of Arab States established through regional/international instruments and is listed by SCU among institutions with international/framework agreements."
+    }
+  ]
+}
