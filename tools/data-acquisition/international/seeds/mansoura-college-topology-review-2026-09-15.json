@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "review_package": "mansoura_college_provider_school_topology_review",
+  "provider": {
+    "review_key": "mansoura-college-educational-campus",
+    "display_name_en": "Mansoura College Educational Campus",
+    "primary_url": "https://mc.edu.eg/",
+    "admissions_url": "https://admission.mc.edu.eg/admission",
+    "review_state": "provider_group_evidenced_not_canonicalized",
+    "note": "Current first-party provider/admissions pages present one Mansoura College educational campus/group with four school units: MC Language School, MMC Modern Language School, British School and American School. Provider review does not imply that every unit is in active Edu Hub international scope."
+  },
+  "units": [
+    {
+      "review_key": "mansoura-college-language-school-mc",
+      "name_en": "Mansoura College Language School",
+      "provider_unit_code": "MC",
+      "unit_type": "school",
+      "curriculum_scope": "national",
+      "d2_1_scope_state": "excluded_provider_context_only",
+      "primary_evidence_urls": ["https://admission.mc.edu.eg/admission"],
+      "source_links": []
+    },
+    {
+      "review_key": "modern-mansoura-college-language-school-mmc",
+      "name_en": "Modern Mansoura College Language School",
+      "provider_unit_code": "MMC",
+      "unit_type": "school",
+      "curriculum_scope": "national",
+      "d2_1_scope_state": "excluded_provider_context_only",
+      "primary_evidence_urls": ["https://admission.mc.edu.eg/admission"],
+      "source_links": [
+        {
+          "source_id": "british_council_partner_schools_egypt_2026_09",
+          "source_record_id": "bcps2026:mansoura-college-modern",
+          "relationship_state": "probable_same_provider_unit_name_mapping_not_identity_merged",
+          "note": "British Council Partner status is exam-delivery support evidence only. The shortened source name 'Mansoura College Modern' is consistent with MMC but is not used as an automatic identity merge or eligibility basis."
+        }
+      ]
+    },
+    {
+      "review_key": "mansoura-college-british-school",
+      "name_en": "Mansoura College British School",
+      "provider_unit_code": "IG",
+      "unit_type": "international_school",
+      "curriculum_scope": "british_igcse",
+      "d2_1_scope_state": "eligible",
+      "strong_evidence": "current_primary_british_school_plus_pearson_approved_centre_award_evidence",
+      "recognized_identifier": "Pearson centre 92720",
+      "primary_evidence_urls": [
+        "https://ig.mc.edu.eg/",
+        "https://ig.mc.edu.eg/about-us/",
+        "https://admission.mc.edu.eg/admission"
+      ],
+      "recognized_evidence_urls": [
+        "https://www.pearson.com/content/dam/one-dot-com/one-dot-com/international-schools/pdfs/why-choose-Pearson/OPLA-Booklets/OPLA-Africa.pdf"
+      ],
+      "recognized_evidence_lifecycle": "Pearson 2024 OPLA recipient-school list identifies Mansoura College British School as approved centre 92720; current 2026 first-party pages establish continued active British-school operation.",
+      "source_links": []
+    },
+    {
+      "review_key": "mansoura-college-2-international-american-school",
+      "name_en": "Mansoura College 2 International American School",
+      "aliases_en": ["Mansoura College American School", "MCAS"],
+      "provider_unit_code": "AD",
+      "unit_type": "international_school",
+      "curriculum_scope": "american",
+      "d2_1_scope_state": "eligible",
+      "strong_evidence": "current_primary_american_school_plus_current_cognia_and_act_recognition_evidence",
+      "primary_evidence_urls": [
+        "https://ad.mc.edu.eg/",
+        "https://admission.mc.edu.eg/admission"
+      ],
+      "recognized_evidence_urls": [
+        "https://www.cognia.org/spt_testimonial/130-mostafa-elghandour/",
+        "https://global.act.org/content/global/en/products-and-services/the-act-non-us/scores/act-high-achievers-mena-region.html"
+      ],
+      "source_links": [
+        {
+          "source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+          "source_record_id": "registry-row-147",
+          "source_name_en": "Mansoura College 2 International School",
+          "relationship_state": "same_american_school_source_membership_reviewed",
+          "note": "Current first-party naming and Cognia evidence establish the American-school scope. The original Cognia row remains preserved as separate source provenance."
+        },
+        {
+          "source_id": "overture_places_2026_08_19",
+          "source_record_id": "2f30ad71-e0bb-47d5-b86e-238edfb1826a",
+          "source_name_en": "Mansoura College American Schools In Egypt",
+          "relationship_state": "same_american_school_alias_reviewed",
+          "note": "Overture is supporting-only; the identity relationship is justified by the shared institution-primary American-school domain/evidence, not by Overture alone."
+        }
+      ]
+    }
+  ],
+  "rerouted_overture_provider_row": {
+    "overture_id": "9e34fa47-a93e-4c90-a902-9a8181834ec2",
+    "name_en": "Mansoura College International Schools",
+    "decision": "provider_umbrella_alias_not_separate_institution",
+    "target_provider_review_key": "mansoura-college-educational-campus",
+    "evidence_urls": [
+      "https://mc.edu.eg/",
+      "https://admission.mc.edu.eg/admission"
+    ],
+    "note": "Current first-party pages use Mansoura College International Schools as an umbrella/admissions identity covering multiple school units. It is not materialized as a separate canonical school institution."
+  },
+  "review_safety": {
+    "canonical_provider_created": false,
+    "canonical_institutions_created": 0,
+    "automatic_identity_merges_performed": 0,
+    "database_mutation_performed": false,
+    "public_projection_rows_created": 0,
+    "british_council_partner_status_granted_eligibility": false,
+    "overture_granted_eligibility": false,
+    "cognia_alone_granted_eligibility": false
+  }
+}
