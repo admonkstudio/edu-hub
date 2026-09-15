@@ -60,22 +60,22 @@ Reference: `tools/data-acquisition/international/DATASET-LAYERS.md`.
 
 ## D2.1 — Complete institution/source universe
 
-Status: **ACTIVE — 604-ROW UNIVERSE STABLE; 213 HIGH-SIGNAL SCHOOL ROWS REMAIN OUTSTANDING**
+Status: **ACTIVE — 604-ROW UNIVERSE STABLE; 204 HIGH-SIGNAL SCHOOL ROWS REMAIN OUTSTANDING**
 
 ### Accepted checkpoint
 
-`EDU-DATA-2 D2.1 Universe Checkpoint` run **35022596202** is green at head `a843e4d5545d5fca3f9d863c4d7104aca37be92d` and proves:
+`EDU-DATA-2 D2.1 Universe Checkpoint` run **35024492612** is green at head `e1c554e61c9f9fc0c8185182a37a33f13ab78ce4` and proves:
 
 - **604 source/evidence rows**;
 - **135 eligible**;
 - **466 supporting candidates**;
 - **3 excluded**;
 - 266 high-signal pre-university Overture rows;
-- **55 explicitly reviewed school rows**;
-- **53 resolved/explained**;
+- **64 explicitly reviewed school rows**;
+- **62 resolved/explained**;
 - **2 reviewed-but-unresolved**;
-- **211 unreviewed**;
-- **213 outstanding**;
+- **202 unreviewed**;
+- **204 outstanding**;
 - zero fuzzy automatic merges;
 - zero canonical identities created;
 - zero runtime database mutation;
@@ -116,18 +116,18 @@ The entire 70-row post-overlay HE queue has explicit checked-in decisions and **
 
 #### High-signal schools — active next cursor
 
-Five school-resolution batches now cover **55 of 266** rows:
+Six school-resolution batches now cover **64 of 266** rows:
 
-- 53 resolved/explained;
+- 62 resolved/explained;
 - 2 reviewed but unresolved (`Kada Modern British School`, `M.S.G International British School`);
-- 211 unreviewed;
-- **213 outstanding**.
+- 202 unreviewed;
+- **204 outstanding**.
 
-Batch 5 explicitly reviewed American International School in Egypt West Campus, Royal British Schools New Damietta, Solaimaneyah International School SIS, Creatives International Schools in 10th of Ramadan and Al Karma/Katameya.
+Batch 6 explicitly reviewed AlMaaly International School, Sun of Knowledge British International School, British Modern School - BMS, Lycée International Balzac, International Schools of Kenana, Norwich International College - HR, Future International Schools Sadat City Branch, Nordic international school in Cairo, and British City College - IGCSE.
 
-AIS West resolves to the existing eligible current IB West Campus row, school code `049504`, and remains distinct from the East Campus identity/code `000654`. Royal British New Damietta and Al Karma remain provider/division/name-topology cases. Solaimaneyah resolves to its current Cognia source identity with matching institution-primary evidence. The 10th of Ramadan Creatives row resolves to the current Sharqia Cognia source identity and remains distinct from the separate Giza Creative International School lead.
+Lycée International Balzac resolves through current French homologation evidence. Kenana, Future Sadat and British City remain provider/division/branch topology work for D2.2 rather than flattened identities. The remaining simple aliases use exact current-source identities only; Cognia and British Council Partner status do not grant eligibility.
 
-AIA International School remains deliberately **not** collapsed into the known Alexandria AIA source identity because the Overture row is located in New Cairo while the current authoritative AIA school is in Alexandria. This remains separate research work rather than an unsafe alias.
+AIA International School remains deliberately **not** collapsed into the known Alexandria AIA source identity because the Overture row is located in New Cairo while the current authoritative AIA school is in Alexandria. Delta American School also remains held back pending stronger current evidence.
 
 ### OSM diagnostic
 
@@ -135,13 +135,13 @@ Accepted OSM diagnostic run **34997269459** remains green as a diagnostic. All 1
 
 ### V7 archive
 
-`tools/data-acquisition/international/build_v7_international_gap_review.py` is ready for read-only matching against the owned **24,916-row** V7 archive. It performs exact normalized-name overlap only and cannot grant eligibility or create identities. It has not yet been executed against the live owned V7 filesystem in this D2.1 pass.
+`tools/data-acquisition/international/build_v7_international_gap_review.py` is ready for read-only matching against the owned **24,916-row V7** archive. It performs exact normalized-name overlap only and cannot grant eligibility or create identities. It has not yet been executed against the live owned V7 filesystem in this D2.1 pass.
 
 Any useful V7 unmatched lead must be re-sourced from current permitted evidence before altering the accepted universe.
 
 ### Remaining D2.1 work — exact order
 
-1. **Continue the 213 outstanding high-signal school rows** in small checked-in batches; prioritize authoritative coverage, explicit aliases, provider/campus/division topology, then genuinely new re-sourced candidates.
+1. **Continue the 204 outstanding high-signal school rows** in small checked-in batches; prioritize authoritative coverage, explicit aliases, provider/campus/division topology, then genuinely new re-sourced candidates.
 2. **Execute the V7 read-only comparison** against all 24,916 owned rows when filesystem access is available; re-source every useful unmatched lead.
 3. **Run controlled Edarabia reference-only discovery**; do not bulk store or reproduce Edarabia content.
 4. **Run the institution/operator primary-source exhaustion pass** for remaining likely gaps and topology ambiguity.
@@ -151,7 +151,7 @@ Any useful V7 unmatched lead must be re-sourced from current permitted evidence 
 
 Status: **PARTIALLY BUILT / SECONDARY WHILE D2.1 REMAINS OPEN**
 
-Current accepted review state remains 30 reviewed institution drafts, 10 reviewed school-division drafts, 51 reviewed source/lead memberships, 67 original strong-source rows in the explicit identity-review queue, and 17 reviewed current-campus drafts across 15 institutions. New D2.1 evidence may not auto-materialize into canonical identities.
+Current accepted review state remains 30 reviewed institution drafts, 10 reviewed school-division drafts, 51 reviewed source/lead memberships, 67 original strong-source rows in the explicit identity-review queue, and 17 reviewed current campuses across 15 institutions. New D2.1 evidence may not auto-materialize into canonical identities.
 
 Accepted Discovery Identity Review run: **34994994433**. Accepted aggregate Campus Review run: **34972560009**.
 
@@ -177,7 +177,8 @@ Status: **NOT STARTED**. Freeze a deterministic presentation-neutral master expo
 
 ## Current accepted CI
 
-- `EDU-DATA-2 D2.1 Universe Checkpoint` — **35022596202** — green — 604 rows / 135 eligible / 466 supporting / 3 excluded; 55 school rows reviewed; 213 outstanding.
+- `EDU-DATA-2 D2.1 Universe Checkpoint` — **35024492612** — green — 604 rows / 135 eligible / 466 supporting / 3 excluded; 64 school rows reviewed; 204 outstanding.
+- `EDU-DATA-2 D2.1 Universe Checkpoint` — **35022596202** — green — batch 5 baseline; 55 school rows reviewed; 213 outstanding.
 - `EDU-DATA-2 D2.1 Universe Checkpoint` — **35021835175** — green — batch 4 baseline; 50 school rows reviewed; 218 outstanding.
 - `EDU-DATA-2 D2.1 Universe Checkpoint` — **35021093103** — green — batch 3 baseline; 41 school rows reviewed; 227 outstanding.
 - `EDU-DATA-2 D2.1 Universe Checkpoint` — **35010912245** — green — accepted Mansoura topology integration baseline.
