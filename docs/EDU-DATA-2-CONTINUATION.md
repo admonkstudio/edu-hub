@@ -1,6 +1,6 @@
 # EDU-DATA-2 Continuation Roadmap
 
-Last updated: 2026-09-15
+Last updated: 2026-09-16
 
 This file is the **durable continuation cursor for active Edu Hub work**. Read it after `AGENTS.md`, `docs/PROJECT-STATUS.md`, and `docs/PROJECT-DECISIONS.md` before changing code or data.
 
@@ -22,8 +22,8 @@ Canonical sequence:
 ## 2. Last accepted checkpoint
 
 - Workflow: `EDU-DATA-2 D2.1 Universe Checkpoint`
-- Accepted run: **35024492612**
-- Accepted head: **`e1c554e61c9f9fc0c8185182a37a33f13ab78ce4`**
+- Accepted run: **35025256648**
+- Accepted head: **`7aa5f49ddf90cf5cf36f5fc55da80bf040f1ceda`**
 - Conclusion: **green**
 
 Accepted source/evidence universe remains:
@@ -34,10 +34,6 @@ Accepted source/evidence universe remains:
 - **3 excluded**
 
 `604` is **not** a unique-institution count.
-
-Construction remains 332 pre-Cognia-current rows → 584 after complete Cognia supersession → 590 after Canadian authorization → 597 after ZfA DAS → 602 after substantive-international HE review → **604 after two reviewed eligible Mansoura College international-school evidence rows**.
-
-Historical source snapshots remain preserved.
 
 ## 3. Completed/frozen major source and review families
 
@@ -52,17 +48,7 @@ Historical source snapshots remain preserved.
 - 5-row reviewed substantive-international HE package: GIU, GUC, UFE, BUE and AASTMT;
 - Mansoura College provider/school topology review.
 
-### Higher-education scope rule
-
-Egyptian incorporation, private-university classification or national legal form does not automatically exclude an institution when separate current evidence establishes substantive **binational, intergovernmental, transnational or international-organizational status**. A foreign name, partnership, validated programme or dual degree alone remains insufficient.
-
-### Mansoura College topology — COMPLETE
-
-Review package: `tools/data-acquisition/international/seeds/mansoura-college-topology-review-2026-09-15.json`.
-
-Mansoura College Language School and Modern Mansoura College Language School remain national/provider context. Mansoura College British School and Mansoura College 2 International American School are the two eligible reviewed evidence additions. The provider umbrella is non-canonical; old Cognia/British Council rows remain separate provenance; the Overture umbrella row is a provider alias only.
-
-Do not restart this review unless current evidence changes or a regression is detected.
+The 70-row Overture higher-education queue is complete with zero outstanding rows. Mansoura College topology is complete. Do not restart either absent changed evidence/regression.
 
 ## 4. Current Overture state
 
@@ -81,10 +67,6 @@ Current Egypt-only acquisition remains:
 
 Overture remains supporting discovery only and grants zero eligibility.
 
-### Higher-education Overture review — COMPLETE
-
-The complete 70-row HE queue has **0 outstanding rows**. Do not restart it.
-
 ### High-signal school review — ACTIVE NEXT CURSOR
 
 Builder: `tools/data-acquisition/international/apply_overture_gap_resolutions.py`.
@@ -97,44 +79,38 @@ Accepted decision batches:
 - `overture-gap-resolution-2026-09-15-batch4.json`
 - `overture-gap-resolution-2026-09-15-batch5.json`
 - `overture-gap-resolution-2026-09-15-batch6.json`
+- `overture-gap-resolution-2026-09-16-batch7.json`
 
-Accepted run `35024492612` proves:
+Accepted run `35025256648` proves:
 
 - **266 input rows**;
-- **64 explicitly reviewed**;
-- **62 resolved/explained**;
+- **69 explicitly reviewed**;
+- **67 resolved/explained**;
 - **2 reviewed-but-unresolved**;
-- **202 unreviewed**;
-- **204 outstanding**.
+- **197 unreviewed**;
+- **199 outstanding**.
 
-Reviewed unresolved rows:
+Reviewed unresolved rows remain `Kada Modern British School` and `M.S.G International British School`.
 
-- `Kada Modern British School`
-- `M.S.G International British School`
+Batch 7 explicitly reconciled:
 
-Batch 6 explicitly resolved/reconciled:
+- `City International Schools` → Zamalek provider/branch/division topology associated with current British City College evidence;
+- `St. Fatima International School` → current Al Hegaz source identity;
+- `Future British International School` → current Tanta source identity while preserving the Overture coordinate defect;
+- `Producer of Life International American School` → current Hurghada Producer of Life source identity;
+- `Summits International Schools` → provider/division topology associated with the current American Division evidence.
 
-- `AlMaaly International School` → current Al Maaly Cognia source identity;
-- `Sun of Knowledge British International School` → current British Council source identity;
-- `British Modern School - BMS` → current British Modern School/Badr source identity;
-- `Lycée International Balzac` → current French homologation source family/UAI `3010006W`;
-- `International Schools of Kenana` → provider umbrella over National, American and British divisions, requiring D2.2 topology;
-- `Norwich International College - HR` → current Norwich Sheikh Zayed source identity;
-- `Future International Schools Sadat City Branch` → current Sadat City provider/branch evidence requiring D2.2 topology;
-- `Nordic international school in Cairo` → current Nordick/Nordic Sheikh Zayed source identity;
-- `British City College - IGCSE` → City International Schools British division/provider topology requiring D2.2.
+No canonical institution was created and no eligibility was granted by Overture, Cognia or British Council Partner status.
 
-All are source-resolution/topology decisions only. No canonical institution was created and no eligibility was granted by Overture, Cognia or British Council Partner status.
+### Held back
 
-### Deliberately not collapsed / held back
-
-`AIA International School` remains unreviewed because its Overture row is located in New Cairo, while the current authoritative AIA/Alexandria International Academy evidence is in Alexandria. Do not map it to the Alexandria source identity without separate current evidence for the New Cairo row.
-
-`Delta American School` remains held back pending stronger current evidence. Do not force an alias merely to reduce the queue.
+- `AIA International School`: New Cairo Overture row vs Alexandria authoritative school evidence.
+- `Delta American School`: insufficient current evidence for a safe mapping.
+- two `Sunrise International School` Hurghada Overture rows: insufficient first-party evidence connecting both place rows to the accepted `New Sunrise International School` source row; do not auto-deduplicate them.
 
 ## 5. Exact resume cursor — START HERE
 
-### Task A — continue the 204 outstanding high-signal school rows
+### Task A — continue the 199 outstanding high-signal school rows
 
 Work in small deterministic checked-in batches. Preferred outcome order:
 
@@ -144,9 +120,9 @@ Work in small deterministic checked-in batches. Preferred outcome order:
 4. genuinely new candidate with current permitted primary/recognized-source evidence;
 5. unresolved supporting-only lead.
 
-Continue from the current unreviewed high-signal artifact produced by accepted run `35024492612`. Use exact Overture IDs and current first-party/regulatory/accreditor evidence. Preserve duplicate place rows, branch distinctions and location mismatches explicitly; do not use fuzzy or location-insensitive aliasing.
+Continue from the unreviewed artifact produced by accepted run `35025256648`. Exact Overture IDs are mandatory; fuzzy similarity is research triage only.
 
-Evidence-rich rows already isolated for the next review include City International Schools in Zamalek, St. Fatima International School - Al Hegaz, Future British International School - Tanta, Producer of Life International American School in Hurghada, Summits International Schools, and two Sunrise International School Hurghada place rows. Each still requires an exact checked-in decision; duplicate place rows must remain separate evidence rows.
+The next evidence-rich group currently under review includes Delta College International School, Riada American School, Tiba International School - American Division, Egyptian English Language School / American Division, The Modern American School of Egypt, and Victory College American Department. Preserve provider/division/campus distinctions; do not use similarity alone.
 
 ### Task B — execute V7 read-only comparison
 
