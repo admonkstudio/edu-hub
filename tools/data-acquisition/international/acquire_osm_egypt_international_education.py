@@ -3,8 +3,10 @@
 
 OpenStreetMap is supporting identity/geography discovery only. To avoid
 country-wide Overpass overload, Egypt is covered by a fixed 3x4 bounding-box
-grid and each small tile is queried independently. Results may identify gaps,
-alternate names, campuses and coordinates but never establish eligibility.
+grid. Three bounded workers query independent tiles concurrently, avoiding the
+serial timeout amplification seen on public mirrors without creating high load.
+Results may identify gaps, alternate names, campuses and coordinates but never
+establish eligibility.
 """
 from __future__ import annotations
 
@@ -12,6 +14,7 @@ import argparse
 import json
 import time
 import unicodedata
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -29,6 +32,7 @@ NAME_PATTERN = (
 )
 LAT_EDGES = [22.0, 25.3, 28.6, 31.9]
 LON_EDGES = [24.5, 27.625, 30.75, 33.875, 37.0]
+MAX_WORKERS = 3
 
 
 def normalize(value: str | None) -> str | None:
@@ -55,14 +59,14 @@ def tiles() -> list[tuple[float, float, float, float]]:
 
 def query_for(bbox: tuple[float, float, float, float]) -> str:
     south, west, north, east = bbox
-    return f'''[out:json][timeout:20];
+    return f'''[out:json][timeout:15];
 (
   nwr["amenity"~"^(school|college|university)$"]["name"~"{NAME_PATTERN}",i]({south},{west},{north},{east});
 );
 out center tags;'''
 
 
-def fetch_tile(bbox: tuple[float, float, float, float], request_timeout_s: int) -> tuple[dict | None, str | None, list[str]]:
+def fetch_tile(index: int, bbox: tuple[float, float, float, float], request_timeout_s: int) -> dict:
     errors: list[str] = []
     headers = {"User-Agent": "EduHub-D2.1-supporting-discovery/1.0", "Accept": "application/json"}
     query = query_for(bbox)
@@ -70,33 +74,55 @@ def fetch_tile(bbox: tuple[float, float, float, float], request_timeout_s: int) 
         try:
             response = requests.post(endpoint, data={"data": query}, headers=headers, timeout=request_timeout_s)
             if response.status_code == 200:
-                return response.json(), endpoint, errors
+                payload = response.json()
+                return {
+                    "tile": index,
+                    "bbox": bbox,
+                    "status": "success",
+                    "endpoint": endpoint,
+                    "errors": errors,
+                    "elements": payload.get("elements", []),
+                }
             errors.append(f"{endpoint}: HTTP {response.status_code}")
         except Exception as exc:
             errors.append(f"{endpoint}: {type(exc).__name__}: {exc}")
-        time.sleep(0.5)
-    return None, None, errors
+        time.sleep(0.35)
+    return {"tile": index, "bbox": bbox, "status": "failed", "endpoint": None, "errors": errors, "elements": []}
 
 
 def build(output: Path, timeout_s: int) -> dict:
-    request_timeout_s = min(max(timeout_s, 10), 25)
-    elements: list[dict] = []
-    tile_summaries: list[dict] = []
-    endpoint_counts: dict[str, int] = {}
+    request_timeout_s = min(max(timeout_s, 8), 15)
+    work = list(enumerate(tiles(), start=1))
+    tile_results: list[dict] = []
 
-    for index, bbox in enumerate(tiles(), start=1):
-        payload, endpoint, errors = fetch_tile(bbox, request_timeout_s)
-        if payload is None:
-            tile_summaries.append({"tile": index, "bbox": bbox, "status": "failed", "endpoint": None, "errors": errors, "element_count": 0})
-            continue
-        tile_elements = payload.get("elements", [])
-        elements.extend(tile_elements)
-        endpoint_counts[endpoint] = endpoint_counts.get(endpoint, 0) + 1
-        tile_summaries.append({"tile": index, "bbox": bbox, "status": "success", "endpoint": endpoint, "errors": errors, "element_count": len(tile_elements)})
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        futures = {
+            executor.submit(fetch_tile, index, bbox, request_timeout_s): index
+            for index, bbox in work
+        }
+        for future in as_completed(futures):
+            tile_results.append(future.result())
 
-    failed_tiles = [item for item in tile_summaries if item["status"] != "success"]
+    tile_results.sort(key=lambda item: item["tile"])
+    failed_tiles = [item for item in tile_results if item["status"] != "success"]
     if failed_tiles:
         raise RuntimeError(f"OSM supporting discovery incomplete; failed tiles: {[item['tile'] for item in failed_tiles]}")
+
+    elements: list[dict] = []
+    endpoint_counts: dict[str, int] = {}
+    tile_summaries: list[dict] = []
+    for item in tile_results:
+        elements.extend(item["elements"])
+        endpoint = item["endpoint"]
+        endpoint_counts[endpoint] = endpoint_counts.get(endpoint, 0) + 1
+        tile_summaries.append({
+            "tile": item["tile"],
+            "bbox": item["bbox"],
+            "status": item["status"],
+            "endpoint": endpoint,
+            "errors": item["errors"],
+            "element_count": len(item["elements"]),
+        })
 
     records: list[dict] = []
     seen = set()
@@ -139,14 +165,15 @@ def build(output: Path, timeout_s: int) -> dict:
     duplicate_groups = {name: ids for name, ids in by_name.items() if len(ids) > 1}
 
     result = {
-        "schema_version": 3,
+        "schema_version": 4,
         "built_at": datetime.now(timezone.utc).isoformat(),
         "work_package": "D2.1_osm_egypt_international_education_supporting_discovery",
         "source": "OpenStreetMap via public Overpass API",
         "coverage_bbox": [22.0, 24.5, 31.9, 37.0],
         "tile_count": len(tile_summaries),
-        "successful_tile_count": len(tile_summaries) - len(failed_tiles),
-        "failed_tile_count": len(failed_tiles),
+        "successful_tile_count": len(tile_summaries),
+        "failed_tile_count": 0,
+        "max_concurrent_tile_requests": MAX_WORKERS,
         "tile_summaries": tile_summaries,
         "endpoint_tile_counts": endpoint_counts,
         "name_signal_pattern": NAME_PATTERN,
@@ -170,14 +197,19 @@ def build(output: Path, timeout_s: int) -> dict:
     }
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"tile_count": result["tile_count"], "record_count": len(records), "endpoint_tile_counts": endpoint_counts}, ensure_ascii=False, indent=2))
+    print(json.dumps({
+        "tile_count": result["tile_count"],
+        "record_count": len(records),
+        "endpoint_tile_counts": endpoint_counts,
+        "max_concurrent_tile_requests": MAX_WORKERS,
+    }, ensure_ascii=False, indent=2))
     return result
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=Path("artifacts/international/osm-egypt-international-education/osm-egypt-international-education.json"))
-    parser.add_argument("--timeout-s", type=int, default=20)
+    parser.add_argument("--timeout-s", type=int, default=12)
     args = parser.parse_args()
     build(args.output, args.timeout_s)
     return 0
