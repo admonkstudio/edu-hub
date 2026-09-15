@@ -95,7 +95,8 @@ jobs:
           python tools/data-acquisition/international/apply_overture_gap_resolutions.py \
             --decisions \
               tools/data-acquisition/international/seeds/overture-gap-resolution-2026-09-15-batch1.json \
-              tools/data-acquisition/international/seeds/overture-gap-resolution-2026-09-15-batch2.json
+              tools/data-acquisition/international/seeds/overture-gap-resolution-2026-09-15-batch2.json \
+              tools/data-acquisition/international/seeds/overture-gap-resolution-2026-09-15-batch3.json
       - name: Apply complete Overture higher-ed review decisions
         run: python tools/data-acquisition/international/apply_overture_higher_ed_resolutions.py
       - name: Assert checkpoint counts, Mansoura topology, Overture gaps and safety boundaries
@@ -194,15 +195,15 @@ jobs:
           assert gaps['overture_rows_auto_added_to_universe'] == 0
 
           assert resolutions['input_high_signal_rows'] == 266
-          assert resolutions['reviewed_rows'] == 30
-          assert resolutions['resolved_existing_or_authoritative_rows'] == 28
+          assert resolutions['reviewed_rows'] == 41
+          assert resolutions['resolved_existing_or_authoritative_rows'] == 39
           assert resolutions['reviewed_still_unresolved_rows'] == 2
-          assert resolutions['unreviewed_high_signal_rows'] == 236
-          assert resolutions['outstanding_high_signal_rows'] == 238
+          assert resolutions['unreviewed_high_signal_rows'] == 225
+          assert resolutions['outstanding_high_signal_rows'] == 227
           assert resolutions['decision_counts'] == {
-              'covered_by_current_authoritative_source_family': 1,
-              'existing_provider_division_requires_d2_2_review': 3,
-              'existing_source_identity_alias': 24,
+              'covered_by_current_authoritative_source_family': 3,
+              'existing_provider_division_requires_d2_2_review': 6,
+              'existing_source_identity_alias': 30,
               'unresolved_supporting_only': 2,
           }
 
