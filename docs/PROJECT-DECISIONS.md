@@ -72,7 +72,7 @@ Reference: `tools/data-acquisition/international/seeds/substantive-international
 
 **Decision:** Current ZfA DAS membership is distinct from current exam authorization. Deutsche Schule Hurghada retains current DAS evidence while the checked KMK Sek-I lifecycle records last conducted year `2024/2025`; no later Sek-I authorization is asserted.
 
-**Decision:** Accepted D2.1 run **`35022596202`** establishes the current **604 source/evidence row** checkpoint: **135 eligible / 466 supporting / 3 excluded**. `604` is not a unique-institution count.
+**Decision:** Accepted D2.1 run **`35024492612`** establishes the current **604 source/evidence row** checkpoint: **135 eligible / 466 supporting / 3 excluded**. `604` is not a unique-institution count.
 
 ## 9. Supporting discovery qualification is evidence-separated
 
@@ -162,11 +162,11 @@ Reference: `docs/SOURCE-USAGE-POLICY.md`.
 
 **Decision:** Overture higher-education review and Mansoura College topology are complete and must not be restarted absent changed evidence/regression.
 
-**Decision:** Five high-signal school batches are accepted. Run **35022596202** proves **55 reviewed / 53 resolved-explained / 2 unresolved / 211 unreviewed / 213 outstanding** from the 266-row high-signal school queue.
+**Decision:** Six high-signal school batches are accepted. Run **35024492612** proves **64 reviewed / 62 resolved-explained / 2 unresolved / 202 unreviewed / 204 outstanding** from the 266-row high-signal school queue.
 
-**Decision:** Batch 5 resolves the AIS Egypt Overture row specifically to the existing **West Campus** IB source identity/code `049504` and preserves it as distinct from East Campus code `000654`; keeps Royal British New Damietta and Al Karma as provider/division/name-topology work; resolves Solaimaneyah and Creatives 10th of Ramadan to their exact current source identities; and preserves the Creatives Sharqia row as distinct from the separate Giza Creative lead.
+**Decision:** Batch 6 explicitly reconciles AlMaaly International School; Sun of Knowledge British International School; British Modern School - BMS; Lycée International Balzac; International Schools of Kenana; Norwich International College - HR; Future International Schools Sadat City Branch; Nordic international school in Cairo; and British City College - IGCSE. Kenana, Future Sadat and British City remain provider/division/branch topology work, while Lycée International Balzac resolves through the current French homologation family. None of these decisions grants eligibility from Overture, Cognia or British Council Partner status.
 
-**Decision:** The exact next D2.1 task is the remaining **213 high-signal school rows**, processed in small deterministic evidence-backed batches, followed by V7 read-only gap comparison, Edarabia reference-only pass and institution/operator primary-source exhaustion.
+**Decision:** The exact next D2.1 task is the remaining **204 high-signal school rows**, processed in small deterministic evidence-backed batches, followed by V7 read-only gap comparison, Edarabia reference-only pass and institution/operator primary-source exhaustion.
 
 **Decision:** AIA International School is not currently mapped to the known Alexandria AIA source identity because the Overture row is located in New Cairo while current authoritative AIA evidence is in Alexandria. It remains separate research work unless current evidence resolves the discrepancy.
 
