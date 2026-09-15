@@ -45,7 +45,7 @@ Review contract: `tools/data-acquisition/international/seeds/mansoura-college-to
 
 ## Current expanded D2.1 source/evidence universe
 
-Accepted `EDU-DATA-2 D2.1 Universe Checkpoint` run **`35024492612`** at head `e1c554e61c9f9fc0c8185182a37a33f13ab78ce4` proves:
+Accepted `EDU-DATA-2 D2.1 Universe Checkpoint` run **`35025256648`** at head `7aa5f49ddf90cf5cf36f5fc55da80bf040f1ceda` proves:
 
 - **604 total source/evidence rows**;
 - **135 eligible source/evidence rows**;
@@ -84,16 +84,16 @@ Against the **604-row** universe, deterministic exact normalized-name comparison
 
 ### High-signal school review
 
-Six checked-in school-review batches now cover **64 of the 266** high-signal pre-university rows:
+Seven checked-in school-review batches now cover **69 of the 266** high-signal pre-university rows:
 
-- **62 resolved/explained** as existing authoritative coverage, explicit source aliases, or provider/division cases requiring D2.2 topology review;
+- **67 resolved/explained** as existing authoritative coverage, explicit source aliases, or provider/division cases requiring D2.2 topology review;
 - **2 reviewed-but-unresolved** supporting leads;
-- **202 high-signal rows remain unreviewed**;
-- **204 rows remain outstanding** in the school-review artifact.
+- **197 high-signal rows remain unreviewed**;
+- **199 rows remain outstanding** in the school-review artifact.
 
 The two reviewed unresolved rows remain `Kada Modern British School` and `M.S.G International British School`.
 
-Batch 6 explicitly reviewed AlMaaly International School, Sun of Knowledge British International School, British Modern School - BMS, Lycée International Balzac, International Schools of Kenana, Norwich International College - HR, Future International Schools Sadat City Branch, Nordic international school in Cairo, and British City College - IGCSE. Kenana, Future Sadat and British City remain provider/division/branch topology work rather than flattened identities. Lycée International Balzac resolves through the current French homologation family. Cognia and British Council Partner status remain supporting evidence only and grant no eligibility.
+Batch 7 explicitly reviewed City International Schools (Zamalek provider/branch/division topology), St. Fatima International School Al Hegaz, Future British International School - Tanta, Producer of Life International School in Hurghada, and Summits International Schools. The Future British Overture row contains a coordinate defect inconsistent with its own Tanta address; the explicit resolution relies on matching current school/address evidence and does not treat the bad coordinate as identity authority. City International and Summits remain provider/division topology work rather than flattened identities.
 
 ### Higher-education review — complete
 
@@ -109,7 +109,7 @@ OpenStreetMap remains a permitted supporting source, but all public Overpass mir
 
 D2.1 remains open for:
 
-- continued explicit review of the **204 outstanding high-signal school rows** in small deterministic batches;
+- continued explicit review of the **199 outstanding high-signal school rows** in small deterministic batches;
 - read-only comparison against the owned **24,916-row V7** archive, with useful unmatched leads re-sourced from current permitted evidence before use;
 - controlled Edarabia reference-only discovery under `docs/SOURCE-USAGE-POLICY.md`;
 - institution/operator primary-source exhaustion for remaining likely gaps and topology ambiguity.
