@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "batch_id": "overture-gap-resolution-2026-09-16-batch7",
+  "snapshot_date": "2026-09-16",
+  "records_count": 5,
+  "records": [
+    {
+      "overture_id": "416d7f66-6c4a-488f-98cd-925463ba7530",
+      "overture_name": "City International Schools",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:british-city-college",
+      "target_name_en": "British City College",
+      "evidence_urls": [
+        "https://cisegypt.edu.eg/",
+        "https://cisegypt.edu.eg/british/",
+        "https://cisegypt.edu.eg/british/contact/",
+        "https://cisegypt.edu.eg/american/contact/",
+        "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf"
+      ],
+      "review_note": "Current City International Schools primary evidence presents an umbrella with American Zamalek, British Zamalek and American October choices. The British division contact is 130 26th July Street, Zamalek, matching the Overture 130 26th of July Corridor row and its cisegypt.edu.eg British application URL. The accepted British City College source row therefore supplies current source coverage for this British/provider relationship, but the Overture provider-wide label must remain D2.2 provider/branch/division topology rather than being flattened into a single curriculum identity. British Council Partner status grants no eligibility."
+    },
+    {
+      "overture_id": "fb7c0a8a-1112-4d99-a990-7b2f9aae5627",
+      "overture_name": "St. Fatima International School",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:st-fatima-international-school-hegaz",
+      "target_name_en": "St. Fatima International School AL Hegaz",
+      "evidence_urls": [
+        "https://sfis-hegaz.com/",
+        "https://sfis-hegaz.com/contacts/",
+        "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf"
+      ],
+      "review_note": "Current SFIS-Hegaz primary evidence identifies St. Fatima International School at 152 Al Hegaz Street, Heliopolis, with landline +2 02 21 80 52 37 and info@sfis-hegaz.com. Those details match the Overture row and distinguish it from separate St. Fatima Nasr City/Badr source identities. This is an explicit Al Hegaz source alias only; British Council Partner status grants no eligibility and no canonical merge is performed."
+    },
+    {
+      "overture_id": "e01e44b4-50d9-49c5-95fd-6db0e43e2434",
+      "overture_name": "Future British International School",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:future-british-international-school-tanta",
+      "target_name_en": "Future British International School - Tanta",
+      "evidence_urls": [
+        "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf",
+        "https://www.britishcouncil.org.eg/sites/default/files/ebook_january_version_2025.pdf"
+      ],
+      "review_note": "The Overture row itself identifies Tanta - AlMahalla Alkubra Road, 1Km, next to Carrefour Orouba Mall. British Council school directories identify Future British International School - Tanta at Kilo 1 Tanta–El Mahala Elkobra Road, matching the accepted September 2026 Tanta source identity. The Overture coordinate is inconsistent with its own Tanta address, so the decision relies on the exact school/address evidence and records the coordinate defect rather than using geography as merge authority. British Council Partner status grants no eligibility."
+    },
+    {
+      "overture_id": "d30aafac-310f-47a2-8043-587f0191c230",
+      "overture_name": "Producer of Life International American School",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-189",
+      "target_name_en": "Producer of Life International School",
+      "evidence_urls": [
+        "https://www.plishrg.com/pdfs/Fees.pdf",
+        "https://www.plishrg.com/",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "Current institution-primary 2025/26 fee evidence names Producer of Life International School at El Dahar, Nagda Blocks, Hurghada, aligning with the Overture Takseem el nagda Hurghada row and the accepted current Cognia Hurghada source identity. The Overture 'American School' wording is treated as source naming/curriculum context rather than a separate canonical institution. Cognia presence alone grants no eligibility."
+    },
+    {
+      "overture_id": "d8e6dc5a-d847-4b94-a415-732db5a459e2",
+      "overture_name": "Summits International Schools",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-228",
+      "target_name_en": "Summits International Schools - American Division",
+      "evidence_urls": [
+        "https://summitsschools.com/",
+        "https://summitsschools.com/american",
+        "https://summitsschools.com/ar/british",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "Current Summits International Schools primary evidence exposes separate American and British admission paths under the same provider brand. The Overture provider-wide row therefore aligns with the accepted current American Division source evidence but cannot be flattened into that division. Preserve the provider/division relationship for D2.2; Cognia presence alone grants no eligibility and no canonical merge is performed."
+    }
+  ],
+  "rules": {
+    "resolution_is_discovery_triage_not_canonical_identity_merge": true,
+    "fuzzy_matching_authorizes_nothing": true,
+    "division_provider_relationships_require_d2_2_review": true,
+    "source_coordinate_defects_do_not_override_exact_current_address_evidence": true,
+    "location_mismatch_blocks_automatic_aliasing_without_explicit_resolution": true,
+    "overture_grants_no_international_eligibility": true,
+    "canonical_institutions_created": 0,
+    "automatic_identity_merges_performed": 0,
+    "database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
