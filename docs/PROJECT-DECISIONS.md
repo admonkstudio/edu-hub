@@ -1,336 +1,249 @@
 # Edu Hub Project Decisions
 
-This file contains the **active durable decisions** for the current product scope.
+This file contains the **active durable decisions** for the current Edu Hub scope. Detailed historical decision text remains preserved in Git history and on the historical national-registry branch where applicable. If an older chat or document conflicts with this file, `AGENTS.md`, the latest verified `PROJECT-STATUS.md`, and `EDU-DATA-2-CONTINUATION.md`, use the newer verified repository state.
 
-Historical national-registry decisions remain preserved on branch `edu-data-1-national-registry` and in Git history. They are not active instructions unless explicitly carried forward below.
+Last consolidated: 2026-09-15.
 
-## 2026-08-18 — Ownership and product model
+## 1. Ownership, audience and product model
 
 **Decision:** Edu Hub is an Admonk-owned product venture presented as an independent brand.
 
-**Decision:** Egypt is the first market.
+**Decision:** Egypt is the first market. Parents and students are the primary audience.
 
-**Decision:** Parents and students are the primary audience.
+**Decision:** Phase 1 is a trustworthy bilingual discovery/knowledge product and data foundation. Monetization is deferred.
 
-**Decision:** Phase 1 focuses on trustworthy discovery/directory data, editorial authority, research/admin operations, bilingual SEO architecture and the data foundation. Monetization is deferred.
+## 2. Database-first execution gate
 
-## 2026-08-18 — Platform
+**Decision:** The active project milestone is `EDU-DATA-2 — Egypt International Education Registry` on branch `edu-data-2-international-registry`.
 
-**Decision:** Astro + TypeScript remains an approved frontend/application direction.
+**Decision:** Current execution order is binding:
 
-**Superseded:** The previous decision naming Supabase as the initial database/auth/storage platform is no longer active.
+`D2.1 universe → D2.2 identities/providers/campuses/divisions → D2.3 EN/AR → D2.4 enrichment → D2.5 media → D2.6 completeness audit → D2.7 portable freeze`.
 
-**Decision (2026-09-14):** Edu Hub will not use Supabase.
+**Decision:** Final Astro-first vs Instatic-first selection, public-page architecture, filter UX, visual design and production frontend work are deferred until D2.7 is frozen.
 
-**Decision (2026-09-14):** The product should eventually be implemented as either Astro-first or Instatic-first. Instatic is the approved self-hosted CMS/publisher option. A hybrid Astro + Instatic stack is allowed only if there is a clear product need and one canonical data owner is defined.
+**Decision:** Supabase is not part of Edu Hub. Ask Kalam infrastructure/data must remain unrelated.
 
-**Decision (2026-09-14):** The final Astro vs Instatic presentation/runtime choice is deferred until the database-completion gate is satisfied. Current data architecture must not be bent around a premature frontend/CMS decision.
+**Decision:** The data/research layer must remain portable and presentation-neutral. The relational SQL model is a domain/reference model; physical runtime storage is chosen later.
 
-**Decision (2026-09-14):** The data/research layer must remain portable and independent of Supabase-specific database, auth, storage, RLS, Edge Functions or APIs.
+## 3. Evidence architecture and source of truth
 
-**Decision (2026-09-14):** The relational SQL model remains a canonical domain/reference model, but physical runtime storage is a later implementation choice.
+**Decision:** The logical data path remains:
 
-**Decision:** Arabic and English are first-class locales from launch, initially `ar-EG` and `en-EG`.
+`external source → raw evidence → staging/reconciliation → reviewed canonical data → public projection → website`.
 
-## 2026-08-18 — Data trust
+**Decision:** Raw and staging layers are private and never published directly.
 
-**Decision:** Official, regulatory, accreditation and institution-primary evidence is preferred over secondary directories.
+**Decision:** Official/regulatory/accreditation/institution-primary evidence is preferred over secondary directories.
 
-**Decision:** Factual verification is separate from commercial/payment status.
+**Decision:** Conflicting assertions remain explicit review work. Missing facts never justify invented values.
 
-**Decision:** Important changing facts preserve source provenance and history where practical.
+**Decision:** Current changing facts should preserve lifecycle/history rather than silently overwrite older evidence.
 
-**Decision:** AI may assist research, matching, localization and drafting but may not invent unsupported institution facts or silently overwrite verified canonical values.
+**Decision:** AI may assist research, matching, localization and drafting but may not invent unsupported facts or silently promote review hints to canonical truth.
 
-## 2026-09-06 — Owned data and media independence
+## 4. Active international-education scope
 
-**Decision:** Edu Hub retains its own persistent copy of acquired data needed to operate the product. Public pages do not depend on live third-party APIs after acquisition.
-
-**Decision:** Media provenance and rights are separate from possession of a file. Public-use eligibility must be explicit.
-
-**Decision:** Published pages must not hotlink source-site images as an operational dependency.
-
-**Decision:** Identical media binaries should be content-addressed/deduplicated where the selected runtime supports it while preserving every source-to-media provenance link.
-
-## 2026-09-13 — Evidence architecture retained
-
-**Decision:** The enforced logical data path remains:
-
-`external source -> edu_raw -> edu_staging -> edu_core -> public projection -> website`
-
-**Decision:** `edu_raw` and `edu_staging` are private evidence/research layers and are never published directly.
-
-**Decision:** Identity validity is separate from profile completeness. Missing fees, media or contact fields do not justify invented values.
-
-**Decision:** Conflicting assertions remain review work until resolved.
-
-**Decision:** If Instatic/SQLite/static artifacts are selected later, the logical raw/staging/core boundaries must still be preserved even if the physical storage implementation differs from the PostgreSQL reference schemas.
-
-## 2026-09-14 — Scope reset to international education
-
-**Decision:** EDU-DATA-2 supersedes the national all-institution registry as the active milestone.
-
-**Decision:** Active Phase 1 coverage is limited to international education in Egypt:
+**Decision:** Active Phase 1 scope is international education in Egypt, including:
 
 - private/independent international schools;
 - private/independent IB World Schools;
 - recognized foreign-national/international school models;
 - recognized foreign university branch campuses;
-- internationally chartered/accredited independent higher-education institutions whose international status is substantive.
+- internationally chartered/accredited/binational/transnational institutions whose international status is substantive.
 
-**Decision:** Egyptian public schools, Egyptian public universities, the 62,690-school EMIS target and the 48,225-nursery MOSS target are no longer active product requirements.
+**Decision:** Egyptian public schools and ordinary Egyptian public universities are not active Phase 1 targets.
 
-**Decision:** The national-registry work is retained historically rather than deleted. It may support future expansion but must not drive current acquisition or publication.
+**Decision:** Historical national-registry work is retained as evidence/history and may support future expansion, but it does not drive current publication.
 
-## 2026-09-14 — International eligibility standard
+## 5. International eligibility standard
 
-**Decision:** Every candidate has an explicit scope state: `candidate`, `eligible`, `excluded`, or `needs_review`.
+**Decision:** Every candidate has an explicit scope/review state. International branding words such as `International`, `American`, `British`, `German`, `Canadian`, etc. never establish eligibility by themselves.
 
-**Decision:** International status must be evidenced. A name containing words such as `International`, `American`, `British`, `German`, etc. is never sufficient by itself.
+**Decision:** Strong school evidence may include active IB authorization, official French homologation, recognized German foreign-school evidence, BSO/recognized foreign-national status, or comparable current regulatory/accreditation evidence combined with the relevant ownership/scope rule.
 
-**Decision:** Strong eligibility evidence can include active IB authorization, official French homologation, official German/KMK recognition, Egyptian regulator recognition of a foreign university branch, or comparable recognized regulatory/accreditation evidence.
+**Decision:** British Council Partner School/attached-centre status is discovery/support evidence only and does not itself grant eligibility.
 
-**Decision:** British Council Partner School/attached-centre status is discovery/support evidence and does not automatically make an institution eligible. An exam centre can still be an ordinary Egyptian language/private school.
+**Decision:** Cognia registry presence is accreditation/support evidence and does not automatically establish Edu Hub international eligibility.
 
-**Decision:** Overture, OpenStreetMap, commercial directories and the historical V7 archive are supporting/discovery sources. They cannot establish international eligibility alone.
+**Decision:** Overture, OpenStreetMap, V7 and commercial directories are supporting/discovery sources. They cannot grant international eligibility alone.
 
-**Decision:** Public/state international-school initiatives remain excluded unless the project owner later changes scope.
+## 6. Higher-education boundary — substantive international status
 
-## 2026-09-14 — Edarabia source policy
+**Decision:** Recognized current foreign university branches are eligible.
 
-**Decision:** Edarabia remains useful as a **reference-only discovery index**, not as a bulk acquisition source.
+**Decision:** AUC is eligible as an internationally chartered/accredited independent institution when backed by current institutional and recognized accreditation evidence.
 
-**Decision:** The current published Edarabia terms prohibit systematic storage/reproduction/commercial reuse of Edarabia content without prior written permission. Therefore Edu Hub must not bulk scrape, systematically store, reproduce or publish Edarabia page content unless written permission/license is obtained.
+**Decision:** Egyptian incorporation, private-university classification or national legal form is **not automatically exclusionary** when separate current evidence establishes substantive **binational, intergovernmental, transnational or international-organizational status**.
 
-**Decision:** An Edarabia listing may identify a school or a potentially missing field, but the actual fact must be re-sourced from an official institution website, regulator, accreditor, awarding body or another permitted source before it enters canonical data.
+**Decision:** A foreign partnership, exchange, franchise, validation, dual-degree arrangement or international-sounding name alone remains insufficient. Those relationships may later be represented at programme level without making the whole institution internationally scoped.
 
-**Decision:** Edarabia does not establish international eligibility, accreditation, regulatory status or canonical fees.
+**Decision:** The 2026-09-15 reviewed substantive-international HE package qualifies the following source/evidence rows under this standard:
 
-**Decision:** Edarabia ratings/reviews are not imported into canonical data.
+- German International University (GIU) — current German-Egyptian/transnational evidence;
+- German University in Cairo (GUC) — current binational/transnational evidence;
+- French University in Egypt (UFE) — Franco-Egyptian intergovernmental/dual-ministry evidence;
+- The British University in Egypt (BUE) — Egypt–UK establishment basis plus substantive UK-validated institutional model;
+- Arab Academy for Science, Technology and Maritime Transport (AASTMT) — League of Arab States specialized-organization status and SCU international/framework classification.
 
-**Decision:** Edarabia images are not copied or published unless independent reuse rights are established.
+**Decision:** These five rows are source/evidence additions, not five automatically created unique canonical institutions.
 
-**Canonical source-use policy:** `docs/SOURCE-USAGE-POLICY.md`.
+**Reference:** `tools/data-acquisition/international/seeds/substantive-international-higher-ed-review-2026-09-15.json`.
 
-## 2026-09-14 — Higher-education boundary
+## 7. Overture higher-education review boundary
 
-**Decision:** Recognized foreign university branches are included.
+**Decision:** Overture category/name signals are triage inputs only. Every HE decision must be explicit and source-backed; no row is promoted because Overture labels it `college_university`.
 
-**Decision:** The American University in Cairo is eligible as an internationally chartered/accredited independent institution when supported by current institutional and recognized accreditation evidence.
+**Decision:** At the accepted 2026-09-15 checkpoint, the full 70-row post-overlay HE queue is explicitly reviewed with **0 HE rows outstanding**:
 
-**Decision:** An Egyptian university is not classified as internationally scoped merely because it has a foreign partnership, exchange, dual degree, franchise or validated programme. Those relationships may later be represented at programme level.
+- 14 existing eligible HE aliases/subunits;
+- 21 out-of-scope Egyptian HE rows/subunits without sufficient substantive-international status;
+- 33 supporting-only academy/training/institute leads with no qualifying current HE evidence;
+- 1 Overture category error resolving to existing Egypt British International School BSO evidence;
+- 1 Overture category error (`Mansoura College International Schools`) rerouted to pre-university provider/division review.
 
-## 2026-09-14 — Campus identity
+**Decision:** Rerouting a category error does not create or merge an identity.
 
-**Decision:** Institution and campus identities are separate. Multiple campuses of the same school/university should not be silently represented as unrelated institutions.
+**References:** `overture-higher-ed-scope-review-2026-09-15-batch1.json` and `apply_overture_higher_ed_resolutions.py`.
 
-**Decision:** Source-specific campus records are reconciled under one canonical institution where the evidence supports that relationship.
+## 8. Source-family and layer-count semantics
 
-## 2026-09-14 — Media publication boundary
+**Decision:** Source/evidence counts, reviewed identity counts, campus counts and division counts are separate contracts and must never be conflated.
 
-**Decision:** Official institution website/social images may be collected as media discovery candidates/provenance, but they remain `public_use_allowed=false` unless a defensible reuse basis exists.
+**Decision:** The deterministic 96-row foundational seed and 106-row historical classified strong-source layer remain independently reproducible provenance layers.
 
-**Decision:** Publication-safe media may come from institution-provided permission, a verified institution claim, Wikimedia Commons/open licenses with attribution preserved, or original Edu Hub/Admonk production.
+**Decision:** Complete current source families may supersede an older same-publisher subset **for current universe counting only** when the supersession is deterministic and explicit. Historical evidence is preserved.
 
-**Decision:** When no safe media is available, the product uses a designed placeholder containing the institution's English name rather than Arabic initials, scraped imagery or hotlinks.
+**Decision:** The four historical Cognia milestone rows are superseded for current counting by the complete 256-row Cognia Egypt registry; only their already-reviewed decisions carry forward through exact same-publisher/name logic. The other Cognia rows receive no automatic eligibility.
 
-## 2026-09-14 — Database cleanup strategy
+**Decision:** Canadian offshore-school and ZfA DAS evidence are additive source families, not automatic unique-institution additions.
 
-**Decision:** Create a new active branch `edu-data-2-international-registry` rather than destructively rewriting the historical national-registry branch.
+**Decision:** Current ZfA DAS membership is distinct from current exam authorization. Deutsche Schule Hurghada retains current DAS evidence while the checked KMK Sek-I lifecycle records last conducted year `2024/2025`; no later Sek-I authorization is asserted.
 
-**Decision:** The clean data model extends the evidence layers with explicit providers, campuses, international eligibility, curricula, accreditations, contacts, fees, admissions, higher-education structures and rights-aware media metadata.
+**Decision:** Accepted D2.1 run `35009564541` establishes the current **602 source/evidence row** checkpoint: **133 eligible / 466 supporting / 3 excluded**. `602` is not a unique-institution count.
 
-**Decision:** Legacy V7 data is not bulk-promoted into the clean registry. Only legacy rows matched to an EDU-DATA-2 eligible institution may contribute supporting assertions.
+## 9. Supporting discovery qualification is evidence-separated
 
-**Superseded:** Edu Hub no longer requires a dedicated Supabase project.
+**Decision:** Supporting discovery may expand research coverage without rewriting historical strong-source layers.
 
-**Decision:** Ask Kalam infrastructure remains unrelated and must not receive Edu Hub data.
+**Decision:** Discovery rows remain supporting candidates until a separate explicit review supplies qualifying primary/regulatory/accreditation evidence.
 
-## 2026-09-14 — Database-first completion gate
+**Decision:** Primary re-sourcing is additive. Discovery provenance records how a lead was found; it is not automatically the eligibility basis.
 
-**Decision:** The current project priority is **database completion and bilingual data architecture before presentation**.
+**Decision:** No unmatched row is assumed unique merely because no duplicate has yet been found.
 
-**Decision:** No final Astro/Instatic selection, profile template, filter UX, visual system or public-page architecture should drive the data model during this gate.
+## 10. Identity, provider, campus and division boundaries
 
-**Decision:** English and Arabic are modeled as first-class localizations of one canonical factual entity model. Language-neutral facts are stored once; localized names/descriptions/display text are stored separately with localization origin/status.
+**Decision:** Institution, provider/group, physical campus and curriculum/language/phase division are distinct concepts.
 
-**Decision:** Prefer official Arabic names where available. Where no official Arabic form exists, transliteration/editorial localization must be explicitly marked and must never be presented internally as an official sourced name.
+**Decision:** A British, American, French, IB or other section inside the same school/provider must not be silently duplicated as a separate institution merely because one source lists that section independently.
 
-**Decision:** Database completeness is measured independently across factual coverage, English localization, Arabic localization, provenance/conflict state and media coverage.
+**Decision:** Division-scoped curriculum, accreditation, admissions, contacts, fees and programme evidence must stay division-scoped unless broader evidence supports institution-wide promotion.
 
-**Decision:** Fees and admissions are versioned by academic year/cycle. New values do not overwrite historical values.
+**Decision:** Cross-source reconciliation may conclude `same institution, different division` or `same provider, distinct school/campus` without forcing either duplication or a broad merge.
 
-**Decision:** Every eligible institution must have an explicit media status even when no publishable image exists. `placeholder_required` is a valid completed media state.
+**Decision:** A reviewed institution does not imply a complete campus topology. `current campus evidenced` and `campus structure complete` are separate states.
 
-**Decision:** The database-completion gate ends with a deterministic, presentation-neutral export containing canonical identities, EN/AR localization, source references, historical/time-sensitive facts, media manifest/rights, conflict state and completeness metrics.
+**Decision:** One known address never proves one-campus completeness. Historical locations are not current campuses unless current evidence supports them.
 
-**Decision:** Provenance is not limited to institution-level fields. Campuses, programmes, facilities, admission requirements, fee items and media/localized fields must be able to retain source evidence and review state.
+**Decision:** Multi-campus review is explicit and additive; absence of another known campus is not proof that none exists.
 
-**Decision:** Name matching performed during candidate discovery produces review hints only; it never authorizes a canonical merge.
+## 11. Review artifacts are not runtime database writes
 
-**Canonical plan:** `docs/DATABASE-COMPLETION-PLAN.md`.
+**Decision:** D2.2 may materialize deterministic reviewed draft artifacts before runtime storage is selected, provided provenance and review boundaries are preserved.
 
-## 2026-09-14 — SEO/publication boundary retained
+**Decision:** Deterministic draft IDs do not by themselves create canonical runtime rows or publication rights.
 
-**Decision:** A database/content record does not automatically become an indexable page.
+**Decision:** Identity review and eligibility remain separate. Grouping source records does not automatically select institution-wide scope where evidence remains division-specific or conflicted.
+
+**Decision:** Incremental explicit identity-review batches are additive, checked in and exact-source-key based. They may not retarget already-reviewed rows or auto-merge identities.
+
+**Decision:** Incremental source overlays preserve the foundational snapshot. New current evidence is layered rather than destructively rewriting historical evidence.
+
+## 12. Name matching and automation safety
+
+**Decision:** Normalized-name or fuzzy similarity may generate review hints only. It never authorizes a canonical merge.
+
+**Decision:** No pipeline may auto-create canonical institutions, auto-merge source identities, auto-infer campus completeness, or auto-publish raw/staging data.
+
+**Decision:** Exact source keys/Overture IDs are required for checked-in gap-resolution decisions.
+
+## 13. OSM and geospatial discovery
+
+**Decision:** OSM remains a permitted supporting discovery/geography source.
+
+**Decision:** Hosted CI Overpass failure is diagnostic state, not negative evidence. Accepted diagnostic run `34997269459` recorded all 12 Egypt tiles blocked as `environment_blocked_all_tiles`; this must never be reported as zero OSM candidates.
+
+**Decision:** Overture is the current functioning broad geospatial supporting layer. It still cannot grant eligibility.
+
+## 14. V7 owned archive
+
+**Decision:** Legacy V7 is not bulk-promoted into the clean registry.
+
+**Decision:** The 24,916-row V7 archive may be queried read-only for exact overlap and missing-name discovery. Useful unmatched legacy leads must be re-sourced from a current permitted source before altering accepted D2.1 evidence or eligibility.
+
+**Decision:** V7 matching performs no fuzzy auto-merge and creates no canonical identities.
+
+## 15. Edarabia policy
+
+**Decision:** Edarabia is **reference-only discovery**, not a bulk acquisition source.
+
+**Decision:** Do not bulk scrape, systematically store, reproduce or publish Edarabia content unless written permission/license is obtained.
+
+**Decision:** Any useful Edarabia lead/fact must be re-sourced from an institution-primary, regulator, accreditor, awarding-body or otherwise permitted source before canonical use.
+
+**Decision:** Edarabia ratings/reviews and images are not imported into canonical/public data without an independent lawful basis.
+
+**Reference:** `docs/SOURCE-USAGE-POLICY.md`.
+
+## 16. EN/AR localization
+
+**Decision:** Arabic and English are first-class locales tied to one factual entity graph.
+
+**Decision:** Language-neutral facts are stored once; localized names/descriptions/display text retain localization origin/status.
+
+**Decision:** Prefer official Arabic names where available. Transliteration/editorial Arabic must be explicitly marked and never represented internally as official sourced Arabic.
+
+## 17. Fees, admissions and temporal facts
+
+**Decision:** Fees and admissions are versioned by academic year/cycle; new values do not overwrite historical values.
+
+**Decision:** Lifecycle-sensitive regulatory/accreditation facts retain dates/status and are not silently presented as current after expiry or supersession.
+
+## 18. Media rights and publication boundary
+
+**Decision:** Edu Hub may retain media discovery/provenance without having publication rights.
+
+**Decision:** Official institution website/social images remain `public_use_allowed=false` unless a defensible reuse basis exists.
+
+**Decision:** Publication-safe media may come from institution permission/claim, verified open/Wikimedia licensing with attribution, or original Edu Hub/Admonk production.
+
+**Decision:** If no safe image exists, a designed placeholder using the institution's English name is valid and preferable to scraping/hotlinking.
+
+**Decision:** Every eligible final institution must reach a terminal media state, including `placeholder_required` where appropriate.
+
+## 19. SEO/publication boundary
+
+**Decision:** A database record does not automatically become an indexable page.
 
 **Decision:** Arbitrary filter combinations do not automatically generate SEO pages.
 
-**Decision:** Only reviewed public projections are eligible for publication/indexing.
+**Decision:** Only reviewed public projections may be published/indexed.
 
-## 2026-09-15 — Pre-university curriculum divisions are first-class subentities
+## 20. Durable continuation and handoff
 
-**Decision:** A school institution, a physical campus, and a curriculum/language/phase division are distinct concepts. A British, American, French, IB or other section operating inside the same school/campus must not be silently duplicated as a separate canonical institution merely because an accreditor or source lists that section independently.
+**Decision:** `docs/EDU-DATA-2-CONTINUATION.md` is the durable execution cursor and GitHub Issue #8 is the visible roadmap.
 
-**Decision:** Division-specific evidence must retain its real scope. French homologation, Cognia accreditation, BSO/inspection evidence, curriculum offerings, admissions, contacts or fees that apply to one division must not automatically be promoted to the entire institution.
+**Decision:** Every substantial continuation agent must read `AGENTS.md`, `PROJECT-STATUS.md`, this decision file, the continuation file, Issue #8 and `DATASET-LAYERS.md` before resuming.
 
-**Decision:** The canonical reference model therefore includes `school_divisions` below institution/campus identity, with bilingual localizations and division-scoped curricula, certificates, languages, accreditation, education levels, contacts, admissions, fees and completeness metrics.
+**Decision:** After every material accepted checkpoint, update deterministic code/evidence, obtain green CI, then synchronize `DATASET-LAYERS.md`, `PROJECT-STATUS.md`, this file when contracts change, `EDU-DATA-2-CONTINUATION.md`, and Issue #8.
 
-**Decision:** Cross-source reconciliation may conclude `same institution, different curriculum division` without forcing either a duplicate institution or an institution-wide factual assertion.
+**Decision:** Do not leave the next agent dependent on chat history.
 
-**Evidence motivating this decision:** current official institution evidence shows Misr Language Schools operating National, British, American, French and other sections, and El Alsson operating British and American schools/sections within one institutional identity/campus structure.
+## 21. Current exact cursor
 
-**Reference migration:** `infra/owned-data/007_school_divisions.sql`.
+**Decision:** Overture higher-education review is complete and must not be restarted.
 
-## 2026-09-15 — Reviewed canonical drafts are portable review artifacts, not database writes
+**Decision:** The next D2.1 task is the explicit `Mansoura College International Schools` provider/division reconciliation using current first-party evidence, followed by the remaining high-signal school queue, V7 read-only gap comparison, Edarabia reference-only pass and final primary-source exhaustion.
 
-**Decision:** D2.2 may materialize explicit, source-backed identity decisions into deterministic portable draft records before a runtime database exists, provided the artifacts preserve all source memberships and review boundaries.
-
-**Decision:** Deterministic UUIDv5 identifiers used in D2.2 build artifacts are stable draft identifiers. They do not by themselves create `edu_core` rows, authorize a runtime import, or make an entity publishable.
-
-**Decision:** Identity review and eligibility selection remain separate. Grouping source records into one reviewed identity does not automatically select a final institution-wide eligibility state when evidence is division-scoped or otherwise unresolved.
-
-**Decision:** A reviewed institution identity does not imply a reviewed campus structure. Until campus count/relationships are explicitly sourced and reviewed, the canonical draft must record an unresolved campus-structure state and create zero canonical campus rows.
-
-**Decision:** Unreviewed source rows remain in an explicit D2.2 review queue; they are not silently treated as unique institutions merely because no duplicate has yet been found.
-
-**Decision:** The current D2.2 materialization boundary permits reviewed institution drafts, reviewed division drafts, campus review states and review queues, while still requiring zero automatic merges, zero runtime database mutation and zero public projection.
-
-**Reference builder:** `tools/data-acquisition/international/build_reviewed_canonical_artifacts.py`.
-
-## 2026-09-15 — Incremental authoritative evidence overlays preserve the foundational snapshot
-
-**Decision:** A dated foundational source build remains independently reproducible even after newer authoritative detail evidence is acquired. New verified source details may be accepted through deterministic overlays rather than destructively rewriting the older evidence snapshot.
-
-**Decision:** An incremental overlay may update only an exact already-known source identity. It must not create a new institution identity, fuzzy-match a target, reorder source identities or change an existing `source_record_id`.
-
-**Decision:** The same source identity may not silently appear in multiple incremental evidence batches. Duplicate target identities across batches are treated as a contract error requiring review.
-
-**Decision:** Incremental evidence batches retain their own source date and provenance. Current accepted state is computed from the foundational snapshot plus all accepted overlays, while the historical foundational state remains reproducible.
-
-**Decision:** Historical source discrepancies are preserved. A later source count or corrected current observation does not erase what a source reported on an earlier snapshot date.
-
-**Decision:** Incremental overlays remain research/staging transformations only: zero automatic identity merges, zero canonical database creation and zero public projection.
-
-**Reference builder:** `tools/data-acquisition/international/apply_ib_detail_batches.py`.
-
-## 2026-09-15 — Current-campus evidence is not the same as campus-structure completeness
-
-**Decision:** Source-backed evidence that an institution currently operates at a particular campus/location may be materialized as a reviewed current-campus draft even when the complete campus topology remains unknown.
-
-**Decision:** `current campus evidenced` and `campus structure complete` are separate review states. One known current address must never be used to assert that an institution has only one campus.
-
-**Decision:** The first campus review package uses the state `at_least_one_current_campus_reviewed_structure_not_exhaustive`. It explicitly leaves `campus_structure_complete=false` and `additional_current_campuses_ruled_out=false` until stronger source review establishes otherwise.
-
-**Decision:** Historical locations remain historical evidence. A former site is not represented as a current campus unless current official evidence supports that status. This rule currently prevents El Alsson's pre-2017 operating site from being silently modeled as a present El Alsson campus.
-
-**Decision:** Campus draft IDs may be deterministic and linked to reviewed institution draft IDs, but materialization remains portable review output only: zero canonical campus rows, zero runtime database mutation and zero public projection.
-
-**Reference builder:** `tools/data-acquisition/international/build_reviewed_campus_artifacts.py`.
-
-## 2026-09-15 — Incremental explicit identity-review batches are additive
-
-**Decision:** Once a D2.2 review base is accepted, additional explicit single-source identity decisions are added through dated checked-in review batches rather than by rewriting the accepted historical decision package.
-
-**Decision:** Every incremental identity row must target an exact source key that is still present in the explicit unreviewed queue, remain scope-eligible, preserve the source identity/name, and carry high-confidence primary or authoritative evidence. An unmatched row is never unique merely because no duplicate proposal exists.
-
-**Decision:** Incremental identity batches may not retarget a source row already covered by an institution/division review, reuse an existing review identity key, automatically merge identities, or change source IDs. Duplicate batch IDs or duplicate target rows are contract failures.
-
-**Decision:** Incremental identity materialization remains portable review output only: zero automatic identity creation, zero automatic merges, zero canonical/runtime database writes and zero public projection.
-
-**Decision:** The first accepted incremental identity batch resolves the four current KMK-recognized German-school source rows as explicit reviewed identities while preserving the separate known-distinct decision between `Europaschule Kairo` and the IB-listed `Europa Schule Neu Kairo`.
-
-**Reference builder:** `tools/data-acquisition/international/build_incremental_identity_review_artifacts.py`.
-
-**Accepted validation:** `EDU-DATA-2 Incremental Identity Review` run `34908639710`.
-
-## 2026-09-15 — Supporting discovery qualification is additive and evidence-separated
-
-**Decision:** A supporting discovery source such as the British Council Partner Schools directory may expand the D2.1 research universe without changing the accepted historical strong-source universe. Discovery rows remain supporting candidates until a separate explicit review supplies qualifying primary/regulatory/accreditation evidence.
-
-**Decision:** A discovery row may receive `eligible` scope only when an exact checked-in decision establishes high-confidence international-model evidence and private/independent ownership/scope from sources other than the discovery status itself. The discovery source remains provenance for how the lead was found, not the eligibility basis.
-
-**Decision:** Primary re-sourcing is an additive review layer. The original 106-row classified universe remains independently reproducible even when newly discovered institutions later qualify. Current expanded counts must always distinguish strong-source rows, supporting candidates and reviewed discoveries instead of rewriting history.
-
-**Decision:** Eligibility review is still not canonical identity creation. Newly qualified discovery rows must pass D2.2 identity/provider/campus/division reconciliation before they become reviewed canonical drafts or contribute to a unique-institution count.
-
-**Decision:** The first accepted British Council discovery review batch captures 35 supporting leads; the first primary qualification batch promotes only King's School The Crown and The International School of Choueifat, Cairo, leaving the other 33 leads unresolved. No Partner School shortcut, automatic identity creation, merge, database write or public projection is permitted.
-
-**Reference builders:** `tools/data-acquisition/international/build_british_council_browser_discovery.py` and `tools/data-acquisition/international/apply_british_council_primary_scope_review.py`.
-
-**Accepted validations:** British Council browser discovery run `34909183019`; primary qualification batch 1 run `34909421938`.
-
-## 2026-09-15 — Qualified discovery reconciliation may consume exact queued original-source rows
-
-**Decision:** A discovery row that has already passed D2.1 qualification may be explicitly reconciled to an original strong-source row that is still present in the D2.2 identity queue when the evidence establishes they represent the same institution.
-
-**Decision:** Every such reconciliation must name the exact discovery `source_record_id` and the exact queued original `source_record_id`. Name similarity, shared domain, fuzzy matching or absence of another candidate is never sufficient to consume an original-source queue row.
-
-**Decision:** Once an exact checked-in reconciliation is accepted, both provenance memberships attach to one reviewed institution draft and the matched original row leaves the identity queue. The discovery evidence therefore improves provenance without inflating the institution count.
-
-**Decision:** The first accepted discovery↔original-source reconciliations cover Global Paradigm Baccalaureate School, Capital International Schools, Mount International School Community and The International School of Elite Education, each joining a qualified British Council discovery row to its exact queued IB source row.
-
-**Decision:** This remains review-artifact materialization only: zero automatic merges, zero canonical/runtime database writes and zero public projection.
-
-**Reference builder:** `tools/data-acquisition/international/build_discovery_identity_review_artifacts.py`.
-
-**Accepted validation:** `EDU-DATA-2 Discovery Identity Review` run `34911619429`.
-
-## 2026-09-15 — Explicit multi-campus review sets are additive and non-exhaustive
-
-**Decision:** One reviewed institution may receive multiple explicitly evidenced current-campus drafts in the same initial campus-review batch when first-party evidence establishes distinct active locations.
-
-**Decision:** Multiple campus rows for one identity are grouped into one campus-structure review record with explicit reviewed campus IDs and count. The reviewed count records what has been evidenced, not a claim that no other campus exists.
-
-**Decision:** A later campus addition to an institution that already has accepted current-campus evidence requires `review_mode=explicit_multi_campus_extension` for every added campus record. This prevents a later source observation from silently changing an accepted campus topology.
-
-**Decision:** Every current reviewed campus structure remains `campus_structure_complete=false`, `additional_current_campuses_ruled_out=false`, and `further_campus_review_required=true` unless a future explicit exhaustive review adopts a stronger state.
-
-**Decision:** The first accepted multi-campus review sets cover Capital International Schools (Main Campus and Lotus Campus) and Mount International School Community (New Administrative Capital and Al-Shorouk). Global Paradigm Baccalaureate School and The International School of Elite Education each receive one current-campus draft in the same batch without any single-campus completeness assertion.
-
-**Decision:** Multi-campus materialization remains portable review output only: zero canonical campus rows, zero runtime database mutation and zero public projection.
-
-**Reference builder:** `tools/data-acquisition/international/build_incremental_campus_review_artifacts.py`.
-
-**Accepted validation:** `EDU-DATA-2 Incremental Campus Review` run `34920248466`.
-
-## 2026-09-15 — Dataset layers and checkpoint counts are intentionally separate
-
-**Decision:** The deterministic 96-row foundational seed is a reproducible evidence layer built from the checked-in IB, UK DfE BSO, French homologation, German KMK, SCU foreign-branch and AUC/MSCHE snapshots. It must not be relabeled as the complete discovery universe or as a unique-institution count.
-
-**Decision:** The classified strong/authoritative research universe is a separate 106-row layer after reviewed CIS/Cognia expansion. Supporting discovery then expands research coverage without rewriting either historical layer.
-
-**Decision:** At the verified 2026-09-15 checkpoint, the expanded D2.1 universe contains **316 source/lead rows**, including **210 British Council discovery rows**. Twelve British Council rows have separate high-confidence primary/recognized qualification and **198 remain supporting candidates**. These are source/discovery counts, not a claim of 316 unique institutions.
-
-**Decision:** D2.2 remains an explicit reviewed-identity layer. At the same checkpoint it contains **30 reviewed institution drafts**, **10 reviewed division drafts**, **51 reviewed source-or-lead memberships**, **67 original strong-source rows still queued for identity review**, and **198 unqualified discovery rows** outside identity review.
-
-**Decision:** The current reviewed campus layer contains **17 current-campus drafts across 15 reviewed institutions**. Two institutions currently have multiple reviewed campuses. Every reviewed campus topology remains non-exhaustive unless future affirmative evidence establishes completeness.
-
-**Decision:** CI contracts must preserve these layer boundaries. Aggregate campus CI rebuilds the same current identity/campus pipeline as the incremental review, while source-specific discovery and identity workflows derive totals from checked-in decision/discovery seeds instead of treating historical magic numbers as canonical identities.
-
-**Reference:** `tools/data-acquisition/international/DATASET-LAYERS.md`.
-
-**Accepted validations at this checkpoint:** `EDU-DATA-2 British Council Discovery` run `34923095404`; `EDU-DATA-2 Discovery Identity Review` run `34923122094`; aggregate `EDU-DATA-2 Campus Review` run `34972560009`; `EDU-DATA-2 International Registry` run `34972805842`.
-
-## Deferred decisions until database completion
-
-- Astro-first vs Instatic-first final implementation choice;
-- if Instatic-first: physical database/storage choice based on real corpus/query requirements;
-- final public profile/listing presentation architecture;
-- final public brand name/domain;
-- final Astro hosting adapter if Astro is selected;
-- final visual identity/design system;
-- final map provider;
-- final analytics/consent stack;
-- exact public-page completeness threshold;
-- institution media permission/claim workflow for Phase 2.
+**Decision:** D2.1 remains open until those gap-exhaustion criteria are satisfied and an explicit closure decision hands the sole active cursor to D2.2.
