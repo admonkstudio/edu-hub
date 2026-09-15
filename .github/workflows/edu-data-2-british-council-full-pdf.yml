@@ -1,0 +1,94 @@
+name: EDU-DATA-2 British Council Full PDF Coverage
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'tools/data-acquisition/international/download_british_council_pdf_browser.py'
+      - 'tools/data-acquisition/international/acquire_british_council_partner_schools.py'
+      - 'tools/data-acquisition/international/build_british_council_browser_discovery.py'
+      - 'tools/data-acquisition/international/build_british_council_full_pdf_coverage.py'
+      - 'tools/data-acquisition/international/seeds/british-council-browser-discovery-*.json'
+      - '.github/workflows/edu-data-2-british-council-full-pdf.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    name: Browser-download and diff the complete September 2026 PDF
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser and PDF dependencies
+        run: |
+          pip install playwright requests pdfplumber
+          python -m playwright install --with-deps chromium
+      - name: Compile acquisition and coverage tools
+        run: |
+          python -m py_compile tools/data-acquisition/international/download_british_council_pdf_browser.py
+          python -m py_compile tools/data-acquisition/international/acquire_british_council_partner_schools.py
+          python -m py_compile tools/data-acquisition/international/build_british_council_browser_discovery.py
+          python -m py_compile tools/data-acquisition/international/build_british_council_full_pdf_coverage.py
+      - name: Download the official PDF through Chromium
+        run: python tools/data-acquisition/international/download_british_council_pdf_browser.py
+      - name: Extract all ruled-table rows from the downloaded PDF
+        run: |
+          python tools/data-acquisition/international/acquire_british_council_partner_schools.py \
+            --pdf-path artifacts/international/british-council-full-pdf/source.pdf \
+            --output-dir artifacts/international/british-council-full-pdf/extracted
+      - name: Rebuild the accepted browser-reviewed set
+        run: python tools/data-acquisition/international/build_british_council_browser_discovery.py
+      - name: Diff the full extraction against accepted browser review
+        run: python tools/data-acquisition/international/build_british_council_full_pdf_coverage.py
+      - name: Assert full-PDF acquisition and safety boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('artifacts/international/british-council-full-pdf')
+          download = json.loads((root/'browser-download-manifest.json').read_text(encoding='utf-8'))
+          extracted = json.loads((root/'extracted/british-council-summary.json').read_text(encoding='utf-8'))
+          coverage = json.loads((root/'coverage/british-council-full-pdf-coverage-summary.json').read_text(encoding='utf-8'))
+          reviewed = json.loads(Path('artifacts/international/british-council-browser-discovery/british-council-browser-summary.json').read_text(encoding='utf-8'))
+
+          assert download['capture_mode'] == 'headless_chromium_same_origin_fetch'
+          assert download['http_status'] == 200
+          assert download['pdf_bytes'] > 500000
+          assert extracted['capture_mode'] == 'local_browser_download'
+          assert extracted['pdf_sha256'] == download['pdf_sha256']
+          assert extracted['pdf_page_count'] >= 19
+          assert extracted['source_rows'] > 210
+          assert extracted['international_eligibility_granted'] == 0
+          assert extracted['canonical_institutions_created'] == 0
+          assert extracted['automatic_merges_performed'] == 0
+          assert extracted['database_mutation_performed'] is False
+          assert extracted['public_projection_rows_created'] == 0
+
+          assert coverage['full_pdf_extracted_rows'] == extracted['source_rows']
+          assert coverage['reviewed_browser_rows'] == reviewed['reviewed_discovery_rows']
+          assert coverage['reviewed_browser_rows'] == 210
+          assert coverage['coverage_audit_complete'] is True
+          assert coverage['gaps_auto_added_to_accepted_universe'] is False
+          assert coverage['international_eligibility_granted'] == 0
+          assert coverage['canonical_institutions_created'] == 0
+          assert coverage['automatic_merges_performed'] == 0
+          assert coverage['database_mutation_performed'] is False
+          assert coverage['public_projection_rows_created'] == 0
+
+          print(json.dumps({'download': download, 'extracted': extracted, 'coverage': coverage}, ensure_ascii=False, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-british-council-full-pdf-coverage
+          path: |
+            artifacts/international/british-council-full-pdf/browser-download-manifest.json
+            artifacts/international/british-council-full-pdf/extracted/
+            artifacts/international/british-council-full-pdf/coverage/
+          if-no-files-found: error
