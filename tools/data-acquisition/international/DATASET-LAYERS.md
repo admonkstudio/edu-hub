@@ -45,7 +45,7 @@ Review contract: `tools/data-acquisition/international/seeds/mansoura-college-to
 
 ## Current expanded D2.1 source/evidence universe
 
-Accepted `EDU-DATA-2 D2.1 Universe Checkpoint` run **`35025256648`** at head `7aa5f49ddf90cf5cf36f5fc55da80bf040f1ceda` proves:
+Accepted `EDU-DATA-2 D2.1 Universe Checkpoint` run **`35025758910`** at head `7a1654aae28de18cdbc5d0273294187008ec7c35` proves:
 
 - **604 total source/evidence rows**;
 - **135 eligible source/evidence rows**;
@@ -84,16 +84,16 @@ Against the **604-row** universe, deterministic exact normalized-name comparison
 
 ### High-signal school review
 
-Seven checked-in school-review batches now cover **69 of the 266** high-signal pre-university rows:
+Eight checked-in school-review batches now cover **75 of the 266** high-signal pre-university rows:
 
-- **67 resolved/explained** as existing authoritative coverage, explicit source aliases, or provider/division cases requiring D2.2 topology review;
+- **73 resolved/explained** as existing authoritative coverage, explicit source aliases, or provider/campus/division cases requiring D2.2 topology review;
 - **2 reviewed-but-unresolved** supporting leads;
-- **197 high-signal rows remain unreviewed**;
-- **199 rows remain outstanding** in the school-review artifact.
+- **191 high-signal rows remain unreviewed**;
+- **193 rows remain outstanding** in the school-review artifact.
 
 The two reviewed unresolved rows remain `Kada Modern British School` and `M.S.G International British School`.
 
-Batch 7 explicitly reviewed City International Schools (Zamalek provider/branch/division topology), St. Fatima International School Al Hegaz, Future British International School - Tanta, Producer of Life International School in Hurghada, and Summits International Schools. The Future British Overture row contains a coordinate defect inconsistent with its own Tanta address; the explicit resolution relies on matching current school/address evidence and does not treat the bad coordinate as identity authority. City International and Summits remain provider/division topology work rather than flattened identities.
+Batch 8 explicitly reviewed Delta College International School, Riada American School, Tiba International School - American Division, Egyptian English Language School / American Division, The Modern American School of Egypt and Victory College American Department. Delta College, EELS and Victory remain provider/division topology work; the Modern American School row is retained as institution/campus topology because current first-party evidence distinguishes the founding 2000 context from a second/newest campus established in 2017. Cognia, ACT, British Council Partner status and Overture remain evidence layers only and grant no eligibility by themselves.
 
 ### Higher-education review — complete
 
@@ -109,7 +109,7 @@ OpenStreetMap remains a permitted supporting source, but all public Overpass mir
 
 D2.1 remains open for:
 
-- continued explicit review of the **199 outstanding high-signal school rows** in small deterministic batches;
+- continued explicit review of the **193 outstanding high-signal school rows** in small deterministic batches;
 - read-only comparison against the owned **24,916-row V7** archive, with useful unmatched leads re-sourced from current permitted evidence before use;
 - controlled Edarabia reference-only discovery under `docs/SOURCE-USAGE-POLICY.md`;
 - institution/operator primary-source exhaustion for remaining likely gaps and topology ambiguity.
