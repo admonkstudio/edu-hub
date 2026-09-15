@@ -5,11 +5,23 @@ on:
     branches:
       - edu-data-2-international-registry
     paths:
-      - 'tools/data-acquisition/international/build_reviewed_campus_artifacts.py'
-      - 'tools/data-acquisition/international/build_reviewed_canonical_artifacts.py'
+      - 'tools/data-acquisition/international/build_authoritative_seed.py'
       - 'tools/data-acquisition/international/apply_ib_detail_batches.py'
+      - 'tools/data-acquisition/international/apply_bso_scope_review.py'
+      - 'tools/data-acquisition/international/build_accreditor_expansion.py'
+      - 'tools/data-acquisition/international/apply_accreditor_scope_review.py'
+      - 'tools/data-acquisition/international/build_extended_identity_artifacts.py'
+      - 'tools/data-acquisition/international/build_hierarchy_review_artifacts.py'
+      - 'tools/data-acquisition/international/build_incremental_identity_review_artifacts.py'
+      - 'tools/data-acquisition/international/build_british_council_browser_discovery.py'
+      - 'tools/data-acquisition/international/apply_british_council_primary_scope_review.py'
+      - 'tools/data-acquisition/international/build_discovery_identity_review_artifacts.py'
+      - 'tools/data-acquisition/international/build_reviewed_campus_artifacts.py'
+      - 'tools/data-acquisition/international/build_incremental_campus_review_artifacts.py'
       - 'tools/data-acquisition/international/seeds/campus-review-decisions-2026-09-15.json'
-      - 'tools/data-acquisition/international/seeds/identity-review-decisions-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/campus-review-decisions-*-batch*.json'
+      - 'tools/data-acquisition/international/seeds/discovered-identity-decisions-*.json'
+      - 'tools/data-acquisition/international/seeds/british-council-primary-scope-review-*.json'
       - '.github/workflows/edu-data-2-campus-review.yml'
   workflow_dispatch:
 
@@ -18,57 +30,101 @@ permissions:
 
 jobs:
   review:
-    name: Validate current-campus evidence without assuming complete campus structure
+    name: Validate aggregate current-campus evidence without assuming complete topology
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Compile campus and dependency builders
+      - name: Compile campus and identity builders
         run: |
           python -m py_compile tools/data-acquisition/international/build_authoritative_seed.py
           python -m py_compile tools/data-acquisition/international/apply_ib_detail_batches.py
+          python -m py_compile tools/data-acquisition/international/apply_bso_scope_review.py
           python -m py_compile tools/data-acquisition/international/build_accreditor_expansion.py
-          python -m py_compile tools/data-acquisition/international/build_reviewed_canonical_artifacts.py
+          python -m py_compile tools/data-acquisition/international/apply_accreditor_scope_review.py
+          python -m py_compile tools/data-acquisition/international/build_extended_identity_artifacts.py
+          python -m py_compile tools/data-acquisition/international/build_hierarchy_review_artifacts.py
+          python -m py_compile tools/data-acquisition/international/build_incremental_identity_review_artifacts.py
+          python -m py_compile tools/data-acquisition/international/build_british_council_browser_discovery.py
+          python -m py_compile tools/data-acquisition/international/apply_british_council_primary_scope_review.py
+          python -m py_compile tools/data-acquisition/international/build_discovery_identity_review_artifacts.py
           python -m py_compile tools/data-acquisition/international/build_reviewed_campus_artifacts.py
-      - name: Build current source universe and reviewed institution drafts
+          python -m py_compile tools/data-acquisition/international/build_incremental_campus_review_artifacts.py
+      - name: Rebuild current reviewed identity universe
         run: |
           python tools/data-acquisition/international/build_authoritative_seed.py --output-dir artifacts/international
           python tools/data-acquisition/international/apply_ib_detail_batches.py
+          python tools/data-acquisition/international/apply_bso_scope_review.py
           python tools/data-acquisition/international/build_accreditor_expansion.py \
-            --base artifacts/international/ib-incremental/authoritative-source-candidates-with-incremental-ib.jsonl \
-            --output-dir artifacts/international/campus-review/accreditor-expansion
-          python tools/data-acquisition/international/build_reviewed_canonical_artifacts.py \
-            --universe artifacts/international/campus-review/accreditor-expansion/authoritative-source-candidates-with-accreditors.jsonl \
-            --output-dir artifacts/international/campus-review/reviewed-canonical-draft
-      - name: Materialize reviewed current-campus evidence
+            --base artifacts/international/bso-scope-review/authoritative-source-candidates-with-bso-scope-review.jsonl \
+            --output-dir artifacts/international/bso-scope-review/accreditor-expansion
+          python tools/data-acquisition/international/apply_accreditor_scope_review.py
+          python tools/data-acquisition/international/build_extended_identity_artifacts.py
+          python tools/data-acquisition/international/build_hierarchy_review_artifacts.py
+          python tools/data-acquisition/international/build_incremental_identity_review_artifacts.py
+          python tools/data-acquisition/international/build_british_council_browser_discovery.py
+          python tools/data-acquisition/international/apply_british_council_primary_scope_review.py
+          python tools/data-acquisition/international/build_discovery_identity_review_artifacts.py
+      - name: Rebuild reviewed current-campus evidence
         run: |
-          python tools/data-acquisition/international/build_reviewed_campus_artifacts.py \
-            --output-dir artifacts/international/campus-review/reviewed-campus-draft
-      - name: Assert campus evidence and identity alignment
+          python tools/data-acquisition/international/build_reviewed_campus_artifacts.py
+          python tools/data-acquisition/international/build_incremental_campus_review_artifacts.py
+      - name: Assert aggregate campus safety and coverage contract
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
 
-          root = Path('artifacts/international/campus-review')
-          institution_rows = [json.loads(line) for line in (root/'reviewed-canonical-draft/reviewed-institution-drafts.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
-          campus_rows = [json.loads(line) for line in (root/'reviewed-campus-draft/reviewed-current-campus-drafts.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
-          states = [json.loads(line) for line in (root/'reviewed-campus-draft/campus-structure-review.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
-          summary = json.loads((root/'reviewed-campus-draft/reviewed-campus-draft-summary.json').read_text(encoding='utf-8'))
+          def jsonl(path):
+              return [json.loads(line) for line in path.read_text(encoding='utf-8').splitlines() if line.strip()]
 
-          assert len(institution_rows) == 9
-          assert len(campus_rows) == len(states) == 9
-          institution_ids = {row['draft_institution_id'] for row in institution_rows}
-          assert len(institution_ids) == 9
-          assert {row['draft_institution_id'] for row in campus_rows} == institution_ids
-          assert {row['draft_institution_id'] for row in states} == institution_ids
-          assert len({row['draft_campus_id'] for row in campus_rows}) == 9
+          identity_root = Path('artifacts/international/discovery-identity-review')
+          base_root = Path('artifacts/international/reviewed-campus-draft')
+          root = Path('artifacts/international/incremental-campus-review')
+          seeds = Path('tools/data-acquisition/international/seeds')
 
-          assert summary['reviewed_identity_groups'] == 9
-          assert summary['reviewed_current_campus_records'] == 9
-          assert summary['identity_groups_with_current_campus_evidence'] == 9
+          identity_summary = json.loads((identity_root/'discovery-identity-summary.json').read_text(encoding='utf-8'))
+          identities = jsonl(identity_root/'reviewed-institution-drafts.jsonl')
+          base_summary = json.loads((base_root/'reviewed-campus-draft-summary.json').read_text(encoding='utf-8'))
+          base_campuses = jsonl(base_root/'reviewed-current-campus-drafts.jsonl')
+          summary = json.loads((root/'incremental-campus-summary.json').read_text(encoding='utf-8'))
+          campuses = jsonl(root/'reviewed-current-campus-drafts.jsonl')
+          structures = jsonl(root/'campus-structure-review.jsonl')
+          new = jsonl(root/'incremental-current-campus-drafts.jsonl')
+          pending = jsonl(root/'campus-review-queue.jsonl')
+
+          batch_paths = sorted(seeds.glob('campus-review-decisions-*-batch*.json'))
+          assert batch_paths, 'expected at least one incremental campus-review decision batch'
+          batches = [json.loads(path.read_text(encoding='utf-8')) for path in batch_paths]
+          expected_new = sum(len(batch.get('records') or []) for batch in batches)
+          assert all(batch.get('records_count') == len(batch.get('records') or []) for batch in batches)
+
+          assert identity_summary['reviewed_institution_drafts'] == len(identities)
+          assert base_summary['reviewed_current_campus_records'] == len(base_campuses)
+          assert summary['reviewed_institution_drafts'] == len(identities)
+          assert summary['base_current_campus_records'] == len(base_campuses)
+          assert summary['incremental_review_batches'] == len(batch_paths)
+          assert summary['new_current_campus_records'] == len(new) == expected_new
+          assert summary['reviewed_current_campus_records'] == len(campuses) == len(base_campuses) + len(new)
+          assert summary['institutions_with_current_campus_evidence'] == len(structures)
+          assert summary['institutions_pending_current_campus_review'] == len(pending) == len(identities) - len(structures)
+          assert summary['institutions_with_multiple_reviewed_current_campuses'] == sum(
+              1 for row in structures if row['reviewed_current_campus_count'] > 1
+          )
+
+          assert len({row['draft_campus_id'] for row in campuses}) == len(campuses)
+          identity_ids = {row['draft_institution_id'] for row in identities}
+          assert {row['draft_institution_id'] for row in campuses}.issubset(identity_ids)
+          assert {row['draft_institution_id'] for row in structures}.issubset(identity_ids)
+          assert {row['draft_institution_id'] for row in pending}.issubset(identity_ids)
+          assert all(row['current_campus_evidence_reviewed'] is True for row in campuses)
+          assert all(row['source_urls'] for row in campuses)
+          assert all(row['campus_structure_complete'] is False for row in campuses)
+          assert all(row['additional_current_campuses_ruled_out'] is False for row in campuses)
+          assert all(row['further_campus_review_required'] is True for row in structures)
+
           assert summary['campus_structure_complete_records'] == 0
           assert summary['additional_current_campuses_ruled_out_records'] == 0
           assert summary['automatic_additional_campus_inference_performed'] is False
@@ -77,19 +133,12 @@ jobs:
           assert summary['runtime_database_mutation_performed'] is False
           assert summary['public_projection_rows_created'] == 0
 
-          assert all(row['current_campus_evidence_reviewed'] is True for row in campus_rows)
-          assert all(row['campus_structure_complete'] is False for row in campus_rows)
-          assert all(row['additional_current_campuses_ruled_out'] is False for row in campus_rows)
-          assert all(row['canonical_campus_created'] is False for row in campus_rows)
-          assert all(row['canonical_database_write_performed'] is False for row in campus_rows)
-          assert all(row['public_projection_performed'] is False for row in campus_rows)
-          assert all(row['campus_structure_state'] == 'at_least_one_current_campus_reviewed_structure_not_exhaustive' for row in states)
-          assert all(row['further_campus_review_required'] is True for row in states)
-
           print(json.dumps(summary, indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
           name: edu-data-2-campus-review
-          path: artifacts/international/campus-review/
+          path: |
+            artifacts/international/reviewed-campus-draft/
+            artifacts/international/incremental-campus-review/
           if-no-files-found: error
