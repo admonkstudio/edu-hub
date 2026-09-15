@@ -5,14 +5,16 @@ This stage starts from the accepted incremental identity-review artifacts for th
 original 106-row universe and may add only discovery rows that have already passed
 a separate D2.1 primary/recognized eligibility review.
 
-Two explicit relationships are supported:
-1. a qualified discovery row reviewed as a standalone institution identity; and
+Three explicit relationships are supported:
+1. a qualified discovery row reviewed as a standalone institution identity;
 2. a qualified discovery row reviewed as the same institution as an original
-   source row that is still in the accepted D2.2 review queue.
+   source row that is still in the accepted D2.2 review queue; and
+3. a qualified discovery row explicitly attached as another source membership
+   of an institution identity that was already reviewed in the accepted base.
 
-Neither relationship is inferred automatically. Absence of a match is never
-uniqueness proof, and qualified discovery rows without an explicit D2.2 decision
-remain in a separate queue.
+None is inferred automatically. Absence of a match is never uniqueness proof,
+and qualified discovery rows without an explicit D2.2 decision remain in a
+separate queue.
 """
 from __future__ import annotations
 
@@ -115,6 +117,14 @@ def build(base_dir: Path, qualified_leads_path: Path, decision_paths: list[Path]
     reviewed_original_overlap_keys: set[tuple[str, str]] = set()
     seen_batch_ids: set[str] = set()
     batch_details: list[dict] = []
+    new_identity_drafts = 0
+    existing_identity_discovery_memberships = 0
+
+    supported_decisions = {
+        "confirmed_discovered_single_source_identity",
+        "confirmed_discovery_overlap_with_original_source_identity",
+        "confirmed_discovery_membership_of_existing_reviewed_identity",
+    }
 
     for decisions_path in decision_paths:
         decisions = load_json(decisions_path)
@@ -140,10 +150,7 @@ def build(base_dir: Path, qualified_leads_path: Path, decision_paths: list[Path]
 
         for decision in decision_rows:
             decision_type = decision.get("decision")
-            if decision_type not in {
-                "confirmed_discovered_single_source_identity",
-                "confirmed_discovery_overlap_with_original_source_identity",
-            }:
+            if decision_type not in supported_decisions:
                 raise AssertionError(f"unsupported discovery identity decision: {decision_type}")
             if decision.get("decision_confidence") != "high":
                 raise AssertionError("discovery identities require high-confidence explicit review")
@@ -151,9 +158,6 @@ def build(base_dir: Path, qualified_leads_path: Path, decision_paths: list[Path]
                 raise AssertionError("discovery identity decision requires at least two evidence URLs")
 
             review_key = decision["review_identity_key"]
-            if review_key in institution_by_review_key:
-                raise AssertionError(f"discovery identity review key already exists: {review_key}")
-
             discovery_key = (decision["source_id"], decision["source_record_id"])
             if discovery_key in existing_source_keys or discovery_key in seen_discovery_source_keys:
                 raise AssertionError(f"discovery source row already has a reviewed D2.2 membership: {discovery_key}")
@@ -179,6 +183,38 @@ def build(base_dir: Path, qualified_leads_path: Path, decision_paths: list[Path]
                 "source_url": discovery["source_url"],
                 "eligibility_review_batch_id": discovery.get("eligibility_review_batch_id"),
             }
+
+            if decision_type == "confirmed_discovery_membership_of_existing_reviewed_identity":
+                existing = institution_by_review_key.get(review_key)
+                if existing is None:
+                    raise AssertionError(f"existing-identity discovery membership target not reviewed: {review_key}")
+                if decision.get("provisional_canonical_name_en") != existing.get("canonical_name_en"):
+                    raise AssertionError(
+                        f"existing identity canonical-name drift for {review_key}: "
+                        f"expected={decision.get('provisional_canonical_name_en')!r} "
+                        f"current={existing.get('canonical_name_en')!r}"
+                    )
+                existing.setdefault("source_memberships", []).append(discovery_membership)
+                existing["source_record_count"] = len(existing["source_memberships"])
+                review_batches = list(existing.get("discovery_membership_review_batches") or [])
+                if batch_id not in review_batches:
+                    review_batches.append(batch_id)
+                existing["discovery_membership_review_batches"] = review_batches
+                existing_identity_discovery_memberships += 1
+                seen_discovery_source_keys.add(discovery_key)
+                discovered_memberships.append({
+                    "draft_institution_id": existing["draft_institution_id"],
+                    "review_identity_key": review_key,
+                    "review_batch_id": batch_id,
+                    "membership_relationship": "attached_to_existing_reviewed_identity",
+                    "review_note": decision["review_note"],
+                    **discovery_membership,
+                })
+                continue
+
+            if review_key in institution_by_review_key:
+                raise AssertionError(f"discovery identity review key already exists: {review_key}")
+
             source_memberships = [discovery_membership]
             review_origin = "explicit_qualified_discovery_single_source_identity_review"
 
@@ -233,11 +269,13 @@ def build(base_dir: Path, qualified_leads_path: Path, decision_paths: list[Path]
             }
             institutions.append(draft)
             institution_by_review_key[review_key] = draft
+            new_identity_drafts += 1
             seen_discovery_source_keys.add(discovery_key)
             discovered_memberships.append({
                 "draft_institution_id": draft["draft_institution_id"],
                 "review_identity_key": review_key,
                 "review_batch_id": batch_id,
+                "membership_relationship": "new_reviewed_identity",
                 **discovery_membership,
             })
             if original_membership is not None:
@@ -290,14 +328,15 @@ def build(base_dir: Path, qualified_leads_path: Path, decision_paths: list[Path]
 
     reviewed_source_or_lead_rows = 35 + len(reviewed_original_overlap_keys) + len(discovered_memberships)
     summary = {
-        "schema_version": 3,
+        "schema_version": 4,
         "built_at": datetime.now(timezone.utc).isoformat(),
         "work_package": "D2.2_discovery_identity_review_materialization",
         "deterministic_id_namespace": str(DRAFT_NAMESPACE),
         "base_reviewed_institution_drafts": 24,
         "discovery_identity_review_batches": len(batch_details),
         "discovery_identity_review_batch_details": batch_details,
-        "new_discovery_driven_identity_drafts": len(discovered_memberships),
+        "new_discovery_driven_identity_drafts": new_identity_drafts,
+        "existing_reviewed_identity_discovery_memberships": existing_identity_discovery_memberships,
         "reviewed_institution_drafts": len(institutions),
         "reviewed_division_drafts": len(divisions),
         "base_reviewed_original_source_rows": 35,
