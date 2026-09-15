@@ -22,8 +22,8 @@ Canonical sequence:
 ## 2. Last accepted checkpoint
 
 - Workflow: `EDU-DATA-2 D2.1 Universe Checkpoint`
-- Accepted run: **35021093103**
-- Accepted head: **`637a5f0bcb8bc6c801eb74ec724914dc3f62a670`**
+- Accepted run: **35021835175**
+- Accepted head: **`1f4f5d369c2950f1291cb0794df2d93e8126f023`**
 - Conclusion: **green**
 
 Accepted source/evidence universe remains:
@@ -94,34 +94,32 @@ Accepted decision batches:
 - `overture-gap-resolution-2026-09-15-batch1.json`
 - `overture-gap-resolution-2026-09-15-batch2.json`
 - `overture-gap-resolution-2026-09-15-batch3.json`
+- `overture-gap-resolution-2026-09-15-batch4.json`
 
-Accepted run `35021093103` proves:
+Accepted run `35021835175` proves:
 
 - **266 input rows**;
-- **41 explicitly reviewed**;
-- **39 resolved/explained**;
+- **50 explicitly reviewed**;
+- **48 resolved/explained**;
 - **2 reviewed-but-unresolved**;
-- **225 unreviewed**;
-- **227 outstanding**.
+- **216 unreviewed**;
+- **218 outstanding**.
 
 Reviewed unresolved rows:
 
 - `Kada Modern British School`
 - `M.S.G International British School`
 
-Batch 3 explicitly resolved/reconciled:
+Batch 4 explicitly resolved/reconciled:
 
-- American City International Schools → current Cognia Cairo source identity;
-- Cairo West International School → current British Council source identity, while divisions remain scoped;
-- Cairo British School → current British Council source identity;
-- International Liberty School - IGCSE → British division/provider topology requiring D2.2;
-- The British International School Madinaty → accepted CIS source identity/current GEMS BISM branding;
-- Nefertari British International School → Nefertari British division topology requiring D2.2;
-- Nefertari International School - October → current October branch source identity;
-- Nefertari International Schools in Cairo → provider/branch topology requiring D2.2;
-- Royal Canadian School → current Canadian authorization family;
-- Lycée Français du Caire - Officiel → current French homologation identity;
-- Deutsche Evangelische Oberschule - unofficial → current ZfA DAS identity.
+- El Alsson International School → provider/British-American topology requiring D2.2;
+- El Rowad American Division → current Cognia division source identity;
+- Forsan International Schools → provider/British-American school topology requiring D2.2;
+- two Manhattan Elite International School Overture rows → provider/school topology requiring D2.2, retained separately rather than auto-deduplicated;
+- The Royal British International School → current UK-government BSO family;
+- The International School of Choueifat - Cairo → current New Cairo branch source identity;
+- The International School of Choueifat - City of 6 October → current Dreamland/6 October branch source identity;
+- Deutsche Schule der Borromäerinnen Kairo → current ZfA DAS source identity.
 
 All are source-resolution/topology decisions only. No canonical institution was created and no eligibility was granted by Overture.
 
@@ -131,7 +129,7 @@ All are source-resolution/topology decisions only. No canonical institution was 
 
 ## 5. Exact resume cursor — START HERE
 
-### Task A — continue the 227 outstanding high-signal school rows
+### Task A — continue the 218 outstanding high-signal school rows
 
 Work in small deterministic checked-in batches. Preferred outcome order:
 
@@ -141,7 +139,9 @@ Work in small deterministic checked-in batches. Preferred outcome order:
 4. genuinely new candidate with current permitted primary/recognized-source evidence;
 5. unresolved supporting-only lead.
 
-Strong next-batch research already identified several evidence-rich candidates: El Alsson International School, El Rowad American Division, Forsan International Schools, Manhattan Elite International School, The Royal British International School, both International School of Choueifat Cairo/6 October Overture rows, Deutsche Schule der Borromäerinnen Kairo, and other current source-family overlaps. Each still requires exact Overture-ID review and primary/recognized evidence before checking in a decision.
+The next evidence-rich candidate already isolated is `The American International School in Egypt` West Campus Overture row (`4352e47f-a803-472e-9062-2039d6e64bfd`). Current primary West Campus evidence and current IB school code `049504` align it to the existing eligible source row `ib_world_schools_egypt:f98633583e51eda1066c`; do not confuse it with the separate East Campus IB identity/code `000654`.
+
+Additional next-batch candidates needing exact current-source review include Royal British School New Damietta, Solaimaneyah International Schools, Delta American School, the 10th Ramadan Creatives International Schools row, Al Karma International School and other current source-family overlaps. Preserve mismatched-location cases instead of forcing aliases.
 
 ### Task B — execute V7 read-only comparison
 
