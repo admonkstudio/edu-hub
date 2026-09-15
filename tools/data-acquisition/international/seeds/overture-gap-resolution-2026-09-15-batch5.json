@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "batch_id": "overture-gap-resolution-2026-09-15-batch5",
+  "snapshot_date": "2026-09-15",
+  "records_count": 5,
+  "records": [
+    {
+      "overture_id": "4352e47f-a803-472e-9062-2039d6e64bfd",
+      "overture_name": "The American International School in Egypt",
+      "decision": "covered_by_current_authoritative_source_family",
+      "target_source_id": "ib_world_schools_egypt",
+      "target_source_record_id": "ib_world_schools_egypt:f98633583e51eda1066c",
+      "target_name_en": "American International School in Egypt West Campus",
+      "evidence_urls": [
+        "https://www.aiswest.com/about",
+        "https://www.aiswest.com/about/contact-us",
+        "https://ibo.org/es/school/049504/"
+      ],
+      "review_note": "Current AIS West primary evidence identifies the West Campus at Greens Compound, Sheikh Zayed and gives telephone +20238540600, matching the Overture row. Current IB evidence independently identifies American International School in Egypt West Campus, private school code 049504, at Entrance 2, Greens Compound, Sheikh Zayed. This resolves to the existing eligible West Campus IB source row and must remain distinct from the separate East Campus IB identity/code 000654."
+    },
+    {
+      "overture_id": "6dd77266-985a-404c-bc65-ea90efb85c29",
+      "overture_name": "Royal British Schools",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:royal-british-school-new-damietta",
+      "target_name_en": "Royal British School New Damietta",
+      "evidence_urls": [
+        "https://royalschools-eg.com/",
+        "https://royalschools-eg.com/about-us",
+        "https://royalschools-eg.com/admission",
+        "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf"
+      ],
+      "review_note": "Current Royal British School primary evidence places the campus in central New Damietta, matching the Overture coordinates, while its admissions page exposes separate American and British admission paths. The Overture plural provider-style label is therefore reviewed against the existing New Damietta source evidence but retained for D2.2 provider/division topology rather than flattened into one institution-wide curriculum identity. British Council Partner status itself grants no eligibility."
+    },
+    {
+      "overture_id": "7f8e12b4-dc0d-489c-b4b9-94732b696137",
+      "overture_name": "Solimaneyah International School SIS",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-218",
+      "target_name_en": "Solaimaneyah International Schools",
+      "evidence_urls": [
+        "https://www.sisegypt.org/",
+        "https://www.sisegypt.org/contact-us",
+        "https://www.sisegypt.org/about-us/accreditation",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "Current institution-primary evidence brands the school as Pioneers Solaimaneyah International Schools / Solaimaneyah International School, offers the American system, gives Kilometer 55 Cairo/Alexandria desert road, 6 October City, and names Cognia on its accreditation page. That aligns the Overture SIS row to the current Cognia 6th of October source identity. Cognia presence alone does not grant eligibility and no canonical merge is performed here."
+    },
+    {
+      "overture_id": "d1f31843-3946-4560-a373-c9c71d465ae1",
+      "overture_name": "Creatives International Schools ( C.I.S )",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-042",
+      "target_name_en": "Creatives International Schools",
+      "evidence_urls": [
+        "https://cis-schools.edupage.org/",
+        "https://cis-schools.edupage.org/privacy/?eqa=ZXBzbT1pbXByZXN1bQ%3D%3D",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "The school-operated EduPage identifies CREATIVES INTERNATIONAL SCHOOLS, uses the school's cis-schools.com email domain, and gives Omar Ibn El Khattab St, 10th of Ramadan, Sharqia, matching this Overture row and the accepted current Cognia Sharqia source identity. This exact 10th of Ramadan row is kept distinct from the separate Giza Creative International School lead."
+    },
+    {
+      "overture_id": "792c2d43-787d-402f-9c8e-7dd0d14ec6ba",
+      "overture_name": "Alkarma International School",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:al-karma-international-school",
+      "target_name_en": "Al Karma International School",
+      "evidence_urls": [
+        "https://alkarmaschools.com/",
+        "https://alkarmaschools.com/about-us/",
+        "https://alkarmaschools.com/igcse/",
+        "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf"
+      ],
+      "review_note": "Current Al Karma primary evidence identifies Al Karma Language School in the Schools District, Ring Road, El Kattameya and explicitly presents an IGCSE stage with a named IGCSE School Director. The Overture International-school label and existing British Council Al Karma International School row therefore require provider/division/name-topology review in D2.2 instead of an institution-wide international alias. British Council Partner status grants no eligibility."
+    }
+  ],
+  "rules": {
+    "resolution_is_discovery_triage_not_canonical_identity_merge": true,
+    "fuzzy_matching_authorizes_nothing": true,
+    "division_provider_relationships_require_d2_2_review": true,
+    "location_mismatch_blocks_automatic_aliasing": true,
+    "overture_grants_no_international_eligibility": true,
+    "canonical_institutions_created": 0,
+    "automatic_identity_merges_performed": 0,
+    "database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
