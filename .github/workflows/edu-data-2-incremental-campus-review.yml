@@ -77,6 +77,7 @@ jobs:
         run: |
           python - <<'PY'
           import json
+          from collections import Counter
           from pathlib import Path
 
           root = Path('artifacts/international/incremental-campus-review')
@@ -88,11 +89,12 @@ jobs:
 
           assert summary['reviewed_institution_drafts'] == 30
           assert summary['base_current_campus_records'] == 9
-          assert summary['incremental_review_batches'] == 1
-          assert summary['new_current_campus_records'] == len(new) == 2
-          assert summary['reviewed_current_campus_records'] == len(campuses) == 11
-          assert summary['institutions_with_current_campus_evidence'] == len(structures) == 11
-          assert summary['institutions_pending_current_campus_review'] == len(pending) == 19
+          assert summary['incremental_review_batches'] == 2
+          assert summary['new_current_campus_records'] == len(new) == 8
+          assert summary['reviewed_current_campus_records'] == len(campuses) == 17
+          assert summary['institutions_with_current_campus_evidence'] == len(structures) == 15
+          assert summary['institutions_with_multiple_reviewed_current_campuses'] == 2
+          assert summary['institutions_pending_current_campus_review'] == len(pending) == 15
           assert summary['campus_structure_complete_records'] == 0
           assert summary['additional_current_campuses_ruled_out_records'] == 0
           assert summary['automatic_additional_campus_inference_performed'] is False
@@ -101,19 +103,39 @@ jobs:
           assert summary['runtime_database_mutation_performed'] is False
           assert summary['public_projection_rows_created'] == 0
 
-          expected = {'kings-school-the-crown', 'international-school-choueifat-cairo'}
-          assert {row['review_identity_key'] for row in new} == expected
-          assert all(row['campus_structure_complete'] is False for row in campuses)
-          assert all(row['additional_current_campuses_ruled_out'] is False for row in campuses)
-          assert len({row['draft_campus_id'] for row in campuses}) == len(campuses)
-
-          pending_keys = {row['review_identity_key'] for row in pending}
-          assert {
+          expected_identities = {
+              'kings-school-the-crown',
+              'international-school-choueifat-cairo',
               'global-paradigm-baccalaureate-school',
               'capital-international-schools',
               'mount-international-school-community',
               'international-school-elite-education',
-          } <= pending_keys
+          }
+          assert {row['review_identity_key'] for row in new} == expected_identities
+          assert all(row['campus_structure_complete'] is False for row in campuses)
+          assert all(row['additional_current_campuses_ruled_out'] is False for row in campuses)
+          assert len({row['draft_campus_id'] for row in campuses}) == len(campuses)
+
+          new_counts = Counter(row['review_identity_key'] for row in new)
+          assert new_counts['capital-international-schools'] == 2
+          assert new_counts['mount-international-school-community'] == 2
+          assert new_counts['global-paradigm-baccalaureate-school'] == 1
+          assert new_counts['international-school-elite-education'] == 1
+
+          structure_by_key = {row['review_identity_key']: row for row in structures}
+          for key in ('capital-international-schools', 'mount-international-school-community'):
+              assert structure_by_key[key]['reviewed_current_campus_count'] == 2
+              assert structure_by_key[key]['campus_structure_state'] == 'multiple_current_campuses_reviewed_structure_not_exhaustive'
+              assert structure_by_key[key]['campus_structure_complete'] is False
+              assert structure_by_key[key]['additional_current_campuses_ruled_out'] is False
+
+          pending_keys = {row['review_identity_key'] for row in pending}
+          assert not ({
+              'global-paradigm-baccalaureate-school',
+              'capital-international-schools',
+              'mount-international-school-community',
+              'international-school-elite-education',
+          } & pending_keys)
 
           print(json.dumps(summary, indent=2))
           PY
