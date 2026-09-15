@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "batch_id": "overture-gap-resolution-2026-09-16-batch8",
+  "snapshot_date": "2026-09-16",
+  "records_count": 6,
+  "records": [
+    {
+      "overture_id": "f6df52a2-78ec-461e-a355-5558757de32b",
+      "overture_name": "Delta College International School",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:delta-college-language-international-school",
+      "target_name_en": "Delta College Language and International School",
+      "evidence_urls": [
+        "https://dcseg.com/",
+        "https://dcseg.com/contact/",
+        "https://dcseg.com/academic-programs/",
+        "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf"
+      ],
+      "review_note": "Current Delta College primary evidence identifies Delta College International Schools in Quesna, Menoufia and exposes multiple education systems including British and language programmes, with an American offering also present on the current site. The Overture row uses the same dcseg.com provider and Quesna geography. The accepted British Council source row is therefore current provider/international-school evidence, but exact programme/division topology belongs in D2.2 rather than being flattened into one curriculum identity. British Council Partner status grants no eligibility."
+    },
+    {
+      "overture_id": "4d48f75f-00bb-4145-9504-ea8d40b6eeb3",
+      "overture_name": "Riada American School",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-200",
+      "target_name_en": "Riada Language School - American Division",
+      "evidence_urls": [
+        "https://riadaamericanschool.org/",
+        "https://riadaamericanschool.org/cms/overview",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "Current Riada American School primary evidence places the American K-12 school on Victor Emanuel Street, Smouha, Alexandria, matching the Overture Victor Emanuel/Smouha row and the accepted current Cognia American-division source identity. The current public brand differs from the registry's provider/division label but describes the same American school division. Cognia presence alone grants no eligibility and no canonical merge is performed."
+    },
+    {
+      "overture_id": "b63bdaa3-a936-436a-bb6e-107c732e8bf3",
+      "overture_name": "Tiba International School - American Division",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-247",
+      "target_name_en": "Tiba Language School, American Division - Alexandria",
+      "evidence_urls": [
+        "https://www.tiba.school/img/StudentParent-Hand-Book%2023-1.pdf",
+        "https://www.tiba.school/",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "Current Tiba primary handbook explicitly identifies Tiba Language School, American Division in Alexandria and states the school has National and American streams. The Overture American-division row uses the same current tiba.school domain and Alexandria/45 Street context, aligning it to the accepted Cognia American-division source identity. Cognia alone grants no eligibility and no canonical merge is performed."
+    },
+    {
+      "overture_id": "15396f7f-7835-4654-87a4-f184c3eb0890",
+      "overture_name": "Egyptian English Language School (E.E.L.S.) / American Division",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-063",
+      "target_name_en": "Egyptian English Language School",
+      "evidence_urls": [
+        "https://eelsschools.com/",
+        "https://eelsschools.com/contact-us/",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "Current EELS primary evidence identifies Egyptian English Language School in Alexandria and explicitly offers National, IGCSE and American Diploma curricula. Its main building is on Mostafa Kamel Street behind the fire station in El Mandara, matching the Overture American-division row. Because the accepted Cognia source identity is institution-level while Overture is division-scoped, preserve the American division as D2.2 provider/division topology rather than broadening the source row. Cognia alone grants no eligibility."
+    },
+    {
+      "overture_id": "2aafda0f-7f43-4064-9823-cc8561de0ec0",
+      "overture_name": "The Modern American School Of Egypt",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-155",
+      "target_name_en": "Modern American School of Egypt 2000",
+      "evidence_urls": [
+        "https://mase.edu.eg/",
+        "https://mase.edu.eg/about/",
+        "https://mase.edu.eg/admission/",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "Current Modern American School of Egypt primary evidence states that MASE was founded in 2000 and that a second/newest campus was established in 2017. The Overture row references an Elnarges 2017 school context, while the accepted current Cognia identity retains the '2000' label. This is therefore explicit institution/campus topology for D2.2, not an automatic campus collapse or new institution. Cognia alone grants no eligibility."
+    },
+    {
+      "overture_id": "c7505fd7-5061-4bc6-a81c-1b0df3fa35e2",
+      "overture_name": "Victory College American Department",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-253",
+      "target_name_en": "Victory College",
+      "evidence_urls": [
+        "https://global.act.org/content/global/en/products-and-services/the-act-non-us/scores/act-high-achievers-mena-region.html",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "Current ACT International recognition lists VICTORY AMERICAN COLLEGE MAADI in Cairo, while the Overture row is Victory College American Department at 250 Street, Degla, Maadi. The accepted current Cognia row is provider-level Victory College, and separate British Department evidence also exists in the source universe. Preserve the American department as provider/division topology for D2.2 rather than flattening departments into the provider. Cognia and ACT recognition are evidence only and do not by themselves create a canonical identity."
+    }
+  ],
+  "rules": {
+    "resolution_is_discovery_triage_not_canonical_identity_merge": true,
+    "fuzzy_matching_authorizes_nothing": true,
+    "division_provider_relationships_require_d2_2_review": true,
+    "campus_relationships_require_d2_2_review": true,
+    "overture_grants_no_international_eligibility": true,
+    "canonical_institutions_created": 0,
+    "automatic_identity_merges_performed": 0,
+    "database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
