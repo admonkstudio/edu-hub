@@ -13,6 +13,7 @@ on:
       - 'tools/data-acquisition/international/apply_british_council_primary_scope_review.py'
       - 'tools/data-acquisition/international/build_candidate_universe.py'
       - 'tools/data-acquisition/international/seeds/cognia-egypt-milestones-2026-2027.json'
+      - 'tools/data-acquisition/international/seeds/canadian-offshore-schools-egypt-2026-09-15.json'
       - 'tools/data-acquisition/international/seeds/british-council-browser-discovery-*.json'
       - 'tools/data-acquisition/international/seeds/british-council-primary-scope-review-*.json'
       - '.github/workflows/edu-data-2-universe-checkpoint.yml'
@@ -66,7 +67,7 @@ jobs:
             --output-dir artifacts/international/british-council-reviewed-candidate-universe
       - name: Extract complete official Cognia Egypt registry
         run: python tools/data-acquisition/international/extract_cognia_egypt_registry.py
-      - name: Build supersession-safe D2.1 checkpoint
+      - name: Build supersession-safe D2.1 checkpoint with Canadian authorization evidence
         run: python tools/data-acquisition/international/build_d2_1_universe_checkpoint.py
       - name: Acquire Egypt-only Overture supporting discovery
         run: python tools/data-acquisition/international/acquire_overture_egypt_international_education.py
@@ -80,6 +81,7 @@ jobs:
           root = Path('artifacts/international/d2-1-universe-checkpoint')
           summary = json.loads((root/'checkpoint-summary.json').read_text(encoding='utf-8'))
           supersession = json.loads((root/'cognia-source-family-supersession.json').read_text(encoding='utf-8'))
+          canadian = json.loads((root/'canadian-offshore-source-family.json').read_text(encoding='utf-8'))
           rows = [json.loads(line) for line in (root/'source-lead-universe.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
           geo = json.loads(Path('artifacts/international/overture-egypt-international-education/overture-egypt-international-education.json').read_text(encoding='utf-8'))
           gaps = json.loads(Path('artifacts/international/overture-gap-review/gap-review-summary.json').read_text(encoding='utf-8'))
@@ -87,27 +89,35 @@ jobs:
           assert summary['foundational_authoritative_seed_rows'] == 96
           assert summary['historical_classified_strong_rows'] == 106
           assert summary['previous_reviewed_source_lead_rows'] == 332
+          assert summary['pre_canadian_current_source_lead_rows'] == 584
           assert summary['british_council_rows'] == 226
           assert summary['cognia_full_registry_rows'] == 256
           assert summary['cognia_milestone_rows_superseded'] == 4
           assert summary['cognia_new_rows_beyond_milestone_subset'] == 252
-          assert summary['current_source_lead_rows'] == 584
-          assert summary['scope_or_lead_state_counts'] == {'eligible': 115, 'excluded': 3, 'supporting_candidate': 466}
-          assert len(rows) == 584
+          assert summary['canadian_authorized_offshore_school_rows'] == 6
+          assert summary['current_source_lead_rows'] == 590
+          assert summary['scope_or_lead_state_counts'] == {'eligible': 121, 'excluded': 3, 'supporting_candidate': 466}
+          assert len(rows) == 590
           assert len(supersession) == 4
+          assert canadian['records_count'] == 6
+          assert len(set(canadian['source_record_ids'])) == 6
+          assert canadian['unique_institutions_claimed'] is None
+          assert canadian['canonical_institutions_created'] == 0
+          assert canadian['automatic_identity_merges_performed'] == 0
           assert summary['unique_institutions_claimed'] is None
+          assert summary['canadian_rows_auto_identity_merged'] == 0
 
           assert geo['country_filter'] == 'EG'
           assert geo['bbox_candidate_rows'] == 1121
           assert geo['non_egypt_rows_rejected'] == 79
           assert geo['record_count'] == 1042
           assert all('EG' in row['address_countries'] for row in geo['records'])
-          assert gaps['current_universe_source_rows'] == 584
+          assert gaps['current_universe_source_rows'] == 590
           assert gaps['overture_egypt_rows'] == 1042
-          assert gaps['exact_normalized_name_overlap_rows'] == 134
-          assert gaps['unmatched_supporting_rows'] == 908
-          assert gaps['unmatched_unique_normalized_names'] == 871
-          assert gaps['high_signal_preuniversity_rows'] == 268
+          assert gaps['exact_normalized_name_overlap_rows'] == 136
+          assert gaps['unmatched_supporting_rows'] == 906
+          assert gaps['unmatched_unique_normalized_names'] == 869
+          assert gaps['high_signal_preuniversity_rows'] == 266
           assert gaps['higher_ed_scope_review_rows'] == 75
           assert gaps['lower_priority_supporting_rows'] == 565
           assert gaps['fuzzy_matches_performed'] == 0
@@ -120,7 +130,7 @@ jobs:
           assert summary['automatic_identity_merges_performed'] == 0
           assert gaps['automatic_identity_merges_performed'] == 0
           assert summary['d2_1_complete'] is False
-          print(json.dumps({'checkpoint': summary, 'overture': {
+          print(json.dumps({'checkpoint': summary, 'canadian_source_family': canadian, 'overture': {
               'bbox_candidate_rows': geo['bbox_candidate_rows'],
               'non_egypt_rows_rejected': geo['non_egypt_rows_rejected'],
               'record_count': geo['record_count'],
