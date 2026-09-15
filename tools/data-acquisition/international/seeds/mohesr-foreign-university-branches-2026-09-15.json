@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "source_id": "mohesr_international_university_branches",
+  "snapshot_date": "2026-09-15",
+  "source_url": "https://dportal.mohesr.gov.eg/?id=172&option=com_sppagebuilder&view=page",
+  "publisher": "Egyptian Ministry of Higher Education and Scientific Research",
+  "source_listing_count": 10,
+  "records": [
+    {
+      "source_key": "upei",
+      "name_ar": "فرع جامعة جزيرة الأمير ادوارد",
+      "parent_university_en": "University of Prince Edward Island",
+      "country_code": "CA",
+      "operator_heading_ar": "الجامعات الكندية في مصر",
+      "source_listing_state": "listed_by_publisher",
+      "scope_state": "candidate",
+      "eligibility_pending": true
+    },
+    {
+      "source_key": "ryerson_tmu",
+      "name_ar": "فرع جامعة رايرسون",
+      "parent_university_en_at_source": "Ryerson University",
+      "current_parent_university_en": "Toronto Metropolitan University",
+      "country_code": "CA",
+      "operator_heading_ar": "الجامعات الكندية في مصر",
+      "source_listing_state": "listed_by_publisher",
+      "scope_state": "needs_review",
+      "eligibility_pending": true,
+      "lifecycle_review_required": true,
+      "source_note": "MOHESR still lists the branch and states it was established by decree 552/2021. SCU's current foreign-branch category reports nine branches and does not list Ryerson/TMU. Toronto Metropolitan University stated on 2023-08-24 that it would not admit new students to TMU-Cairo because it could not deliver programs to required standards at that time.",
+      "conflict_sources": [
+        "https://scu.eg/branches-of-international-universities/",
+        "https://www.torontomu.ca/media/releases/2023/08/toronto-metropolitan-university-working-with-egyptian-government/"
+      ]
+    },
+    {
+      "source_key": "coventry",
+      "name_ar": "فرع جامعة كوفنتري البريطانية",
+      "parent_university_en": "Coventry University",
+      "country_code": "GB",
+      "operator_heading_ar": "جامعات المعرفة الدولية",
+      "source_listing_state": "listed_by_publisher",
+      "scope_state": "candidate",
+      "eligibility_pending": true
+    },
+    {
+      "source_key": "nova",
+      "name_ar": "فرع جامعة نوفا البرتغالية",
+      "parent_university_en": "NOVA University Lisbon",
+      "country_code": "PT",
+      "operator_heading_ar": "جامعات المعرفة الدولية",
+      "source_listing_state": "listed_by_publisher",
+      "scope_state": "candidate",
+      "eligibility_pending": true
+    },
+    {
+      "source_key": "university_of_london",
+      "name_ar": "فرع جامعة لندن",
+      "parent_university_en": "University of London",
+      "country_code": "GB",
+      "operator_heading_ar": "الجامعات الأوروبية في مصر",
+      "source_listing_state": "listed_by_publisher",
+      "scope_state": "candidate",
+      "eligibility_pending": true
+    },
+    {
+      "source_key": "uclan",
+      "name_ar": "فرع جامعة وسط لانكشاير",
+      "parent_university_en": "University of Central Lancashire",
+      "country_code": "GB",
+      "operator_heading_ar": "الجامعات الأوروبية في مصر",
+      "source_listing_state": "listed_by_publisher",
+      "scope_state": "candidate",
+      "eligibility_pending": true
+    },
+    {
+      "source_key": "uel",
+      "name_ar": "فرع جامعة إيست لندن",
+      "parent_university_en": "University of East London",
+      "country_code": "GB",
+      "operator_heading_ar": "الجامعات الأوروبية في مصر",
+      "source_listing_state": "listed_by_publisher",
+      "scope_state": "candidate",
+      "eligibility_pending": true
+    },
+    {
+      "source_key": "kazan",
+      "name_ar": "فرع جامعة كازان الروسية",
+      "parent_university_en": "Kazan Federal University",
+      "country_code": "RU",
+      "operator_heading_ar": "مؤسسة مودرن جروب",
+      "source_listing_state": "listed_by_publisher",
+      "scope_state": "candidate",
+      "eligibility_pending": true
+    },
+    {
+      "source_key": "saint_petersburg",
+      "name_ar": "فرع جامعة سان بطرسبرج الروسية",
+      "parent_university_en": "Saint Petersburg State University",
+      "country_code": "RU",
+      "operator_heading_ar": "مؤسسة مودرن جروب",
+      "source_listing_state": "listed_by_publisher",
+      "scope_state": "candidate",
+      "eligibility_pending": true
+    },
+    {
+      "source_key": "hertfordshire",
+      "name_ar": "فرع جامعة هيرتفوردشاير البريطانية",
+      "parent_university_en": "University of Hertfordshire",
+      "country_code": "GB",
+      "operator_heading_ar": "مؤسسة جلوبال",
+      "source_listing_state": "listed_by_publisher",
+      "scope_state": "candidate",
+      "eligibility_pending": true
+    }
+  ],
+  "records_count": 10,
+  "notes": "This captures what the MOHESR page lists on 2026-09-15. It is source evidence, not an assertion that all ten branches are currently operating. Current branch status is reconciled against SCU and institution-primary evidence before promotion."
+}
