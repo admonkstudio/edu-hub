@@ -102,10 +102,10 @@ jobs:
           review_root = Path('artifacts/international/british-council-primary-scope-review')
           review = json.loads((review_root/'british-council-primary-scope-summary.json').read_text(encoding='utf-8'))
           assert review['source_rows'] == 105
-          assert review['review_batches'] == 2
-          assert review['reviewed_rows'] == 6
-          assert review['eligible_rows'] == 6
-          assert review['remaining_supporting_candidates'] == 99
+          assert review['review_batches'] == 3
+          assert review['reviewed_rows'] == 9
+          assert review['eligible_rows'] == 9
+          assert review['remaining_supporting_candidates'] == 96
           assert review['partner_status_treated_as_international_eligibility'] is False
           assert review['automatic_identity_creation_performed'] is False
           assert review['automatic_merges_performed'] == 0
@@ -116,9 +116,9 @@ jobs:
           summary = json.loads((root/'candidate-universe-summary.json').read_text(encoding='utf-8'))
           assert summary['source_record_count'] == 211
           assert summary['source_counts']['british_council_partner_schools_egypt_2026_09'] == 105
-          assert summary['scope_or_lead_state_counts']['eligible'] == 109
+          assert summary['scope_or_lead_state_counts']['eligible'] == 112
           assert summary['scope_or_lead_state_counts']['excluded'] == 3
-          assert summary['scope_or_lead_state_counts']['supporting_candidate'] == 99
+          assert summary['scope_or_lead_state_counts']['supporting_candidate'] == 96
           assert summary['english_name_present'] == 211
           assert summary['bilingual_name_gap_count'] == 97
           assert summary['unique_institutions_claimed'] is None
@@ -135,6 +135,9 @@ jobs:
               'bcps2026:capital-international-schools',
               'bcps2026:mount-international-school-community',
               'bcps2026:international-school-elite-education',
+              'bcps2026:alsson-international-school-haraniya',
+              'bcps2026:misr-language-schools',
+              'bcps2026:new-giza-international-school-evolution',
           }
           print(json.dumps({'browser_discovery': bc, 'primary_review': review, 'reviewed_candidate_universe': summary}, indent=2))
           PY
