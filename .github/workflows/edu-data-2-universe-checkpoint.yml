@@ -15,6 +15,7 @@ on:
       - 'tools/data-acquisition/international/build_candidate_universe.py'
       - 'tools/data-acquisition/international/seeds/cognia-egypt-milestones-2026-2027.json'
       - 'tools/data-acquisition/international/seeds/canadian-offshore-schools-egypt-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/zfa-german-schools-abroad-egypt-2026-09-15.json'
       - 'tools/data-acquisition/international/seeds/overture-gap-resolution-*.json'
       - 'tools/data-acquisition/international/seeds/british-council-browser-discovery-*.json'
       - 'tools/data-acquisition/international/seeds/british-council-primary-scope-review-*.json'
@@ -70,7 +71,7 @@ jobs:
             --output-dir artifacts/international/british-council-reviewed-candidate-universe
       - name: Extract complete official Cognia Egypt registry
         run: python tools/data-acquisition/international/extract_cognia_egypt_registry.py
-      - name: Build supersession-safe D2.1 checkpoint with Canadian authorization evidence
+      - name: Build supersession-safe D2.1 checkpoint with Canadian and ZfA evidence
         run: python tools/data-acquisition/international/build_d2_1_universe_checkpoint.py
       - name: Acquire Egypt-only Overture supporting discovery
         run: python tools/data-acquisition/international/acquire_overture_egypt_international_education.py
@@ -78,7 +79,7 @@ jobs:
         run: python tools/data-acquisition/international/build_overture_gap_review.py
       - name: Apply explicit Overture high-signal review decisions
         run: python tools/data-acquisition/international/apply_overture_gap_resolutions.py
-      - name: Assert checkpoint counts, Overture gap counts and safety boundaries
+      - name: Assert checkpoint counts, source-family lifecycle, Overture gaps and safety boundaries
         run: |
           python - <<'PY'
           import json
@@ -87,6 +88,7 @@ jobs:
           summary = json.loads((root/'checkpoint-summary.json').read_text(encoding='utf-8'))
           supersession = json.loads((root/'cognia-source-family-supersession.json').read_text(encoding='utf-8'))
           canadian = json.loads((root/'canadian-offshore-source-family.json').read_text(encoding='utf-8'))
+          zfa = json.loads((root/'zfa-german-schools-abroad-source-family.json').read_text(encoding='utf-8'))
           rows = [json.loads(line) for line in (root/'source-lead-universe.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
           geo = json.loads(Path('artifacts/international/overture-egypt-international-education/overture-egypt-international-education.json').read_text(encoding='utf-8'))
           gaps = json.loads(Path('artifacts/international/overture-gap-review/gap-review-summary.json').read_text(encoding='utf-8'))
@@ -96,29 +98,44 @@ jobs:
           assert summary['historical_classified_strong_rows'] == 106
           assert summary['previous_reviewed_source_lead_rows'] == 332
           assert summary['pre_canadian_current_source_lead_rows'] == 584
+          assert summary['pre_zfa_current_source_lead_rows'] == 590
           assert summary['british_council_rows'] == 226
           assert summary['cognia_full_registry_rows'] == 256
           assert summary['cognia_milestone_rows_superseded'] == 4
           assert summary['cognia_new_rows_beyond_milestone_subset'] == 252
           assert summary['canadian_authorized_offshore_school_rows'] == 6
-          assert summary['current_source_lead_rows'] == 590
-          assert summary['scope_or_lead_state_counts'] == {'eligible': 121, 'excluded': 3, 'supporting_candidate': 466}
-          assert len(rows) == 590
+          assert summary['zfa_german_schools_abroad_rows'] == 7
+          assert summary['current_source_lead_rows'] == 597
+          assert summary['scope_or_lead_state_counts'] == {'eligible': 128, 'excluded': 3, 'supporting_candidate': 466}
+          assert len(rows) == 597
           assert len(supersession) == 4
           assert canadian['records_count'] == 6
           assert len(set(canadian['source_record_ids'])) == 6
           assert canadian['unique_institutions_claimed'] is None
+          assert zfa['records_count'] == 7
+          assert len(set(zfa['source_record_ids'])) == 7
+          assert zfa['unique_institutions_claimed'] is None
+          assert zfa['current_das_membership_is_distinct_from_current_exam_authorization'] is True
+          assert zfa['hurghada_sek_i_last_conducted_school_year'] == '2024/2025'
           assert canadian['canonical_institutions_created'] == 0
           assert canadian['automatic_identity_merges_performed'] == 0
+          assert zfa['canonical_institutions_created'] == 0
+          assert zfa['automatic_identity_merges_performed'] == 0
           assert summary['unique_institutions_claimed'] is None
           assert summary['canadian_rows_auto_identity_merged'] == 0
+          assert summary['zfa_rows_auto_identity_merged'] == 0
+
+          hurghada = [r for r in rows if r.get('source_id') == 'zfa_german_schools_abroad_egypt_2026_09_15' and 'hurghada' in (r.get('name_en') or '').lower()]
+          assert len(hurghada) == 1
+          assert hurghada[0]['kmk_sek_i_lifecycle']['last_conducted_school_year'] == '2024/2025'
+          assert hurghada[0]['kmk_sek_i_lifecycle']['current_sek_i_exam_authorization_after_2024_2025'] == 'not_asserted'
 
           assert geo['country_filter'] == 'EG'
           assert geo['bbox_candidate_rows'] == 1121
           assert geo['non_egypt_rows_rejected'] == 79
           assert geo['record_count'] == 1042
           assert all('EG' in row['address_countries'] for row in geo['records'])
-          assert gaps['current_universe_source_rows'] == 590
+          assert gaps['current_universe_source_rows'] == 597
           assert gaps['overture_egypt_rows'] == 1042
           assert gaps['exact_normalized_name_overlap_rows'] == 136
           assert gaps['unmatched_supporting_rows'] == 906
@@ -152,7 +169,7 @@ jobs:
           assert gaps['automatic_identity_merges_performed'] == 0
           assert resolutions['automatic_identity_merges_performed'] == 0
           assert summary['d2_1_complete'] is False
-          print(json.dumps({'checkpoint': summary, 'canadian_source_family': canadian, 'overture': {
+          print(json.dumps({'checkpoint': summary, 'canadian_source_family': canadian, 'zfa_das_source_family': zfa, 'overture': {
               'bbox_candidate_rows': geo['bbox_candidate_rows'],
               'non_egypt_rows_rejected': geo['non_egypt_rows_rejected'],
               'record_count': geo['record_count'],
