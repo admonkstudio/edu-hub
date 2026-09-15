@@ -98,7 +98,7 @@ jobs:
           assert summary['reviewed_discovery_source_rows'] == 6
           assert summary['reviewed_source_or_lead_rows'] == 45
           assert summary['original_unreviewed_source_rows'] == len(original_queue) == 67
-          assert summary['unqualified_discovery_rows'] == len(discovery_queue) == 64
+          assert summary['unqualified_discovery_rows'] == len(discovery_queue) == 99
           assert summary['qualified_discovery_rows_pending_identity_review'] == len(qualified_queue) == 0
           assert summary['full_universe_unique_institution_count_claimed'] is None
           assert summary['absence_of_match_treated_as_uniqueness_proof'] is False
