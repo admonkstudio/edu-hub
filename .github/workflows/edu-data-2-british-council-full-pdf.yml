@@ -58,9 +58,23 @@ jobs:
           coverage = json.loads((root/'coverage/british-council-full-pdf-coverage-summary.json').read_text(encoding='utf-8'))
           reviewed = json.loads(Path('artifacts/international/british-council-browser-discovery/british-council-browser-summary.json').read_text(encoding='utf-8'))
 
-          assert download['capture_mode'] == 'headless_chromium_same_origin_fetch'
+          assert download['capture_mode'] == 'headless_chromium_browser_acquisition'
+          assert download['discovery_mode'] in {
+              'landing_page_discovery',
+              'pinned_official_url_after_landing_failure',
+          }
+          assert download['retrieval_mode'] in {
+              'browser_navigation_response',
+              'same_context_fetch',
+          }
           assert download['http_status'] == 200
           assert download['pdf_bytes'] > 500000
+          assert download['international_eligibility_granted'] == 0
+          assert download['canonical_institutions_created'] == 0
+          assert download['automatic_merges_performed'] == 0
+          assert download['database_mutation_performed'] is False
+          assert download['public_projection_rows_created'] == 0
+
           assert extracted['capture_mode'] == 'local_browser_download'
           assert extracted['pdf_sha256'] == download['pdf_sha256']
           assert extracted['pdf_page_count'] >= 19
