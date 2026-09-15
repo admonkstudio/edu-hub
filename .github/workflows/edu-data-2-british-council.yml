@@ -80,9 +80,9 @@ jobs:
 
           bc_root = Path('artifacts/international/british-council-browser-discovery')
           bc = json.loads((bc_root/'british-council-browser-summary.json').read_text(encoding='utf-8'))
-          assert bc['reviewed_discovery_batches'] == 2
-          assert bc['reviewed_discovery_rows'] == 70
-          assert bc['rows_with_website_reference'] == 54
+          assert bc['reviewed_discovery_batches'] == 3
+          assert bc['reviewed_discovery_rows'] == 105
+          assert bc['rows_with_website_reference'] == 82
           assert bc['unique_institutions_claimed'] is None
           assert bc['international_eligibility_granted'] == 0
           assert bc['canonical_institutions_created'] == 0
@@ -93,19 +93,19 @@ jobs:
 
           raw_root = Path('artifacts/international/british-council-candidate-universe')
           raw = json.loads((raw_root/'candidate-universe-summary.json').read_text(encoding='utf-8'))
-          assert raw['source_record_count'] == 176
-          assert raw['source_counts']['british_council_partner_schools_egypt_2026_09'] == 70
+          assert raw['source_record_count'] == 211
+          assert raw['source_counts']['british_council_partner_schools_egypt_2026_09'] == 105
           assert raw['scope_or_lead_state_counts']['eligible'] == 103
           assert raw['scope_or_lead_state_counts']['excluded'] == 3
-          assert raw['scope_or_lead_state_counts']['supporting_candidate'] == 70
+          assert raw['scope_or_lead_state_counts']['supporting_candidate'] == 105
 
           review_root = Path('artifacts/international/british-council-primary-scope-review')
           review = json.loads((review_root/'british-council-primary-scope-summary.json').read_text(encoding='utf-8'))
-          assert review['source_rows'] == 70
+          assert review['source_rows'] == 105
           assert review['review_batches'] == 2
           assert review['reviewed_rows'] == 6
           assert review['eligible_rows'] == 6
-          assert review['remaining_supporting_candidates'] == 64
+          assert review['remaining_supporting_candidates'] == 99
           assert review['partner_status_treated_as_international_eligibility'] is False
           assert review['automatic_identity_creation_performed'] is False
           assert review['automatic_merges_performed'] == 0
@@ -114,12 +114,12 @@ jobs:
 
           root = Path('artifacts/international/british-council-reviewed-candidate-universe')
           summary = json.loads((root/'candidate-universe-summary.json').read_text(encoding='utf-8'))
-          assert summary['source_record_count'] == 176
-          assert summary['source_counts']['british_council_partner_schools_egypt_2026_09'] == 70
+          assert summary['source_record_count'] == 211
+          assert summary['source_counts']['british_council_partner_schools_egypt_2026_09'] == 105
           assert summary['scope_or_lead_state_counts']['eligible'] == 109
           assert summary['scope_or_lead_state_counts']['excluded'] == 3
-          assert summary['scope_or_lead_state_counts']['supporting_candidate'] == 64
-          assert summary['english_name_present'] == 176
+          assert summary['scope_or_lead_state_counts']['supporting_candidate'] == 99
+          assert summary['english_name_present'] == 211
           assert summary['bilingual_name_gap_count'] == 97
           assert summary['unique_institutions_claimed'] is None
           assert summary['canonical_institutions_created'] == 0
