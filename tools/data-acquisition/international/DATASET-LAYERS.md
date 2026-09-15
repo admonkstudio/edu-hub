@@ -31,35 +31,43 @@ The current ZfA directory contributes **7 Egypt DAS source rows**. DAS membershi
 
 ## Substantive international higher-education review layer
 
-The 2026-09-15 higher-education review adds **5 explicitly qualified source/evidence rows** under the project's existing substantive-international standard:
+The 2026-09-15 higher-education review adds **5 explicitly qualified source/evidence rows**: GIU, GUC, UFE, BUE and AASTMT.
 
-- German International University (GIU);
-- German University in Cairo (GUC);
-- French University in Egypt (UFE);
-- The British University in Egypt (BUE);
-- Arab Academy for Science, Technology and Maritime Transport (AASTMT).
-
-The eligibility basis is substantive binational/intergovernmental/transnational/international-organizational status supported by current regulator, government, recognized academic-network or institution-primary evidence. Egyptian legal incorporation, private-university status or national-university status is not by itself decisive; however, branding, a foreign partnership, a validation arrangement or a dual degree alone remains insufficient.
+The eligibility basis is substantive binational/intergovernmental/transnational/international-organizational status supported by current regulator, government, recognized academic-network or institution-primary evidence. Egyptian legal incorporation, private-university status or national-university status is not by itself decisive; branding, a foreign partnership, validation arrangement or dual degree alone remains insufficient.
 
 These are source/evidence additions, not a claim of five new unique canonical institutions.
 
+## Mansoura College provider/school topology review
+
+The accepted 2026-09-15 Mansoura review establishes a provider/campus umbrella with four school units without materializing that umbrella as a canonical institution.
+
+- `Mansoura College Language School` — national, provider context only, not added to the active international universe.
+- `Modern Mansoura College Language School` — national, provider context only; the existing British Council row remains separate supporting provenance and is not auto-merged.
+- `Mansoura College British School` — **eligible reviewed source/evidence row**, supported by current institution-primary evidence plus Pearson centre `92720` lifecycle evidence.
+- `Mansoura College 2 International American School` — **eligible reviewed source/evidence row**, supported by current institution-primary evidence plus current recognized Cognia/ACT evidence; the original Cognia row remains separate provenance.
+
+The Overture row `Mansoura College International Schools` is reviewed as a provider-umbrella alias, not a separate institution. Overture, Cognia and British Council Partner status grant no eligibility by themselves.
+
+Review contract: `tools/data-acquisition/international/seeds/mansoura-college-topology-review-2026-09-15.json`.
+
 ## Current expanded D2.1 source/evidence universe
 
-Accepted `EDU-DATA-2 D2.1 Universe Checkpoint` run **`35009564541`** at head `6ffb7cbb3d4e07e66bfc8317451a9829328c22c8` proves:
+Accepted `EDU-DATA-2 D2.1 Universe Checkpoint` run **`35010912245`** at head `020b223368fc0fd4dcc1b148bfa61461c92e493a` proves:
 
-- **602 total source/evidence rows**;
-- **133 eligible source/evidence rows**;
+- **604 total source/evidence rows**;
+- **135 eligible source/evidence rows**;
 - **466 supporting candidates**;
 - **3 excluded source rows**;
 - 226 British Council rows;
 - 256 current Cognia registry rows;
 - 6 Canadian authorized offshore-school rows;
 - 7 current ZfA German Schools Abroad rows;
-- 5 reviewed substantive-international higher-education rows.
+- 5 reviewed substantive-international higher-education rows;
+- 2 reviewed eligible Mansoura College international-school rows.
 
-`602` is **not** a unique-institution count. A source row may later reconcile to an institution, campus, division, provider/group, cross-source overlap, lifecycle evidence or an out-of-scope entity.
+`604` is **not** a unique-institution count. A source row may later reconcile to an institution, campus, division, provider/group, cross-source overlap, lifecycle evidence or an out-of-scope entity.
 
-The general `EDU-DATA-2 International Registry` validation for the same head is also green: run **`35009564572`**.
+The Mansoura checkpoint performs zero fuzzy matching, zero automatic identity merges, zero canonical institution creation, zero runtime database mutation and zero public projection.
 
 ## Overture supporting discovery and gap review
 
@@ -72,37 +80,39 @@ Current Egypt-filtered acquisition:
 - **1,042 Egypt-only supporting rows**;
 - 42 duplicate normalized-name groups retained.
 
-Against the 602-row universe, deterministic exact normalized-name comparison yields:
+Against the **604-row** universe, deterministic exact normalized-name comparison remains:
 
 - **141 exact overlap rows**;
 - **901 unmatched supporting rows**;
 - **865 unmatched normalized names**;
 - **266 high-signal pre-university rows**;
-- **70 higher-education review rows** after five exact-name HE overlaps introduced by the reviewed HE package;
+- **70 higher-education review rows**;
 - **565 lower-priority supporting rows**.
+
+The Mansoura additions do not distort these Overture comparison counts.
 
 ### High-signal school review
 
-Two checked-in school-review batches cover 30 of the 266 high-signal pre-university rows:
+Two checked-in school-review batches currently cover 30 of the 266 high-signal pre-university rows:
 
 - 28 resolved/explained as existing authoritative coverage, exact source aliases, or provider/division cases requiring D2.2 topology review;
 - 2 reviewed-but-unresolved supporting leads;
 - 236 high-signal rows remain unreviewed;
-- **238 rows remain outstanding in that school-review artifact**.
+- **238 rows remain outstanding in the school-review artifact**.
 
 The two already-reviewed unresolved rows are `Kada Modern British School` and `M.S.G International British School`.
 
+The separately rerouted Mansoura provider case is now complete and therefore is no longer an additional school follow-up outside the 238-row artifact.
+
 ### Higher-education review — complete
 
-The full **70-row post-overlay Overture higher-ed queue is explicitly reviewed** and now has **0 outstanding HE rows**:
+The full **70-row post-overlay Overture higher-ed queue is explicitly reviewed** and has **0 outstanding HE rows**:
 
-- 14 rows resolve to existing eligible HE identities or their departments/subunits;
-- 21 rows are classified out of active scope as Egyptian public/private/national HE or their subunits without sufficient substantive-international status;
+- 14 rows resolve to existing eligible HE identities or departments/subunits;
+- 21 rows are out of active scope as Egyptian public/private/national HE or subunits without sufficient substantive-international status;
 - 33 ambiguous academy/training/language/institute leads remain supporting-only because no current qualifying HE evidence was established;
-- 1 row (`Egypt British International School`) was an Overture category error and resolves to an existing BSO pre-university identity;
-- 1 row (`Mansoura College International Schools`) was an Overture category error and is rerouted to explicit pre-university provider/division review.
-
-The Mansoura reroute is backed by current first-party admissions/school evidence showing National, British IG and American school divisions. It is not automatically merged with existing Mansoura source rows.
+- 1 row (`Egypt British International School`) is an Overture category error resolving to existing BSO pre-university evidence;
+- 1 row (`Mansoura College International Schools`) is an Overture category error now resolved by the explicit provider/school topology review above.
 
 Overture grants zero eligibility, performs zero fuzzy matching and creates zero canonical identities.
 
@@ -114,8 +124,8 @@ OpenStreetMap remains a permitted supporting source, but all public Overpass mir
 
 D2.1 remains open for:
 
-- continued explicit review of the **238 outstanding high-signal school rows**, plus the separately rerouted Mansoura College school/provider follow-up;
-- read-only comparison against the owned **24,916-row V7** archive, with all useful unmatched leads re-sourced from current permitted evidence before use;
+- continued explicit review of the **238 outstanding high-signal school rows** in small deterministic batches;
+- read-only comparison against the owned **24,916-row V7** archive, with useful unmatched leads re-sourced from current permitted evidence before use;
 - controlled Edarabia reference-only discovery under `docs/SOURCE-USAGE-POLICY.md`;
 - institution/operator primary-source exhaustion for remaining likely gaps and topology ambiguity.
 
