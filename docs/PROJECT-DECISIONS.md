@@ -14,164 +14,74 @@ Last consolidated: 2026-09-16.
 
 **Decision:** Binding order is `D2.1 universe → D2.2 identities/providers/campuses/divisions → D2.3 EN/AR → D2.4 enrichment → D2.5 media → D2.6 completeness audit → D2.7 portable freeze`.
 
-**Decision:** Astro/Instatic selection, public-page architecture, filters, visual design and production frontend work are deferred until D2.7 is frozen.
-
-**Decision:** Supabase is not part of Edu Hub. Ask Kalam infrastructure/data must remain unrelated. The research/data layer must remain portable and presentation-neutral.
+**Decision:** Astro/Instatic selection, public-page architecture, filters, visual design and production frontend work are deferred until D2.7 is frozen. Supabase is not part of Edu Hub.
 
 ## 3. Evidence architecture and source of truth
 
 **Decision:** Logical path remains `external source → raw evidence → staging/reconciliation → reviewed canonical data → public projection → website`.
 
-**Decision:** Raw/staging layers are private and never published directly. Official/regulatory/accreditation/institution-primary evidence is preferred over secondary directories. Conflicting assertions remain explicit review work; missing facts never justify invented values. Current changing facts preserve lifecycle/history.
-
-**Decision:** AI may assist research, matching, localization and drafting but may not invent unsupported facts or silently promote review hints to canonical truth.
+**Decision:** Raw/staging layers are private and never published directly. Official/regulatory/accreditation/institution-primary evidence is preferred over secondary directories. Conflicting assertions remain explicit review work; missing facts never justify invented values. AI may assist but may not silently promote review hints to canonical truth.
 
 ## 4. Active international-education scope
 
-**Decision:** Active Phase 1 scope covers international education in Egypt, including private/independent international schools, private/independent IB World Schools, recognized foreign-national/international school models, recognized foreign university branches, and substantive internationally chartered/accredited/binational/transnational institutions.
-
-**Decision:** Egyptian public schools and ordinary Egyptian public universities are not active Phase 1 targets. Historical national-registry work is retained as evidence/history only.
-
-## 5. International eligibility standard
-
-**Decision:** Every candidate has an explicit scope/review state. International branding never establishes eligibility by itself.
-
-**Decision:** Strong school evidence may include active IB authorization, official French homologation, recognized German foreign-school evidence, BSO/recognized foreign-national status, or comparable current regulatory/accreditation evidence combined with the relevant scope rule.
+**Decision:** Active Phase 1 scope covers international education in Egypt, including private/independent international schools, recognized foreign-national/international school models, recognized foreign university branches, and substantively international/binational/transnational institutions. International branding never establishes eligibility by itself.
 
 **Decision:** British Council Partner status, Cognia presence, Overture/OSM, V7 and commercial directories are discovery/support evidence only and do not independently grant international eligibility.
 
-## 6. Higher-education boundary — substantive international status
+## 5. Higher-education boundary
 
-**Decision:** Recognized current foreign university branches are eligible. AUC is eligible as an internationally chartered/accredited independent institution when backed by current evidence.
+**Decision:** Recognized current foreign university branches are eligible. Egyptian incorporation/private/national legal form is not automatically exclusionary where separate current evidence establishes substantive binational, intergovernmental, transnational or international-organizational status. Foreign branding, partnership, validation or dual degree alone remains insufficient.
 
-**Decision:** Egyptian incorporation/private/national legal form is not automatically exclusionary when separate current evidence establishes substantive **binational, intergovernmental, transnational or international-organizational status**.
+**Decision:** GIU, GUC, UFE, BUE and AASTMT remain the explicit 2026-09-15 substantive-international HE additions. The full 70-row post-overlay Overture HE queue has **0 outstanding rows** and must not be restarted absent changed evidence/regression.
 
-**Decision:** Foreign branding, partnership, exchange, franchise, validation or dual degree alone remains insufficient.
-
-**Decision:** The 2026-09-15 reviewed HE package qualifies GIU, GUC, UFE, BUE and AASTMT under this standard. These are source/evidence additions, not five automatically created unique institutions.
-
-Reference: `tools/data-acquisition/international/seeds/substantive-international-higher-ed-review-2026-09-15.json`.
-
-## 7. Overture higher-education review boundary
-
-**Decision:** Overture category/name signals are triage inputs only; every HE decision is explicit and source-backed.
-
-**Decision:** The full 70-row post-overlay HE queue has **0 outstanding rows**: 14 existing eligible aliases/subunits, 21 out-of-scope Egyptian HE rows/subunits, 33 supporting-only academy/training/institute leads, 1 EBIS school-category error and 1 Mansoura provider/school category error closed through explicit topology review.
-
-**Decision:** Rerouting a category error does not create or merge an identity. Do not restart this review unless current evidence changes or a regression is found.
-
-## 8. Source-family and layer-count semantics
+## 6. Source-family and layer-count semantics
 
 **Decision:** Source/evidence counts, reviewed identity counts, campus counts and division counts are separate contracts and must never be conflated.
 
-**Decision:** The 96-row foundational seed and 106-row historical classified strong-source layer remain independently reproducible provenance layers.
+**Decision:** The four historical Cognia milestone rows are superseded for current counting by the complete 256-row Cognia Egypt registry. Historical evidence remains preserved.
 
-**Decision:** A complete current same-publisher source family may supersede an older subset for current counting only when deterministic and explicit; historical evidence remains preserved.
+**Decision:** Accepted D2.1 run **`35025758910`** establishes the current **604 source/evidence row** checkpoint: **135 eligible / 466 supporting / 3 excluded**. `604` is not a unique-institution count.
 
-**Decision:** The four historical Cognia milestone rows are superseded for current counting by the complete 256-row Cognia Egypt registry. Canadian offshore-school and ZfA DAS evidence are additive source families, not automatic unique-institution additions.
+## 7. Identity, provider, campus and division boundaries
 
-**Decision:** Current ZfA DAS membership is distinct from current exam authorization. Deutsche Schule Hurghada retains current DAS evidence while the checked KMK Sek-I lifecycle records last conducted year `2024/2025`; no later Sek-I authorization is asserted.
+**Decision:** Institution, provider/group, physical campus and curriculum/language/phase division are distinct concepts. A British, American, French, IB or other section inside the same school/provider must not be silently duplicated as a separate institution merely because one source lists it independently.
 
-**Decision:** Accepted D2.1 run **`35025256648`** establishes the current **604 source/evidence row** checkpoint: **135 eligible / 466 supporting / 3 excluded**. `604` is not a unique-institution count.
+**Decision:** One known address never proves campus completeness. Historical/current campus relationships and provider/division relationships require explicit reviewed D2.2 topology decisions.
 
-## 9. Supporting discovery qualification is evidence-separated
+**Decision:** Duplicate Overture place rows are not automatically deduplicated. Location mismatches block automatic aliasing. A demonstrable discovery-coordinate defect also does not override exact current address/name/contact evidence; preserve the defect explicitly rather than silently repair it.
 
-**Decision:** Supporting discovery may expand research coverage without rewriting historical strong-source layers. Discovery rows remain supporting candidates until separate explicit review supplies qualifying current evidence.
+### Mansoura College topology
 
-**Decision:** Primary re-sourcing is additive; discovery provenance records how a lead was found and is not automatically its eligibility basis. No unmatched row is assumed unique merely because no duplicate has yet been found.
+**Decision:** Mansoura College Language School and Modern Mansoura College Language School remain national/provider context. `Mansoura College British School` and `Mansoura College 2 International American School` are the two eligible reviewed source/evidence additions. The provider umbrella remains non-canonical and old Cognia/British Council rows remain separate provenance.
 
-## 10. Identity, provider, campus and division boundaries
+## 8. Name matching and automation safety
 
-**Decision:** Institution, provider/group, physical campus and curriculum/language/phase division are distinct concepts.
+**Decision:** Normalized/fuzzy similarity generates review hints only. No pipeline may auto-create canonical institutions, auto-merge source identities, auto-infer campus completeness or auto-publish raw/staging data. Exact source keys/Overture IDs are required for checked-in gap-resolution decisions.
 
-**Decision:** A British, American, French, IB or other section inside the same school/provider must not be silently duplicated as a separate institution merely because one source lists it independently. Division-scoped evidence remains division-scoped unless broader evidence supports promotion.
+## 9. OSM, V7 and Edarabia
 
-**Decision:** Cross-source reconciliation may conclude `same institution, different division` or `same provider, distinct school/campus` without forcing duplication or broad merge.
+**Decision:** OSM remains supporting discovery; hosted CI Overpass failure is diagnostic state, not zero coverage.
 
-**Decision:** A reviewed institution does not imply complete campus topology. One known address never proves one-campus completeness; historical locations are not current campuses unless current evidence supports them.
+**Decision:** V7 may be queried read-only for exact-name overlap/missing-name discovery across the owned 24,916-row archive; useful unmatched leads must be re-sourced before altering D2.1.
 
-### Mansoura College topology decision
+**Decision:** Edarabia is reference-only discovery. Do not bulk scrape/store/reproduce its content; re-source useful leads from permitted current sources.
 
-**Decision:** Current first-party Mansoura College evidence establishes a provider/campus umbrella with four school units. The umbrella is not materialized as a separate canonical institution during D2.1.
+## 10. Localization, temporal facts and media
 
-**Decision:** Mansoura College Language School and Modern Mansoura College Language School are national/provider context and are not added to the active international source universe. The British Council `Mansoura College Modern` row remains separate supporting provenance.
+**Decision:** EN and AR are first-class locales over one factual graph. Fees/admissions and lifecycle-sensitive facts retain academic-year/date/status provenance. Media discovery does not imply publication rights; `placeholder_required` is a valid terminal media state.
 
-**Decision:** `Mansoura College British School` and `Mansoura College 2 International American School` are the only two eligible reviewed source/evidence additions. Their supporting Pearson/Cognia/ACT and prior-source evidence remains separately preserved.
+## 11. Durable continuation and handoff
 
-**Decision:** Overture `Mansoura College International Schools` is a reviewed provider-umbrella alias, not a separate institution.
+**Decision:** `docs/EDU-DATA-2-CONTINUATION.md` is the durable execution cursor and GitHub Issue #8 is the visible roadmap. After each material accepted checkpoint, obtain green CI and synchronize all durable trackers.
 
-Reference: `tools/data-acquisition/international/seeds/mansoura-college-topology-review-2026-09-15.json`.
+## 12. Current exact cursor
 
-## 11. Review artifacts are not runtime database writes
+**Decision:** Eight high-signal school batches are accepted. Run **35025758910** proves **75 reviewed / 73 resolved-explained / 2 unresolved / 191 unreviewed / 193 outstanding** from the 266-row high-signal school queue.
 
-**Decision:** D2.2 may materialize deterministic reviewed draft artifacts before runtime storage is selected if provenance/review boundaries are preserved. Deterministic draft IDs do not themselves create canonical runtime rows or publication rights.
+**Decision:** Batch 8 reconciles Delta College International School as provider/programme topology; Riada American School to the current American-division source identity; Tiba International School - American Division to the current Alexandria American-division source identity; EELS American Division as division-scoped topology under the current EELS source identity; Modern American School of Egypt as explicit institution/campus topology preserving the 2000 and 2017 campus evidence; and Victory College American Department as division topology under the current Victory College provider identity.
 
-**Decision:** Identity review and eligibility remain separate. Incremental review batches are checked in, exact-source-key based, additive and may not retarget already-reviewed rows or auto-merge identities.
+**Decision:** The exact next D2.1 task is the remaining **193 high-signal school rows**, processed in small deterministic evidence-backed batches, followed by V7 read-only gap comparison, Edarabia reference-only pass and institution/operator primary-source exhaustion.
 
-## 12. Name matching and automation safety
+**Decision:** AIA International School, Delta American School and the two Sunrise International School Hurghada place rows remain held back pending stronger current evidence. Weak evidence must remain unresolved rather than be forced into an existing identity.
 
-**Decision:** Normalized-name or fuzzy similarity may generate review hints only; it never authorizes a canonical merge.
-
-**Decision:** No pipeline may auto-create canonical institutions, auto-merge source identities, auto-infer campus completeness or auto-publish raw/staging data. Exact source keys/Overture IDs are required for checked-in gap-resolution decisions.
-
-**Decision:** Duplicate Overture place rows are not automatically deduplicated. When current evidence shows they describe the same provider/campus area, each place row remains explicit review evidence until D2.2 makes a topology decision.
-
-**Decision:** Location mismatches block automatic aliasing. A similar or identical school name at a materially different location remains separate research work unless current evidence explicitly establishes the relationship.
-
-**Decision:** A demonstrable coordinate defect inside a discovery row does not override exact current address/name/contact evidence. The defect must be preserved in the review note rather than silently repaired or used as merge authority.
-
-## 13. OSM and geospatial discovery
-
-**Decision:** OSM remains a permitted supporting source. Hosted CI Overpass failure is diagnostic state, not negative evidence. Accepted diagnostic run `34997269459` recorded all 12 Egypt tiles blocked as `environment_blocked_all_tiles`; this must never be reported as zero OSM candidates.
-
-**Decision:** Overture is the current functioning broad geospatial supporting layer and still cannot grant eligibility.
-
-## 14. V7 owned archive
-
-**Decision:** Legacy V7 is not bulk-promoted. The owned 24,916-row archive may be queried read-only for exact overlap/missing-name discovery. Useful unmatched leads must be re-sourced from current permitted evidence before altering D2.1. V7 performs no fuzzy merge, eligibility decision or canonical creation.
-
-## 15. Edarabia policy
-
-**Decision:** Edarabia is reference-only discovery. Do not bulk scrape, systematically store, reproduce or publish Edarabia content without written permission/license. Re-source every useful lead/fact from permitted current sources. Edarabia ratings/reviews/images are not imported without independent lawful basis.
-
-Reference: `docs/SOURCE-USAGE-POLICY.md`.
-
-## 16. EN/AR localization
-
-**Decision:** Arabic and English are first-class locales tied to one factual graph. Language-neutral facts are stored once; localized text retains origin/status. Prefer official Arabic; transliteration/editorial Arabic must be explicitly marked.
-
-## 17. Fees, admissions and temporal facts
-
-**Decision:** Fees/admissions are versioned by academic year/cycle. Lifecycle-sensitive regulatory/accreditation facts retain dates/status and are not silently presented as current after expiry/supersession.
-
-## 18. Media rights and publication boundary
-
-**Decision:** Media discovery/provenance does not imply publication rights. Official-site/social images remain `public_use_allowed=false` unless a defensible reuse basis exists. Valid publication bases include institution permission/claim, verified open/Wikimedia licensing with attribution, or original Edu Hub/Admonk production. `placeholder_required` is a valid terminal state.
-
-## 19. SEO/publication boundary
-
-**Decision:** A database record does not automatically become an indexable page and arbitrary filter combinations do not automatically generate SEO pages. Only reviewed public projections may be published/indexed.
-
-## 20. Durable continuation and handoff
-
-**Decision:** `docs/EDU-DATA-2-CONTINUATION.md` is the durable execution cursor and GitHub Issue #8 is the visible roadmap.
-
-**Decision:** Every substantial continuation agent reads `AGENTS.md`, `PROJECT-STATUS.md`, this file, the continuation file, Issue #8 and `DATASET-LAYERS.md`, then inspects actual branch state/latest green CI before resuming.
-
-**Decision:** After each material accepted checkpoint, commit deterministic evidence/review decisions, obtain green CI, and synchronize durable docs/Issue #8 so the next agent never depends on chat history.
-
-## 21. Current exact cursor
-
-**Decision:** Overture higher-education review and Mansoura College topology are complete and must not be restarted absent changed evidence/regression.
-
-**Decision:** Seven high-signal school batches are accepted. Run **35025256648** proves **69 reviewed / 67 resolved-explained / 2 unresolved / 197 unreviewed / 199 outstanding** from the 266-row high-signal school queue.
-
-**Decision:** Batch 7 reconciles City International Schools in Zamalek as provider/branch/division topology linked to current British City College evidence; St. Fatima International School to the Al Hegaz source identity; Future British International School to the current Tanta source identity while preserving its Overture coordinate defect; Producer of Life International American School to the current Hurghada Producer of Life source identity; and Summits International Schools as provider/division topology linked to the current American Division evidence.
-
-**Decision:** The exact next D2.1 task is the remaining **199 high-signal school rows**, processed in small deterministic evidence-backed batches, followed by V7 read-only gap comparison, Edarabia reference-only pass and institution/operator primary-source exhaustion.
-
-**Decision:** AIA International School is not currently mapped to the known Alexandria AIA source identity because the Overture row is located in New Cairo while current authoritative AIA evidence is in Alexandria. Sunrise International School Hurghada also remains held back because two separate Overture place rows still lack sufficient first-party evidence connecting them to the accepted `New Sunrise International School` source row.
-
-**Decision:** Weak or incomplete evidence must remain unresolved rather than be forced into an existing alias. Delta American School remains held back pending stronger current evidence.
-
-**Decision:** D2.1 remains open until gap-exhaustion criteria are satisfied and an explicit closure decision hands the sole active cursor to D2.2.
+**Decision:** D2.1 remains open until gap-exhaustion criteria are satisfied and an explicit closure decision hands the sole cursor to D2.2.
