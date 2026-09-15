@@ -63,9 +63,21 @@ def capture(output: Path, timeout_ms: int) -> dict:
         initial_status = response.status if response else None
         page.wait_for_timeout(3000)
 
-        country = page.locator(f"#{COUNTRY_SELECT_ID}")
+        # Mendix-generated ids contain dots, so a CSS '#id' selector would
+        # interpret pieces of the id as class names. Attribute targeting keeps
+        # the generated id literal and matches the control observed by the
+        # preceding public-registry probe.
+        country = page.locator(f'select[id="{COUNTRY_SELECT_ID}"]')
         if country.count() != 1:
-            raise RuntimeError("Cognia country selector was not found exactly once")
+            # Fall back to the only select containing the observed Egypt option
+            # if Cognia regenerates the Mendix widget id while preserving UI.
+            candidates = page.locator("select").filter(has=page.locator("option", has_text="Egypt"))
+            if candidates.count() == 1:
+                country = candidates
+            else:
+                raise RuntimeError(
+                    f"Cognia country selector unresolved: exact={country.count()} candidates={candidates.count()}"
+                )
         selected_value = country.select_option(label="Egypt")
 
         search_button = page.get_by_role("button", name="Search", exact=True)
