@@ -6,15 +6,21 @@ builder carries that accepted evidence forward and may add current-campus drafts
 only for institution identities already present in the current D2.2 reviewed
 identity artifact. Each campus requires checked-in first-party evidence.
 
-A reviewed current location is not proof of complete campus topology. The builder
-therefore preserves campus_structure_complete=false and never infers additional
-campuses, writes canonical/runtime data, or creates a public projection.
+An institution may have more than one explicitly reviewed current campus. Multiple
+campuses in the same initial review batch are grouped into one campus-structure
+record. Adding a campus to an institution that already has accepted campus evidence
+requires review_mode=explicit_multi_campus_extension on every added record.
+
+A reviewed set of current locations is not proof of complete campus topology. The
+builder therefore preserves campus_structure_complete=false and never infers
+additional campuses, writes canonical/runtime data, or creates a public projection.
 """
 from __future__ import annotations
 
 import argparse
 import json
 import uuid
+from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -48,6 +54,16 @@ def discover_batches() -> list[Path]:
     return sorted((HERE / "seeds").glob(DEFAULT_BATCH_GLOB))
 
 
+def structure_key(row: dict) -> str | None:
+    return row.get("review_identity_key") or row.get("review_group_id")
+
+
+def structure_state(count: int) -> str:
+    if count > 1:
+        return "multiple_current_campuses_reviewed_structure_not_exhaustive"
+    return "at_least_one_current_campus_reviewed_structure_not_exhaustive"
+
+
 def build(identities_dir: Path, base_campus_dir: Path, output_dir: Path, batch_paths: list[Path]) -> dict:
     if not batch_paths:
         raise AssertionError("at least one incremental campus review batch is required")
@@ -73,11 +89,24 @@ def build(identities_dir: Path, base_campus_dir: Path, output_dir: Path, batch_p
     if len(institution_by_key) != len(institutions):
         raise AssertionError("duplicate review_identity_key in current institution drafts")
 
-    reviewed_identity_keys = {
-        row.get("review_identity_key") or row.get("review_group_id") for row in structures
-    }
-    if None in reviewed_identity_keys or len(reviewed_identity_keys) != len(structures):
-        raise AssertionError("base campus structure review contains duplicate or missing identity keys")
+    structures_by_key: dict[str, dict] = {}
+    for row in structures:
+        key = structure_key(row)
+        if key is None or key in structures_by_key:
+            raise AssertionError("base campus structure review contains duplicate or missing identity keys")
+        reviewed_ids = list(row.get("reviewed_current_campus_ids") or [])
+        if not reviewed_ids:
+            raise AssertionError(f"base campus structure has no reviewed campus IDs: {key}")
+        row["review_identity_key"] = key
+        row["reviewed_current_campus_ids"] = reviewed_ids
+        row["reviewed_current_campus_count"] = len(reviewed_ids)
+        row["review_batch_ids"] = list(row.get("review_batch_ids") or [row.get("review_batch_id")])
+        row["review_batch_ids"] = [value for value in row["review_batch_ids"] if value]
+        row["campus_structure_state"] = structure_state(len(reviewed_ids))
+        row["campus_structure_complete"] = False
+        row["additional_current_campuses_ruled_out"] = False
+        row["further_campus_review_required"] = True
+        structures_by_key[key] = row
 
     campus_ids = {row["draft_campus_id"] for row in campuses}
     if len(campus_ids) != len(campuses):
@@ -108,76 +137,111 @@ def build(identities_dir: Path, base_campus_dir: Path, output_dir: Path, batch_p
         if safety.get("public_projection_rows_created") != 0:
             raise AssertionError(f"{batch_path.name} must perform zero public projection")
 
+        records_by_key: dict[str, list[dict]] = defaultdict(list)
         for record in records:
-            key = record["review_identity_key"]
+            records_by_key[record["review_identity_key"]].append(record)
+
+        for key, identity_records in records_by_key.items():
             institution = institution_by_key.get(key)
             if institution is None:
                 raise AssertionError(f"campus review references unknown reviewed institution: {key}")
-            if key in reviewed_identity_keys:
-                raise AssertionError(
-                    f"identity already has accepted current-campus evidence; explicit multi-campus review required: {key}"
-                )
-            if record.get("campus_structure_complete") is not False:
-                raise AssertionError(f"incremental current-campus evidence cannot declare structure complete: {key}")
-            if record.get("lifecycle_status") != "active":
-                raise AssertionError(f"incremental campus package currently supports active campuses only: {key}")
-            if not record.get("address_en"):
-                raise AssertionError(f"current-campus review requires a source-backed location: {key}")
-            source_urls = list(record.get("source_urls") or [])
-            if not source_urls:
-                raise AssertionError(f"current-campus review requires first-party source URLs: {key}")
 
-            campus_key = record["campus_key"]
-            campus_id = stable_uuid("campus", f"{key}:{campus_key}")
-            if campus_id in campus_ids:
-                raise AssertionError(f"duplicate deterministic campus ID: {key}:{campus_key}")
-            campus_ids.add(campus_id)
-            institution_id = institution["draft_institution_id"]
+            existing_structure = structures_by_key.get(key)
+            if existing_structure is not None:
+                bad_modes = [
+                    record.get("review_mode")
+                    for record in identity_records
+                    if record.get("review_mode") != "explicit_multi_campus_extension"
+                ]
+                if bad_modes:
+                    raise AssertionError(
+                        "identity already has accepted current-campus evidence; later additions require "
+                        f"review_mode=explicit_multi_campus_extension: {key}"
+                    )
 
-            campus_row = {
-                "draft_campus_id": campus_id,
-                "draft_institution_id": institution_id,
-                "review_identity_key": key,
-                "institution_name_en": institution["canonical_name_en"],
-                "review_batch_id": batch_id,
-                "campus_key": campus_key,
-                "campus_type": record["campus_type"],
-                "lifecycle_status": record["lifecycle_status"],
-                "source_named_campus_name_en": record.get("source_named_campus_name_en"),
-                "address_en": record["address_en"],
-                "source_urls": source_urls,
-                "evidence_note": record["evidence_note"],
-                "current_campus_evidence_reviewed": True,
-                "campus_structure_complete": False,
-                "additional_current_campuses_ruled_out": False,
-                "canonical_campus_created": False,
-                "canonical_database_write_performed": False,
-                "public_projection_performed": False,
-            }
-            campuses.append(campus_row)
-            new_campuses.append(campus_row)
-            structures.append({
-                "draft_institution_id": institution_id,
-                "review_identity_key": key,
-                "institution_name_en": institution["canonical_name_en"],
-                "review_batch_id": batch_id,
-                "campus_structure_state": "at_least_one_current_campus_reviewed_structure_not_exhaustive",
-                "reviewed_current_campus_ids": [campus_id],
-                "reviewed_current_campus_count": 1,
-                "campus_structure_complete": False,
-                "additional_current_campuses_ruled_out": False,
-                "further_campus_review_required": True,
-                "canonical_database_write_performed": False,
-                "public_projection_performed": False,
-            })
-            reviewed_identity_keys.add(key)
+            added_ids: list[str] = []
+            for record in identity_records:
+                if record.get("campus_structure_complete") is not False:
+                    raise AssertionError(f"incremental current-campus evidence cannot declare structure complete: {key}")
+                if record.get("lifecycle_status") != "active":
+                    raise AssertionError(f"incremental campus package currently supports active campuses only: {key}")
+                if not record.get("address_en"):
+                    raise AssertionError(f"current-campus review requires a source-backed location: {key}")
+                source_urls = list(record.get("source_urls") or [])
+                if not source_urls:
+                    raise AssertionError(f"current-campus review requires first-party source URLs: {key}")
+
+                campus_key = record["campus_key"]
+                campus_id = stable_uuid("campus", f"{key}:{campus_key}")
+                if campus_id in campus_ids:
+                    raise AssertionError(f"duplicate deterministic campus ID: {key}:{campus_key}")
+                campus_ids.add(campus_id)
+                institution_id = institution["draft_institution_id"]
+
+                campus_row = {
+                    "draft_campus_id": campus_id,
+                    "draft_institution_id": institution_id,
+                    "review_identity_key": key,
+                    "institution_name_en": institution["canonical_name_en"],
+                    "review_batch_id": batch_id,
+                    "review_mode": record.get("review_mode") or "initial_current_campus_review",
+                    "campus_key": campus_key,
+                    "campus_type": record["campus_type"],
+                    "lifecycle_status": record["lifecycle_status"],
+                    "source_named_campus_name_en": record.get("source_named_campus_name_en"),
+                    "address_en": record["address_en"],
+                    "source_urls": source_urls,
+                    "evidence_note": record["evidence_note"],
+                    "current_campus_evidence_reviewed": True,
+                    "campus_structure_complete": False,
+                    "additional_current_campuses_ruled_out": False,
+                    "canonical_campus_created": False,
+                    "canonical_database_write_performed": False,
+                    "public_projection_performed": False,
+                }
+                campuses.append(campus_row)
+                new_campuses.append(campus_row)
+                added_ids.append(campus_id)
+
+            if existing_structure is None:
+                structure = {
+                    "draft_institution_id": institution["draft_institution_id"],
+                    "review_identity_key": key,
+                    "institution_name_en": institution["canonical_name_en"],
+                    "review_batch_id": batch_id,
+                    "review_batch_ids": [batch_id],
+                    "reviewed_current_campus_ids": added_ids,
+                    "reviewed_current_campus_count": len(added_ids),
+                    "campus_structure_state": structure_state(len(added_ids)),
+                    "campus_structure_complete": False,
+                    "additional_current_campuses_ruled_out": False,
+                    "further_campus_review_required": True,
+                    "canonical_database_write_performed": False,
+                    "public_projection_performed": False,
+                }
+                structures_by_key[key] = structure
+            else:
+                merged_ids = list(existing_structure["reviewed_current_campus_ids"]) + added_ids
+                existing_structure["reviewed_current_campus_ids"] = merged_ids
+                existing_structure["reviewed_current_campus_count"] = len(merged_ids)
+                existing_structure["campus_structure_state"] = structure_state(len(merged_ids))
+                batch_ids = list(existing_structure.get("review_batch_ids") or [])
+                if batch_id not in batch_ids:
+                    batch_ids.append(batch_id)
+                existing_structure["review_batch_ids"] = batch_ids
+                existing_structure["review_batch_id"] = batch_id
+                existing_structure["campus_structure_complete"] = False
+                existing_structure["additional_current_campuses_ruled_out"] = False
+                existing_structure["further_campus_review_required"] = True
 
         applied_batches.append({
             "batch_id": batch_id,
             "path": batch_path.name,
             "records_count": len(records),
+            "institution_identity_count": len(records_by_key),
         })
 
+    reviewed_identity_keys = set(structures_by_key)
     pending_keys = sorted(set(institution_by_key) - reviewed_identity_keys)
     pending = [
         {
@@ -191,9 +255,12 @@ def build(identities_dir: Path, base_campus_dir: Path, output_dir: Path, batch_p
         for key in pending_keys
     ]
 
+    structures = list(structures_by_key.values())
     campuses.sort(key=lambda row: (row.get("review_identity_key") or row.get("review_group_id"), row["campus_key"]))
-    structures.sort(key=lambda row: row.get("review_identity_key") or row.get("review_group_id"))
-    new_campuses.sort(key=lambda row: row["review_identity_key"])
+    structures.sort(key=lambda row: structure_key(row) or "")
+    new_campuses.sort(key=lambda row: (row["review_identity_key"], row["campus_key"]))
+
+    multi_campus_structures = [row for row in structures if row["reviewed_current_campus_count"] > 1]
 
     output_dir.mkdir(parents=True, exist_ok=True)
     campuses_path = output_dir / "reviewed-current-campus-drafts.jsonl"
@@ -206,7 +273,7 @@ def build(identities_dir: Path, base_campus_dir: Path, output_dir: Path, batch_p
     write_jsonl(pending_path, pending)
 
     summary = {
-        "schema_version": 2,
+        "schema_version": 3,
         "built_at": datetime.now(timezone.utc).isoformat(),
         "work_package": "D2.2_incremental_current_campus_materialization",
         "deterministic_id_namespace": str(DRAFT_NAMESPACE),
@@ -217,6 +284,7 @@ def build(identities_dir: Path, base_campus_dir: Path, output_dir: Path, batch_p
         "new_current_campus_records": len(new_campuses),
         "reviewed_current_campus_records": len(campuses),
         "institutions_with_current_campus_evidence": len(reviewed_identity_keys),
+        "institutions_with_multiple_reviewed_current_campuses": len(multi_campus_structures),
         "institutions_pending_current_campus_review": len(pending),
         "campus_structure_complete_records": 0,
         "additional_current_campuses_ruled_out_records": 0,
