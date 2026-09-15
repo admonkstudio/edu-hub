@@ -22,8 +22,8 @@ Canonical sequence:
 ## 2. Last accepted checkpoint
 
 - Workflow: `EDU-DATA-2 D2.1 Universe Checkpoint`
-- Accepted run: **35025256648**
-- Accepted head: **`7aa5f49ddf90cf5cf36f5fc55da80bf040f1ceda`**
+- Accepted run: **35025758910**
+- Accepted head: **`7a1654aae28de18cdbc5d0273294187008ec7c35`**
 - Conclusion: **green**
 
 Accepted source/evidence universe remains:
@@ -80,27 +80,29 @@ Accepted decision batches:
 - `overture-gap-resolution-2026-09-15-batch5.json`
 - `overture-gap-resolution-2026-09-15-batch6.json`
 - `overture-gap-resolution-2026-09-16-batch7.json`
+- `overture-gap-resolution-2026-09-16-batch8.json`
 
-Accepted run `35025256648` proves:
+Accepted run `35025758910` proves:
 
 - **266 input rows**;
-- **69 explicitly reviewed**;
-- **67 resolved/explained**;
+- **75 explicitly reviewed**;
+- **73 resolved/explained**;
 - **2 reviewed-but-unresolved**;
-- **197 unreviewed**;
-- **199 outstanding**.
+- **191 unreviewed**;
+- **193 outstanding**.
 
 Reviewed unresolved rows remain `Kada Modern British School` and `M.S.G International British School`.
 
-Batch 7 explicitly reconciled:
+Batch 8 explicitly reconciled:
 
-- `City International Schools` → Zamalek provider/branch/division topology associated with current British City College evidence;
-- `St. Fatima International School` → current Al Hegaz source identity;
-- `Future British International School` → current Tanta source identity while preserving the Overture coordinate defect;
-- `Producer of Life International American School` → current Hurghada Producer of Life source identity;
-- `Summits International Schools` → provider/division topology associated with the current American Division evidence.
+- `Delta College International School` → Quesna provider/international-school topology requiring D2.2;
+- `Riada American School` → current Cognia American-division source identity in Smouha, Alexandria;
+- `Tiba International School - American Division` → current Cognia American-division source identity in Alexandria;
+- `Egyptian English Language School (E.E.L.S.) / American Division` → current EELS provider identity with American division preserved for D2.2;
+- `The Modern American School Of Egypt` → current MASE identity with 2000/2017 campus context preserved for D2.2;
+- `Victory College American Department` → current Victory College provider identity with American department preserved for D2.2.
 
-No canonical institution was created and no eligibility was granted by Overture, Cognia or British Council Partner status.
+No canonical institution was created and no eligibility was granted by Overture, Cognia, ACT recognition or British Council Partner status.
 
 ### Held back
 
@@ -110,7 +112,7 @@ No canonical institution was created and no eligibility was granted by Overture,
 
 ## 5. Exact resume cursor — START HERE
 
-### Task A — continue the 199 outstanding high-signal school rows
+### Task A — continue the 193 outstanding high-signal school rows
 
 Work in small deterministic checked-in batches. Preferred outcome order:
 
@@ -120,9 +122,9 @@ Work in small deterministic checked-in batches. Preferred outcome order:
 4. genuinely new candidate with current permitted primary/recognized-source evidence;
 5. unresolved supporting-only lead.
 
-Continue from the unreviewed artifact produced by accepted run `35025256648`. Exact Overture IDs are mandatory; fuzzy similarity is research triage only.
+Continue from the unreviewed artifact produced by accepted run `35025758910`. Exact Overture IDs are mandatory; fuzzy similarity is research triage only.
 
-The next evidence-rich group currently under review includes Delta College International School, Riada American School, Tiba International School - American Division, Egyptian English Language School / American Division, The Modern American School of Egypt, and Victory College American Department. Preserve provider/division/campus distinctions; do not use similarity alone.
+The next evidence-rich group already isolated includes Beverly Hills American division, Cadmus International School New Administrative Capital, Cairo British College, Capital International School / Hadayek October, Dome/Genius Dome, Pioneers IGCSE, Thebes, Kaumeya American Department, Mount International branch rows, Noor/NILS Damietta, Port Said International School and Kenana American division. Preserve provider/division/campus distinctions and leave ambiguous rows unresolved rather than forcing aliases.
 
 ### Task B — execute V7 read-only comparison
 
