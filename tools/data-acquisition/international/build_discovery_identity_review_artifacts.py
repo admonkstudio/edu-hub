@@ -51,7 +51,14 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
 
 
 def current_name(row: dict) -> str:
-    return str(row.get("name_en") or row.get("name_ar") or row.get("parent_university_en") or "")
+    """Read names from both source-universe rows and materialized queue rows."""
+    return str(
+        row.get("source_name")
+        or row.get("name_en")
+        or row.get("name_ar")
+        or row.get("parent_university_en")
+        or ""
+    )
 
 
 def discover_decisions() -> list[Path]:
