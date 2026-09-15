@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "batch_id": "overture-higher-ed-scope-review-2026-09-15-batch1",
+  "source_snapshot_date": "2026-09-15",
+  "expected_input_rows": 70,
+  "evidence_context": [
+    "https://scu.eg/branches-of-international-universities/",
+    "https://scu.eg/educational-institutions-with-international-and-framework-agreements/",
+    "https://scu.eg/accredited-private-universities/",
+    "https://scu.eg/الجامعات-المصرية-الأهلية/"
+  ],
+  "groups": [
+    {
+      "decision": "existing_eligible_he_identity_or_subunit",
+      "target_source_id": "msche_auc",
+      "target_source_record_id": "msche-0637",
+      "target_name_en": "The American University in Cairo",
+      "evidence_urls": ["https://www.aucegypt.edu/"],
+      "review_note": "AUC is already an accepted eligible institution; Overture row is a department/name variant.",
+      "overture_ids": [
+        "25be875d-ba3e-4c92-b69d-e2123110d3b3",
+        "f6473cdc-ba79-4e10-952f-4fd5970148e7",
+        "ee14adb7-9d92-4156-b630-41a6a570246b"
+      ]
+    },
+    {
+      "decision": "existing_eligible_he_identity_or_subunit",
+      "target_source_id": "reviewed_he_bue_uk_egypt_2026_09_15",
+      "target_source_record_id": "bue",
+      "target_name_en": "The British University in Egypt",
+      "evidence_urls": [
+        "https://www.bue.edu.eg/leadership-structure",
+        "https://www.bue.edu.eg/academic-services/academic-regulations-bue"
+      ],
+      "review_note": "BUE was separately re-sourced as substantive international HE; remaining Overture rows are aliases/faculty subunits.",
+      "overture_ids": [
+        "cde06798-74a0-4bac-a4b6-8eb672e870f2",
+        "3e92e6c9-b19e-41e1-bd6b-9dc79e4631b7",
+        "cc5c7eb3-325c-4fb2-b9f4-2797a4faf7be",
+        "dc710c29-0173-4674-a26c-e97aa60fc600",
+        "8d6f70ed-5a73-4a1c-9f9d-ad38f6605e1c"
+      ]
+    },
+    {
+      "decision": "existing_eligible_he_identity_or_subunit",
+      "target_source_id": "reviewed_he_ufe_franco_egyptian_2026_09_15",
+      "target_source_record_id": "ufe",
+      "target_name_en": "French University in Egypt",
+      "evidence_urls": [
+        "https://ufe.edu.eg/about-ufe-2/",
+        "https://www.egypte.campusfrance.org/fr/l-universite-francaise-d-egypte-ufe"
+      ],
+      "review_note": "UFE was separately re-sourced as substantive international HE; remaining Overture rows are office/name variants.",
+      "overture_ids": [
+        "fddcd48f-25be-48f0-8025-cb54b8a8034e",
+        "13da73a5-a4fa-4460-a4d9-76e986b373d0"
+      ]
+    },
+    {
+      "decision": "existing_eligible_he_identity_or_subunit",
+      "target_source_id": "reviewed_he_guc_binational_2026_09_15",
+      "target_source_record_id": "guc",
+      "target_name_en": "German University in Cairo",
+      "evidence_urls": ["https://www.daad.de/de/infos-services-fuer-hochschulen/weiterfuehrende-infos-zu-daad-foerderprogrammen/guc/"],
+      "review_note": "GUC was separately re-sourced as binational/transnational HE; remaining bilingual Overture row is a name variant.",
+      "overture_ids": ["344a9a69-574b-418c-8ee3-dd686ffc6b95"]
+    },
+    {
+      "decision": "existing_eligible_he_identity_or_subunit",
+      "target_source_id": "reviewed_he_aastmt_arab_league_2026_09_15",
+      "target_source_record_id": "aastmt",
+      "target_name_en": "Arab Academy for Science, Technology and Maritime Transport",
+      "evidence_urls": [
+        "https://aast.edu/en/sdg/contenttemp.php?page_id=100019",
+        "https://scu.eg/educational-institutions-with-international-and-framework-agreements/"
+      ],
+      "review_note": "AASTMT was separately re-sourced as an Arab League specialized HE organization; Overture rows are college/campus subunits.",
+      "overture_ids": [
+        "e241e912-2bda-4d74-9d96-54197edac28d",
+        "eb32df34-fac6-4f60-a440-a170fd2ca583",
+        "aa5eec75-1546-43a0-8314-13dee37e5d79"
+      ]
+    },
+    {
+      "decision": "rerouted_preuniversity_existing_identity",
+      "target_source_id": "uk_dfe_bso_egypt_2026_08",
+      "target_source_record_id": "uk_dfe_bso_egypt_2026_08:257054225b1b6daa112d",
+      "target_name_en": "Egypt British International School",
+      "evidence_urls": ["https://reports.isi.net/DownloadReport.aspx?schoolId=1467"],
+      "review_note": "Overture misclassified a pre-university school as college/university; exact current source identity already exists.",
+      "overture_ids": ["f600b318-8e60-4688-a6f7-4548c08ef167"]
+    },
+    {
+      "decision": "rerouted_preuniversity_unresolved",
+      "evidence_urls": [],
+      "review_note": "Name/site pattern indicates a pre-university school lead, not a higher-ed institution. Preserve for school review rather than discard or promote.",
+      "overture_ids": ["9e34fa47-a93e-4c90-a902-9a8181834ec2"]
+    },
+    {
+      "decision": "out_of_scope_egyptian_higher_education",
+      "evidence_urls": [
+        "https://scu.eg/accredited-private-universities/",
+        "https://scu.eg/الجامعات-المصرية-الأهلية/",
+        "https://scu.eg/branches-of-international-universities/"
+      ],
+      "review_note": "Rows are Egyptian public/private/national institutions or their departments/services and do not become international-scope HE merely from foreign-language, country-name, international-office, or partnership branding.",
+      "overture_ids": [
+        "2c11a345-2a07-43f0-b7ce-697669cf405c",
+        "95cfbfe8-610d-4789-832e-663b6f2211e8",
+        "30092b44-b0ea-4d72-9ef6-53d1472dcdef",
+        "3669bf4b-65d2-4944-88cd-30856d6937d4",
+        "f2bf2fca-1cac-4853-b362-42339cae877e",
+        "55a83eb0-2eca-420b-a117-16b3b147758a",
+        "d0973d30-644a-4f1f-b689-419d504b2574",
+        "c1f2a2fa-d3b4-476c-819d-c9323bd7fdc0",
+        "b95ebbc0-25d0-430e-8d49-722f6c83d527",
+        "a1d84120-daaa-4464-83a0-26bbfdeac2b1",
+        "fa544a2b-49b3-468a-989e-5e9bc264bea0",
+        "217395b4-7608-4635-b174-a647ad277f94",
+        "1b178d2b-e1b8-467a-88d1-d54042d93b77",
+        "88aebcc3-28b1-4313-b5a6-4df318e7de08",
+        "36bc0a91-639b-49f9-87f2-608e379b6e3e",
+        "28e7f310-9694-41c4-994d-0b4e245bd8f4",
+        "ef1ebb2e-3a89-47f9-89f8-ac4f176a9444",
+        "e78a8cfc-d150-4152-836c-2392ec7deecd",
+        "2723a07c-484d-451d-8de9-780026214ee5",
+        "cc9a1f58-3c1b-4276-bcdc-b4a4c49aaee2",
+        "89047c34-a03c-488c-b6a5-fe6a779f9301"
+      ]
+    },
+    {
+      "decision": "supporting_only_no_current_qualifying_he_evidence",
+      "evidence_urls": ["https://scu.eg/branches-of-international-universities/"],
+      "review_note": "Overture alone supplies no qualifying regulator/charter evidence for these academy, training, language, foundation, institute, or ambiguous leads. They remain supporting-only and are not promoted.",
+      "overture_ids": [
+        "c26338cb-0fb2-445c-bfb5-b0c86a650ccc",
+        "09378147-44be-4065-bf5e-e9300f477fe6",
+        "95e57699-a0e8-4dc4-80c2-98fe8581dd87",
+        "b5643b27-6ee6-44f6-af8e-bc5ea6fcb892",
+        "5e994700-1986-416f-b29f-472f0bc6e959",
+        "1d277cd7-090d-43fb-baeb-ebddd87962e1",
+        "5c75f5fb-f85a-4e8f-a978-bfadf0c1d5d7",
+        "7379f4f9-c6f4-4d4d-abf9-1d45566569f4",
+        "93313843-aaa8-40f1-8d26-d6eaf57d8aaf",
+        "3f9f0fa2-bc08-46a5-a3f0-036c4a4b080c",
+        "484f0fd3-d8ff-40ac-bce1-68644258b7ba",
+        "4bd17df1-037f-4e84-97a7-c2e5ec0db7db",
+        "1f86c4f9-e57e-4aca-85e5-933e716bb6b0",
+        "3bb88b71-fcba-4d41-ad66-2ebcd0a07e80",
+        "bdb42748-df3d-4a46-93ba-159e7393dc71",
+        "21c93293-f236-4ca9-b9c0-cfde5d3af878",
+        "c4522ef7-7d4d-4b41-af2a-c9cd8fb8a279",
+        "d3dfa187-f764-4bae-b20b-1ba79bc03e38",
+        "e9b49b66-63b7-4aba-98c4-31aa9549a387",
+        "bc0fe0ae-388a-47ed-a242-a0b3898dbc8d",
+        "1a79669e-509f-4898-a5a7-f846008e0849",
+        "02fcbc51-44de-4725-a41f-71f3e16e919b",
+        "2df71c9c-1628-4e03-a281-710cbf21a3c1",
+        "eaf6432a-da7f-4061-9dd5-253cd67df0d6",
+        "b3aa0251-2d0a-4814-b384-3e54b67df7b2",
+        "b71af842-9d53-4d7b-b432-ff8b87926007",
+        "ed7f6836-9976-4922-a235-541d882daf36",
+        "1febe3e4-a790-48fd-8b61-f5762c1426b7",
+        "bcb1870d-dcd9-419d-a48c-3da3d86da393",
+        "c6e7388e-3019-4173-aeab-bab051b82ef4",
+        "7adb2876-a0f8-4e54-b5f9-b8ed9a7dd643",
+        "e40608f4-4193-4ca3-bc6c-9077fa068e4a",
+        "8118e874-a536-4743-a12f-1967bdbfa6e5"
+      ]
+    }
+  ]
+}
