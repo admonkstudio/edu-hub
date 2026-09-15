@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "batch_id": "overture-gap-resolution-2026-09-15-batch1",
+  "snapshot_date": "2026-09-15",
+  "records_count": 10,
+  "records": [
+    {
+      "overture_id": "658a613e-3d24-42ac-aef4-5470c929d2c8",
+      "overture_name": "British Columbia Canadian International School - BCCIS",
+      "decision": "covered_by_current_authoritative_source_family",
+      "target_source_id": "cicic_canadian_offshore_schools_egypt_2026_09_15",
+      "target_source_record_id": "cicic-4154",
+      "target_name_en": "British Columbia Canadian International School East (BCCIS East)",
+      "evidence_urls": [
+        "https://www.cicic.ca/986/british_columbia_canadian_international_school_east_%28bccis_east%29.canada?id=4154",
+        "https://bcforhighschool.gov.bc.ca/offshore/students-parents/find-a-bc-offshore-school/",
+        "https://bccis.ca/"
+      ],
+      "review_note": "Overture website and El Shorouk address align with the currently authorized BCCIS East source row. This is a review mapping only; no canonical merge is performed."
+    },
+    {
+      "overture_id": "264c07a4-909a-40a9-85d4-b3a62a90515a",
+      "overture_name": "GEMS - The British School",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "cis_international_accreditation_egypt",
+      "target_source_record_id": "cis_international_accreditation_egypt:e69a14b98712d28196aa",
+      "target_name_en": "The British School Al Rehab",
+      "evidence_urls": [
+        "https://tbs-cairo.net/"
+      ],
+      "review_note": "Current school branding is GEMS The British School Al Rehab; the accepted universe already contains the CIS identity and a British Council variant."
+    },
+    {
+      "overture_id": "d865585a-f125-4f5b-9723-473dbb79e55e",
+      "overture_name": "Kada Modern British School",
+      "decision": "unresolved_supporting_only",
+      "target_source_id": null,
+      "target_source_record_id": null,
+      "target_name_en": null,
+      "evidence_urls": [
+        "http://kada.com.eg/"
+      ],
+      "review_note": "A current school web presence exists, but no current recognized regulatory/accreditation evidence sufficient for D2.1 eligibility was established in this review."
+    },
+    {
+      "overture_id": "ee281c58-c1bf-4358-a658-d4df751e3d28",
+      "overture_name": "Manor House American School",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:manor-house-school-new-cairo",
+      "target_name_en": "Manor House School",
+      "evidence_urls": [
+        "https://mhsinternational.edu.eg/",
+        "https://mhsinternational.edu.eg/admissions-american"
+      ],
+      "review_note": "The institution-primary site explicitly models British and American schools/programmes under Manor House. Exact institution/division/campus topology remains D2.2 work."
+    },
+    {
+      "overture_id": "d9009e10-802a-40ee-a6a5-097080967ff0",
+      "overture_name": "Lycée Francais d'Alexandrie",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "french_homologation_2026_2027",
+      "target_source_record_id": "3010003T",
+      "target_name_en": "Lycée français - Mlf",
+      "evidence_urls": [
+        "http://www.lfalex.org/",
+        "https://talents.aefe.fr/fr/annonce/4562811-assistant-deducation-second-degre-alexandrie-egypte-alexandria"
+      ],
+      "review_note": "Current institution naming identifies Lycée français d'Alexandrie; the accepted French homologation row uses the Mlf list label and UAI 3010003T."
+    },
+    {
+      "overture_id": "460799a8-05a0-4fa6-8f2f-8e5450ac45c8",
+      "overture_name": "Nefertari Deutsche Internationale Schule",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "ib_world_schools_egypt",
+      "target_source_record_id": "ib_world_schools_egypt:da08494c7053c0824c89",
+      "target_name_en": "Nefertari International School",
+      "evidence_urls": [
+        "https://niscl.net/",
+        "https://ndis.niscl.net/",
+        "https://ndis.niscl.net/leitbild/"
+      ],
+      "review_note": "Nefertari's current primary site lists the German school as one of its curriculum divisions; NDIS itself states it is part of Nefertari International Schools Cairo."
+    },
+    {
+      "overture_id": "2f30ad71-e0bb-47d5-b86e-238edfb1826a",
+      "overture_name": "Mansoura College American Schools In Egypt",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-147",
+      "target_name_en": "Mansoura College 2 International School",
+      "evidence_urls": [
+        "https://ad.mc.edu.eg/"
+      ],
+      "review_note": "The institution-primary American School site is part of the Mansoura College education group. Exact relationship to the Cognia and British Council source rows requires D2.2 review rather than a new D2.1 identity assertion."
+    },
+    {
+      "overture_id": "5edc7306-db66-4679-998c-49fac966a9fe",
+      "overture_name": "American School Beverly Hills",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-022",
+      "target_name_en": "American School Beverly Hills Wahet October",
+      "evidence_urls": [
+        "https://www.bhs-egypt.com/american-school"
+      ],
+      "review_note": "Current primary site uses American School Beverly Hills Cairo – Wahet October, aligning with the existing Cognia registry source identity."
+    },
+    {
+      "overture_id": "98d37543-5344-4771-b4b7-531ab7750b50",
+      "overture_name": "M.S.G International British School of Egypt",
+      "decision": "unresolved_supporting_only",
+      "target_source_id": null,
+      "target_source_record_id": null,
+      "target_name_en": null,
+      "evidence_urls": [
+        "http://msg.edu.eg/"
+      ],
+      "review_note": "A current school web presence exists, but this review did not establish independent recognized evidence sufficient for D2.1 eligibility or a deterministic overlap with the current universe."
+    },
+    {
+      "overture_id": "b94dc47f-0cfe-4594-a78d-2e3e894eea57",
+      "overture_name": "Brilliance British School",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:brilliance-international-school-alexandria",
+      "target_name_en": "Brilliance International School, Alexandria",
+      "evidence_urls": [
+        "https://brilliance-bis.edupage.org/",
+        "https://brilliance-bis.edupage.org/contact/"
+      ],
+      "review_note": "The current school site identifies Brilliance International School at Askot, Alexandria, matching the location of the Overture British-name variant and the accepted British Council source row."
+    }
+  ],
+  "rules": {
+    "resolution_is_discovery_triage_not_canonical_identity_merge": true,
+    "fuzzy_matching_authorizes_nothing": true,
+    "division_provider_relationships_require_d2_2_review": true,
+    "unresolved_supporting_rows_remain_outside_accepted_universe": true,
+    "canonical_institutions_created": 0,
+    "automatic_identity_merges_performed": 0,
+    "database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
