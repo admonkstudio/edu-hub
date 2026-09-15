@@ -270,6 +270,40 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 **Accepted validations:** British Council browser discovery run `34909183019`; primary qualification batch 1 run `34909421938`.
 
+## 2026-09-15 — Qualified discovery reconciliation may consume exact queued original-source rows
+
+**Decision:** A discovery row that has already passed D2.1 qualification may be explicitly reconciled to an original strong-source row that is still present in the D2.2 identity queue when the evidence establishes they represent the same institution.
+
+**Decision:** Every such reconciliation must name the exact discovery `source_record_id` and the exact queued original `source_record_id`. Name similarity, shared domain, fuzzy matching or absence of another candidate is never sufficient to consume an original-source queue row.
+
+**Decision:** Once an exact checked-in reconciliation is accepted, both provenance memberships attach to one reviewed institution draft and the matched original row leaves the identity queue. The discovery evidence therefore improves provenance without inflating the institution count.
+
+**Decision:** The first accepted discovery↔original-source reconciliations cover Global Paradigm Baccalaureate School, Capital International Schools, Mount International School Community and The International School of Elite Education, each joining a qualified British Council discovery row to its exact queued IB source row.
+
+**Decision:** This remains review-artifact materialization only: zero automatic merges, zero canonical/runtime database writes and zero public projection.
+
+**Reference builder:** `tools/data-acquisition/international/build_discovery_identity_review_artifacts.py`.
+
+**Accepted validation:** `EDU-DATA-2 Discovery Identity Review` run `34911619429`.
+
+## 2026-09-15 — Explicit multi-campus review sets are additive and non-exhaustive
+
+**Decision:** One reviewed institution may receive multiple explicitly evidenced current-campus drafts in the same initial campus-review batch when first-party evidence establishes distinct active locations.
+
+**Decision:** Multiple campus rows for one identity are grouped into one campus-structure review record with explicit reviewed campus IDs and count. The reviewed count records what has been evidenced, not a claim that no other campus exists.
+
+**Decision:** A later campus addition to an institution that already has accepted current-campus evidence requires `review_mode=explicit_multi_campus_extension` for every added campus record. This prevents a later source observation from silently changing an accepted campus topology.
+
+**Decision:** Every current reviewed campus structure remains `campus_structure_complete=false`, `additional_current_campuses_ruled_out=false`, and `further_campus_review_required=true` unless a future explicit exhaustive review adopts a stronger state.
+
+**Decision:** The first accepted multi-campus review sets cover Capital International Schools (Main Campus and Lotus Campus) and Mount International School Community (New Administrative Capital and Al-Shorouk). Global Paradigm Baccalaureate School and The International School of Elite Education each receive one current-campus draft in the same batch without any single-campus completeness assertion.
+
+**Decision:** Multi-campus materialization remains portable review output only: zero canonical campus rows, zero runtime database mutation and zero public projection.
+
+**Reference builder:** `tools/data-acquisition/international/build_incremental_campus_review_artifacts.py`.
+
+**Accepted validation:** `EDU-DATA-2 Incremental Campus Review` run `34920248466`.
+
 ## Deferred decisions until database completion
 
 - Astro-first vs Instatic-first final implementation choice;
