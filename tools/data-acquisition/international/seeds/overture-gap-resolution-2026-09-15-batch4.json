@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "batch_id": "overture-gap-resolution-2026-09-15-batch4",
+  "snapshot_date": "2026-09-15",
+  "records_count": 9,
+  "records": [
+    {
+      "overture_id": "416b4ce3-8df4-4e81-b62a-e051c5c32954",
+      "overture_name": "El Alsson International School",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "uk_dfe_bso_egypt_2026_08",
+      "target_source_record_id": "uk_dfe_bso_egypt_2026_08:589996a51baeed6c9f56",
+      "target_name_en": "El Alsson British & American International School",
+      "evidence_urls": [
+        "https://www.alsson.com/",
+        "https://www.alsson.com/about/the-story-of-el-alsson",
+        "https://www.alsson.com/contact/",
+        "https://www.gov.uk/government/publications/british-schools-overseas-inspection-reports/british-schools-overseas-accredited-schools-inspection-reports"
+      ],
+      "review_note": "Current primary evidence identifies El Alsson British & American International School and states that its current NEWGIZA campus contains two schools, British and American, while current UK DfE BSO evidence covers the British school. The Overture umbrella name therefore requires D2.2 provider/school/division reconciliation rather than a flat canonical merge."
+    },
+    {
+      "overture_id": "e8d2afbd-8e87-4440-843a-b8975f2ea281",
+      "overture_name": "El ROWAD American Division",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-080",
+      "target_name_en": "El Rowad Language School - American Division",
+      "evidence_urls": [
+        "https://www.elrowadcollege.com/",
+        "https://www.elrowadcollege.com/American/",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "The current institution-primary site explicitly lists National, American and IGCSE divisions at 8 Mostafa El Nahhas Street and gives a separate American Division phone. The Overture row is an explicit American-division source alias to the accepted Cognia row; no institution-wide merge is inferred."
+    },
+    {
+      "overture_id": "49d986f2-c131-4ab7-9b8f-5289f74441a1",
+      "overture_name": "Forsan International Schools",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-092",
+      "target_name_en": "Forsan American School",
+      "evidence_urls": [
+        "https://www.forsan.edu.eg/",
+        "https://www.forsan.edu.eg/about-us-british/the-history-of-forsan-british-school",
+        "https://www.forsan.edu.eg/index.php/contact-us",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "Current Forsan primary evidence says Forsan International Schools comprises Play School, British School and American School in the same Smouha compound, with each school retaining a distinct mission, identity and premises. The Overture umbrella row therefore requires D2.2 provider/school topology review and must not collapse the British and American source identities."
+    },
+    {
+      "overture_id": "c202ac1e-75db-49ba-aee2-54b094e374dd",
+      "overture_name": "Manhattan Elite International School",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-145",
+      "target_name_en": "Manhattan Elite",
+      "evidence_urls": [
+        "https://www.manhattanschools-eg.com/",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "The current Manhattan Schools Egypt site lists separate American School and British School navigation and gives the current Zahraa El Maadi campus/contact matching this Overture row. The accepted Cognia name is an anchor source only; exact provider/school/division topology remains D2.2 work."
+    },
+    {
+      "overture_id": "c4f0189d-967d-48da-997d-72ed3ba437c0",
+      "overture_name": "Manhattan Elite International School",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-145",
+      "target_name_en": "Manhattan Elite",
+      "evidence_urls": [
+        "https://www.manhattanschools-eg.com/",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "This second Overture place row carries the same school name and phone and an El Saada Street/Zahraa El Maadi address consistent with the current Manhattan Schools campus. Because the primary site presents American and British schools, this is retained as reviewed provider/topology evidence rather than automatically deduplicated or merged."
+    },
+    {
+      "overture_id": "5513b622-cac1-4c9c-bbe1-bae1fb4eeb68",
+      "overture_name": "The Royal British International School",
+      "decision": "covered_by_current_authoritative_source_family",
+      "target_source_id": "uk_dfe_bso_egypt_2026_08",
+      "target_source_record_id": "uk_dfe_bso_egypt_2026_08:93c3c5b5c0c24d256c43",
+      "target_name_en": "The Royal British International School, Cairo",
+      "evidence_urls": [
+        "https://royalbritish.edu.eg/",
+        "https://www.get-information-schools.service.gov.uk/Establishments/Establishment/Details/150546",
+        "https://www.gov.uk/government/publications/british-schools-overseas-inspection-reports/british-schools-overseas-accredited-schools-inspection-reports"
+      ],
+      "review_note": "The current primary site identifies The Royal British International School in New Cairo. Current UK government BSO records list the same open school at 5th Urban District, El Banafseg Zone, with a February 2026 inspection. The accepted BSO source family therefore already covers this Overture lead."
+    },
+    {
+      "overture_id": "93fd2983-1b11-493f-9310-532679812d9d",
+      "overture_name": "The International School of Choueifat",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:international-school-choueifat-cairo",
+      "target_name_en": "The International School of Choueifat, Cairo",
+      "evidence_urls": [
+        "https://isccairo.sabis.net/",
+        "https://isccairo.sabis.net/contact-us",
+        "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf"
+      ],
+      "review_note": "Current SABIS primary contact evidence identifies The International School of Choueifat - Cairo at Fifth Urban Community, New Cairo, matching the Overture address and phone. This is a branch-specific source alias to the accepted Cairo row; British Council Partner status itself grants no eligibility."
+    },
+    {
+      "overture_id": "c3aa0eb9-666f-4468-8cf2-b73ef637a9e8",
+      "overture_name": "The International School of Choueifat",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:international-school-choueifat-cairo-dreamland",
+      "target_name_en": "The International School of Choueifat,Cairo",
+      "evidence_urls": [
+        "https://isc6october.sabis.net/",
+        "https://isc6october.sabis.net/contact-us",
+        "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf"
+      ],
+      "review_note": "Current SABIS primary evidence explicitly identifies The International School of Choueifat - City of 6 October at Dreamland, City of 6 October, matching the Overture place. This is a branch-specific source alias and is kept distinct from the New Cairo branch; British Council Partner status grants no eligibility."
+    },
+    {
+      "overture_id": "fd7f8a38-038c-458f-aa1a-140675452d96",
+      "overture_name": "Deutsche Schule der Borromaerinnen Kairo - DSBK",
+      "decision": "covered_by_current_authoritative_source_family",
+      "target_source_id": "zfa_german_schools_abroad_egypt_2026_09_15",
+      "target_source_record_id": "zfa-das-egypt-borromaeerinnen-kairo",
+      "target_name_en": "Deutsche Schule der Borromäerinnen Kairo",
+      "evidence_urls": [
+        "https://www.dsbkairo.de/de/impressum",
+        "https://www.auslandsschulwesen.de/DE/Schulnetz/DAS/Weltkarte/weltkarte_node.html"
+      ],
+      "review_note": "Current primary evidence gives Deutsche Schule der Borromäerinnen Kairo at Mohamed Mahmoud Straße 8, matching the Overture row, and the current ZfA German Schools Abroad directory independently lists the same school and address. The current authoritative ZfA source family already covers this lead."
+    }
+  ],
+  "rules": {
+    "resolution_is_discovery_triage_not_canonical_identity_merge": true,
+    "fuzzy_matching_authorizes_nothing": true,
+    "division_provider_relationships_require_d2_2_review": true,
+    "duplicate_overture_places_are_not_automatically_deduplicated": true,
+    "overture_grants_no_international_eligibility": true,
+    "canonical_institutions_created": 0,
+    "automatic_identity_merges_performed": 0,
+    "database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
