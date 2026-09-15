@@ -78,7 +78,11 @@ jobs:
       - name: Compare Overture discovery to current universe
         run: python tools/data-acquisition/international/build_overture_gap_review.py
       - name: Apply explicit Overture high-signal review decisions
-        run: python tools/data-acquisition/international/apply_overture_gap_resolutions.py
+        run: |
+          python tools/data-acquisition/international/apply_overture_gap_resolutions.py \
+            --decisions \
+              tools/data-acquisition/international/seeds/overture-gap-resolution-2026-09-15-batch1.json \
+              tools/data-acquisition/international/seeds/overture-gap-resolution-2026-09-15-batch2.json
       - name: Assert checkpoint counts, source-family lifecycle, Overture gaps and safety boundaries
         run: |
           python - <<'PY'
@@ -147,17 +151,21 @@ jobs:
           assert gaps['overture_rows_auto_added_to_universe'] == 0
 
           assert resolutions['input_high_signal_rows'] == 266
-          assert resolutions['reviewed_rows'] == 10
-          assert resolutions['resolved_existing_or_authoritative_rows'] == 8
+          assert resolutions['reviewed_rows'] == 30
+          assert resolutions['resolved_existing_or_authoritative_rows'] == 28
           assert resolutions['reviewed_still_unresolved_rows'] == 2
-          assert resolutions['unreviewed_high_signal_rows'] == 256
-          assert resolutions['outstanding_high_signal_rows'] == 258
+          assert resolutions['unreviewed_high_signal_rows'] == 236
+          assert resolutions['outstanding_high_signal_rows'] == 238
           assert resolutions['decision_counts'] == {
               'covered_by_current_authoritative_source_family': 1,
               'existing_provider_division_requires_d2_2_review': 3,
-              'existing_source_identity_alias': 4,
+              'existing_source_identity_alias': 24,
               'unresolved_supporting_only': 2,
           }
+          assert resolutions['batch_ids'] == [
+              'overture-gap-resolution-2026-09-15-batch1',
+              'overture-gap-resolution-2026-09-15-batch2',
+          ]
           assert resolutions['fuzzy_matches_performed'] == 0
           assert resolutions['overture_rows_auto_added_to_universe'] == 0
 
