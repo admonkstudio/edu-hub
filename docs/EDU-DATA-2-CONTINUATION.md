@@ -6,6 +6,8 @@ This file is the **continuation cursor for the active Edu Hub work**. It exists 
 
 Read this file after `AGENTS.md`, `docs/PROJECT-STATUS.md`, and `docs/PROJECT-DECISIONS.md` before changing code or data.
 
+Visible GitHub tracker: **Issue #8 — `EDU-DATA-2 Continuation Roadmap — D2.1 → D2.7`**.
+
 ## 1. Active scope
 
 - Repository: `admonkstudio/edu-hub`
@@ -234,7 +236,7 @@ D2.1 may be marked complete only when all of the following are true:
 - current source/lead universe is reproducibly rebuilt by green CI;
 - source-row counts are not mislabeled as unique institutions;
 - zero fuzzy auto-merge, zero unsupported eligibility, zero database mutation and zero public projection occurred;
-- `PROJECT-STATUS.md`, `PROJECT-DECISIONS.md`, `DATASET-LAYERS.md` and this continuation file agree;
+- `PROJECT-STATUS.md`, `PROJECT-DECISIONS.md`, `DATASET-LAYERS.md`, this continuation file and GitHub Issue #8 agree;
 - an explicit decision records D2.1 closure and hands the cursor to D2.2.
 
 ## 10. Non-negotiable safety/data rules
@@ -257,12 +259,13 @@ D2.1 may be marked complete only when all of the following are true:
 2. `docs/PROJECT-STATUS.md`
 3. `docs/PROJECT-DECISIONS.md`
 4. **this file** — `docs/EDU-DATA-2-CONTINUATION.md`
-5. `tools/data-acquisition/international/DATASET-LAYERS.md`
-6. `.github/workflows/edu-data-2-universe-checkpoint.yml`
-7. `tools/data-acquisition/international/build_d2_1_universe_checkpoint.py`
-8. `tools/data-acquisition/international/build_overture_gap_review.py`
-9. `tools/data-acquisition/international/apply_overture_gap_resolutions.py`
-10. the checked-in source/review seeds referenced by those builders.
+5. GitHub Issue **#8**
+6. `tools/data-acquisition/international/DATASET-LAYERS.md`
+7. `.github/workflows/edu-data-2-universe-checkpoint.yml`
+8. `tools/data-acquisition/international/build_d2_1_universe_checkpoint.py`
+9. `tools/data-acquisition/international/build_overture_gap_review.py`
+10. `tools/data-acquisition/international/apply_overture_gap_resolutions.py`
+11. the checked-in source/review seeds referenced by those builders.
 
 Inspect current branch implementation before assuming a count from historical conversation text.
 
@@ -275,6 +278,7 @@ After material progress:
 3. update `tools/data-acquisition/international/DATASET-LAYERS.md` when layer counts change;
 4. update `docs/PROJECT-STATUS.md` and `docs/PROJECT-DECISIONS.md` when status/architecture/count contracts change;
 5. update **this continuation file** with the new accepted run, counts, completed batches and exact next cursor;
-6. never leave a future agent dependent on chat history to know what happens next.
+6. update GitHub Issue **#8** with the same accepted checkpoint and checklist progress;
+7. never leave a future agent dependent on chat history to know what happens next.
 
-The continuation file should always describe the **last verified state**, not work that was merely planned or started.
+The continuation file and Issue #8 should always describe the **last verified state**, not work that was merely planned or started.
