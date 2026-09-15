@@ -9,11 +9,13 @@ on:
       - 'tools/data-acquisition/international/extract_cognia_egypt_registry.py'
       - 'tools/data-acquisition/international/acquire_overture_egypt_international_education.py'
       - 'tools/data-acquisition/international/build_overture_gap_review.py'
+      - 'tools/data-acquisition/international/apply_overture_gap_resolutions.py'
       - 'tools/data-acquisition/international/build_british_council_browser_discovery.py'
       - 'tools/data-acquisition/international/apply_british_council_primary_scope_review.py'
       - 'tools/data-acquisition/international/build_candidate_universe.py'
       - 'tools/data-acquisition/international/seeds/cognia-egypt-milestones-2026-2027.json'
       - 'tools/data-acquisition/international/seeds/canadian-offshore-schools-egypt-2026-09-15.json'
+      - 'tools/data-acquisition/international/seeds/overture-gap-resolution-*.json'
       - 'tools/data-acquisition/international/seeds/british-council-browser-discovery-*.json'
       - 'tools/data-acquisition/international/seeds/british-council-primary-scope-review-*.json'
       - '.github/workflows/edu-data-2-universe-checkpoint.yml'
@@ -50,6 +52,7 @@ jobs:
           python -m py_compile tools/data-acquisition/international/build_d2_1_universe_checkpoint.py
           python -m py_compile tools/data-acquisition/international/acquire_overture_egypt_international_education.py
           python -m py_compile tools/data-acquisition/international/build_overture_gap_review.py
+          python -m py_compile tools/data-acquisition/international/apply_overture_gap_resolutions.py
       - name: Rebuild classified strong layer and 226-row British Council layer
         run: |
           python tools/data-acquisition/international/build_authoritative_seed.py --output-dir artifacts/international
@@ -73,6 +76,8 @@ jobs:
         run: python tools/data-acquisition/international/acquire_overture_egypt_international_education.py
       - name: Compare Overture discovery to current universe
         run: python tools/data-acquisition/international/build_overture_gap_review.py
+      - name: Apply explicit Overture high-signal review decisions
+        run: python tools/data-acquisition/international/apply_overture_gap_resolutions.py
       - name: Assert checkpoint counts, Overture gap counts and safety boundaries
         run: |
           python - <<'PY'
@@ -85,6 +90,7 @@ jobs:
           rows = [json.loads(line) for line in (root/'source-lead-universe.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
           geo = json.loads(Path('artifacts/international/overture-egypt-international-education/overture-egypt-international-education.json').read_text(encoding='utf-8'))
           gaps = json.loads(Path('artifacts/international/overture-gap-review/gap-review-summary.json').read_text(encoding='utf-8'))
+          resolutions = json.loads(Path('artifacts/international/overture-gap-resolution/resolution-summary.json').read_text(encoding='utf-8'))
 
           assert summary['foundational_authoritative_seed_rows'] == 96
           assert summary['historical_classified_strong_rows'] == 106
@@ -123,18 +129,34 @@ jobs:
           assert gaps['fuzzy_matches_performed'] == 0
           assert gaps['overture_rows_auto_added_to_universe'] == 0
 
-          for obj in (summary, gaps):
+          assert resolutions['input_high_signal_rows'] == 266
+          assert resolutions['reviewed_rows'] == 10
+          assert resolutions['resolved_existing_or_authoritative_rows'] == 8
+          assert resolutions['reviewed_still_unresolved_rows'] == 2
+          assert resolutions['unreviewed_high_signal_rows'] == 256
+          assert resolutions['outstanding_high_signal_rows'] == 258
+          assert resolutions['decision_counts'] == {
+              'covered_by_current_authoritative_source_family': 1,
+              'existing_provider_division_requires_d2_2_review': 3,
+              'existing_source_identity_alias': 4,
+              'unresolved_supporting_only': 2,
+          }
+          assert resolutions['fuzzy_matches_performed'] == 0
+          assert resolutions['overture_rows_auto_added_to_universe'] == 0
+
+          for obj in (summary, gaps, resolutions):
               assert obj['canonical_institutions_created'] == 0
               assert obj['database_mutation_performed'] is False
               assert obj['public_projection_rows_created'] == 0
           assert summary['automatic_identity_merges_performed'] == 0
           assert gaps['automatic_identity_merges_performed'] == 0
+          assert resolutions['automatic_identity_merges_performed'] == 0
           assert summary['d2_1_complete'] is False
           print(json.dumps({'checkpoint': summary, 'canadian_source_family': canadian, 'overture': {
               'bbox_candidate_rows': geo['bbox_candidate_rows'],
               'non_egypt_rows_rejected': geo['non_egypt_rows_rejected'],
               'record_count': geo['record_count'],
-          }, 'gap_review': gaps}, ensure_ascii=False, indent=2))
+          }, 'gap_review': gaps, 'gap_resolution': resolutions}, ensure_ascii=False, indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
@@ -146,4 +168,5 @@ jobs:
             artifacts/international/british-council-primary-scope-review/british-council-primary-scope-summary.json
             artifacts/international/overture-egypt-international-education/
             artifacts/international/overture-gap-review/
+            artifacts/international/overture-gap-resolution/
           if-no-files-found: error
