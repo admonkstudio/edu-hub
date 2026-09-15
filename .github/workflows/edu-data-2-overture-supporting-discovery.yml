@@ -1,0 +1,60 @@
+name: EDU-DATA-2 Overture Supporting Discovery
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'tools/data-acquisition/international/acquire_overture_egypt_international_education.py'
+      - '.github/workflows/edu-data-2-overture-supporting-discovery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    name: Discover supporting international-education candidates from Overture
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install DuckDB
+        run: pip install duckdb
+      - name: Compile acquisition tool
+        run: python -m py_compile tools/data-acquisition/international/acquire_overture_egypt_international_education.py
+      - name: Query official Overture Places release
+        run: python tools/data-acquisition/international/acquire_overture_egypt_international_education.py
+      - name: Assert supporting-only safety boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('artifacts/international/overture-egypt-international-education/overture-egypt-international-education.json')
+          data = json.loads(p.read_text(encoding='utf-8'))
+          assert data['work_package'] == 'D2.1_overture_egypt_international_education_supporting_discovery'
+          assert data['source'] == 'Overture Maps Places'
+          assert data['release'] == '2026-08-19.0'
+          assert data['record_count'] == len(data['records'])
+          assert data['record_count'] > 0
+          assert all(r['international_eligibility_granted'] is False for r in data['records'])
+          assert data['rules']['overture_auto_international_eligibility'] is False
+          assert data['rules']['overture_auto_identity_merge'] is False
+          assert data['rules']['overture_auto_canonical_creation'] is False
+          assert data['rules']['coordinates_require_identity_review_before_attachment'] is True
+          assert data['database_mutation_performed'] is False
+          assert data['public_projection_rows_created'] == 0
+          print(json.dumps({
+              'release': data['release'],
+              'record_count': data['record_count'],
+              'duplicate_normalized_name_group_count': data['duplicate_normalized_name_group_count'],
+          }, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-overture-supporting-discovery
+          path: artifacts/international/overture-egypt-international-education/
+          if-no-files-found: error
