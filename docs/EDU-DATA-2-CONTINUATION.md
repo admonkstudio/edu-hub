@@ -2,283 +2,280 @@
 
 Last updated: 2026-09-15
 
-This file is the **continuation cursor for the active Edu Hub work**. It exists so a new agent can resume correctly even when the previous chat is unavailable or truncated.
+This file is the **continuation cursor for active Edu Hub work**. A new agent must be able to resume correctly from this file even if all prior chat context is unavailable.
 
-Read this file after `AGENTS.md`, `docs/PROJECT-STATUS.md`, and `docs/PROJECT-DECISIONS.md` before changing code or data.
+Read it after `AGENTS.md`, `docs/PROJECT-STATUS.md`, and `docs/PROJECT-DECISIONS.md` before changing code or data.
 
 Visible GitHub tracker: **Issue #8 — `EDU-DATA-2 Continuation Roadmap — D2.1 → D2.7`**.
 
 ## 1. Active scope
 
 - Repository: `admonkstudio/edu-hub`
-- Active branch: `edu-data-2-international-registry`
-- Active milestone: `EDU-DATA-2 — Egypt International Education Registry`
-- Current execution stage: `D2.1 — Complete the institution/source universe`
-- Frontend/CMS decision: **deferred until D2.7 database freeze**
+- Branch: `edu-data-2-international-registry`
+- Milestone: `EDU-DATA-2 — Egypt International Education Registry`
+- Active stage: `D2.1 — Complete the institution/source universe`
+- Frontend/CMS choice: **deferred until D2.7**
 - Supabase: **not part of Edu Hub**
 
-Canonical sequence remains:
+Canonical sequence:
 
 `D2.1 universe → D2.2 identities → D2.3 EN/AR → D2.4 enrichment → D2.5 media → D2.6 audit → D2.7 portable freeze → Astro/Instatic decision → public product build`
 
-Do not skip ahead because a website implementation appears easier than the data work.
+Do not skip ahead to website implementation.
 
 ## 2. Last accepted checkpoint
 
-The current accepted D2.1 checkpoint is:
+Current accepted D2.1 checkpoint:
 
 - Workflow: `EDU-DATA-2 D2.1 Universe Checkpoint`
-- Accepted run: **35001371492**
-- Accepted validation head: `f3ddc06ed85193d251dfd7c02fcba032bfe54944`
+- Accepted run: **35009564541**
+- Accepted head: **`6ffb7cbb3d4e07e66bfc8317451a9829328c22c8`**
 - Conclusion: **green**
+- General `EDU-DATA-2 International Registry` run for the same head: **35009564572 — green**
 
-The accepted source/evidence universe is:
+Accepted source/evidence universe:
 
-- **597 source/evidence rows total**
-- **128 eligible**
+- **602 total source/evidence rows**
+- **133 eligible**
 - **466 supporting candidates**
 - **3 excluded**
 
-`597` is **not** a unique-institution count. It is a source/evidence count. Cross-source duplicates, campuses, divisions and provider relationships remain explicit reconciliation work.
+`602` is **not** a unique-institution count.
 
-The current 597 rows are derived as follows:
+Current construction:
 
-- historical reviewed source/lead universe after British Council: 332 rows;
-- replace the four historical Cognia milestone rows for current counting with the complete 256-row Cognia Egypt registry: 584 rows;
-- add six current Canadian-authorized offshore-school source rows: 590 rows;
-- add seven current ZfA German Schools Abroad Egypt source rows: 597 rows.
+- 332 pre-Cognia-current reviewed source/lead rows after British Council expansion;
+- complete 256-row Cognia registry replaces the four historical milestone rows for current counting → 584;
+- +6 current Canadian offshore-school authorization rows → 590;
+- +7 current ZfA German Schools Abroad Egypt rows → 597;
+- +5 reviewed substantive-international higher-education rows → **602**.
 
-Historical source snapshots are preserved; source-family additions do not rewrite older evidence layers.
+Historical source snapshots remain preserved.
 
-## 3. Source families already completed or frozen
-
-### Foundational and historical layers
+## 3. Completed/frozen major source families
 
 - 96-row foundational deterministic seed;
 - 106-row historical classified strong-source layer;
-- 226-row September 2026 British Council Partner Schools discovery layer;
-- 256-row complete official Cognia Egypt registry;
-- 9 current SCU foreign-university branches, with Ryerson/TMU preserved only as a lifecycle conflict from MOHESR.
+- 226-row British Council September 2026 discovery layer;
+- 256-row complete Cognia Egypt registry;
+- 6 current Canadian offshore-school authorization rows;
+- 7 current ZfA DAS Egypt rows;
+- 9 current SCU foreign-university branches with Ryerson/TMU kept as lifecycle conflict only;
+- AUC substantive international/accreditation evidence;
+- 5-row reviewed substantive-international HE package: GIU, GUC, UFE, BUE and AASTMT.
 
-### Canadian offshore schools
+### Higher-education scope rule adopted
 
-Checked-in source:
+Egyptian incorporation, private-university classification or national legal form does not automatically exclude an institution when separate current evidence establishes **substantive binational, intergovernmental, transnational or international-organizational status**.
 
-`tools/data-acquisition/international/seeds/canadian-offshore-schools-egypt-2026-09-15.json`
+However, a foreign name, partnership, validated programme or dual degree alone remains insufficient.
 
-Current family: **6 authorized source rows** across Canadian provincial systems.
+Checked-in review package:
 
-Important identity rule: these six rows are source evidence, not six new unique institutions. Cross-source overlap and BCCIS East/West topology remain D2.2 review work.
+`tools/data-acquisition/international/seeds/substantive-international-higher-ed-review-2026-09-15.json`
 
-### German Schools Abroad / ZfA
+Overlay builder:
 
-Checked-in source:
+`tools/data-acquisition/international/apply_substantive_international_he_review.py`
 
-`tools/data-acquisition/international/seeds/zfa-german-schools-abroad-egypt-2026-09-15.json`
+## 4. Current Overture state
 
-Current family: **7 Egypt DAS source rows**.
+Overture Places release: `2026-08-19.0`.
 
-Important lifecycle rule: current ZfA DAS membership is distinct from current KMK exam authorization. `Deutsche Schule Hurghada` is preserved as a current DAS school, while the checked KMK Sek-I evidence records the last conducted school year as `2024/2025`; the pipeline does **not** assert current Sek-I exam authorization after 2024/25.
-
-## 4. Overture supporting-gap state
-
-Official Overture Places release used: `2026-08-19.0`.
-
-Acquisition script:
-
-`tools/data-acquisition/international/acquire_overture_egypt_international_education.py`
-
-The rectangular Egypt bbox initially returned 1,121 candidates. The acquisition now requires Overture address country `EG` and rejects neighboring-country leakage.
-
-Accepted Overture state:
+Current Egypt-only acquisition:
 
 - 1,121 bbox candidates;
-- 79 non-Egypt rows rejected;
-- **1,042 Egypt-only supporting rows**;
-- 136 exact normalized-name overlaps with the 597-row checkpoint;
-- 906 unmatched supporting rows;
-- 869 unmatched normalized names;
+- 79 non-Egypt rows rejected by Overture address country;
+- **1,042 Egypt-only rows**;
+- **141 exact normalized-name overlaps** with the 602-row universe;
+- **901 unmatched rows**;
+- **865 unmatched normalized names**;
 - **266 high-signal pre-university rows**;
-- **75 higher-education scope-review rows**;
+- **70 post-overlay higher-ed review rows**;
 - **565 lower-priority supporting rows**.
 
-Overture cannot establish eligibility and cannot create or merge identities.
+Overture remains supporting discovery only and grants zero eligibility.
 
-### Explicit Overture review batches
+### School high-signal review
 
-Resolution builder:
+Builder:
 
 `tools/data-acquisition/international/apply_overture_gap_resolutions.py`
 
-Checked-in decisions:
+Accepted school decision batches:
 
-- `tools/data-acquisition/international/seeds/overture-gap-resolution-2026-09-15-batch1.json`
-- `tools/data-acquisition/international/seeds/overture-gap-resolution-2026-09-15-batch2.json`
+- `overture-gap-resolution-2026-09-15-batch1.json`
+- `overture-gap-resolution-2026-09-15-batch2.json`
 
-Current high-signal result after the two batches:
+Current school artifact:
 
-- 266 high-signal input rows;
-- **30 explicitly reviewed**;
-- **28 resolved/explained** as existing authoritative coverage, exact source aliases, or provider/division cases requiring D2.2 topology review;
-- **2 reviewed but unresolved supporting-only leads**;
-- **236 not yet reviewed**;
-- **238 total high-signal rows still outstanding**.
+- 266 input rows;
+- 30 explicitly reviewed;
+- 28 resolved/explained;
+- 2 reviewed-but-unresolved;
+- 236 not yet reviewed;
+- **238 outstanding in the current school artifact**.
 
-The two unresolved reviewed rows are:
+Reviewed unresolved rows:
 
 - `Kada Modern British School`
 - `M.S.G International British School`
 
-No fuzzy matching is allowed to remove an Overture row from the gap queue. Every resolution must target the exact Overture ID and, when resolved to current evidence, an exact current source key.
+### Higher-education Overture review — COMPLETE
 
-## 5. OSM status
+Decision seed:
 
-OSM is **not a successful acquisition source in the current hosted CI environment**.
+`tools/data-acquisition/international/seeds/overture-higher-ed-scope-review-2026-09-15-batch1.json`
 
-Workflow: `EDU-DATA-2 OSM Supporting Discovery`
+Builder:
 
-Accepted diagnostic run: **34997269459** — green diagnostic.
+`tools/data-acquisition/international/apply_overture_higher_ed_resolutions.py`
 
-All 12 Egypt tiles were blocked across the bounded public Overpass mirrors from GitHub-hosted CI. The pipeline records `environment_blocked_all_tiles` rather than treating failed coverage as zero candidates.
+The complete 70-row post-overlay HE queue now has **0 outstanding rows**:
 
-Do not keep spending CI time retrying public Overpass unless the network/runtime approach changes materially. Overture is the current functioning geospatial/supporting layer.
+- 14 existing eligible HE aliases/departments/subunits;
+- 21 out-of-scope Egyptian HE rows/subunits without sufficient substantive-international status;
+- 33 supporting-only academy/training/institute leads with no current qualifying HE evidence;
+- 1 misclassified pre-university row resolved to existing Egypt British International School evidence;
+- 1 misclassified pre-university row (`Mansoura College International Schools`) rerouted to school/provider/division review.
 
-## 6. V7 owned archive status
+No fuzzy matching, automatic universe promotion or identity creation occurred.
 
-A read-only V7 gap matcher exists:
+## 5. Exact resume cursor — START HERE
+
+**Do not repeat the completed higher-education review.**
+
+### Task A — resolve Mansoura College provider/division topology
+
+The Overture row `Mansoura College International Schools` (`9e34fa47-a93e-4c90-a902-9a8181834ec2`) was incorrectly categorized as higher education.
+
+Current first-party evidence:
+
+- `https://admission.mc.edu.eg/admission`
+- `https://mc2.mc.edu.eg/`
+
+The current admissions system shows a pre-university Mansoura College group with multiple school/division offerings, including National, British IG and American tracks/schools.
+
+Existing current-universe evidence includes Mansoura-related Cognia/British Council rows. The next agent must:
+
+1. inspect all exact Mansoura source rows in the current 602-row universe and existing D2.2 review artifacts;
+2. distinguish provider/group, physical campus and curriculum/school division identities;
+3. create an explicit checked-in review decision linking only what current evidence actually proves;
+4. do **not** auto-merge by shared branding/name/domain;
+5. preserve division-scoped curriculum/accreditation evidence;
+6. validate with green CI.
+
+### Task B — continue the 238 outstanding high-signal school rows
+
+Work in small deterministic batches. Preferred outcome order:
+
+1. exact/current authoritative family coverage;
+2. explicit source alias;
+3. provider/campus/division topology requiring D2.2 review;
+4. genuinely new candidate with current permitted primary/recognized-source evidence;
+5. unresolved supporting-only lead.
+
+No fuzzy auto-merge logic may be introduced merely to reduce the queue.
+
+### Task C — execute V7 read-only comparison
+
+Matcher:
 
 `tools/data-acquisition/international/build_v7_international_gap_review.py`
 
-Its contract is deliberately conservative:
+Owned V7 contract:
 
-- expects exactly **24,916 raw V7 rows**;
-- reads the owned archive only;
-- performs deterministic exact normalized-name overlap only;
-- emits unmatched international-signal leads for current re-sourcing;
-- performs zero fuzzy auto-merge;
-- grants zero eligibility;
-- creates zero canonical identities;
-- does not promote V7 rows into the current universe directly.
+- **24,916 raw rows**;
+- read-only;
+- exact normalized-name overlap only;
+- unmatched international-signal leads only;
+- zero eligibility and zero canonical identities from V7 itself.
 
-The matcher has not yet been executed against the live/owned V7 filesystem in the current D2.1 pass because that requires access to the existing Railway/Instatic V7 data location.
+The matcher is ready but has not yet been run against the live owned V7 filesystem in this pass. Any useful V7 unmatched lead must be re-sourced from current permitted evidence.
 
-Any useful V7 unmatched lead must be re-sourced from a current permitted source before it can change the accepted D2.1 universe.
+### Task D — Edarabia reference-only gap pass
 
-## 7. Current D2.2 state — do not confuse with D2.1 counts
+Use Edarabia only as a discovery/reference index. Do not bulk scrape, systematically store or reproduce Edarabia content. Re-source every useful lead from institution-primary/regulatory/accreditor evidence.
 
-D2.2 is partially built but is **not the current primary cursor** while D2.1 remains open.
+### Task E — primary-source exhaustion pass
 
-Current reviewed identity state from the previously accepted D2.2 artifacts:
+Use institution/operator primary sites and recognized source families to close remaining likely gaps and provider/campus/division ambiguity.
+
+## 6. OSM status
+
+Accepted OSM diagnostic run: **34997269459 — green diagnostic**.
+
+All 12 tiled public-Overpass attempts were blocked from GitHub-hosted CI. The pipeline records `environment_blocked_all_tiles`. Failed source access must never be interpreted as zero OSM candidates.
+
+Do not repeatedly retry the same public Overpass approach unless the runtime/network method changes materially.
+
+## 7. Current D2.2 state — not the primary cursor yet
+
+Current accepted review artifacts contain:
 
 - 30 reviewed institution drafts;
 - 10 reviewed division drafts;
 - 51 reviewed source/lead memberships;
-- 67 original strong-source rows still in the explicit identity-review queue;
-- 17 reviewed current-campus drafts across 15 reviewed institutions;
-- two reviewed institutions currently have multiple reviewed campuses.
+- 67 original strong-source rows still queued;
+- 17 reviewed current campuses across 15 institutions;
+- two reviewed institutions with multiple current campuses.
 
-New Canadian, ZfA, Cognia and Overture evidence must not be automatically materialized as institutions. D2.2 resumes as the sole active workstream only after D2.1 is explicitly closed.
+D2.2 remains secondary until D2.1 is explicitly closed. New Cognia, Canadian, ZfA, substantive-HE, Overture and V7 evidence may not auto-materialize into canonical identities.
 
-## 8. Exact resume cursor
+## 8. D2.1 exit criteria
 
-**Resume here. Do not restart completed acquisition work.**
+D2.1 may close only when:
 
-### Next task A — triage the 75 Overture higher-education rows
+- Overture HE queue is complete — **DONE**;
+- high-signal school review is substantially exhausted and residual unresolved rows are explicitly documented;
+- OSM limitation remains documented without a false zero-coverage claim — **DONE**;
+- V7 comparison is executed or explicitly blocked with durable evidence;
+- controlled Edarabia reference-only gap review is complete;
+- useful archive/directory leads are re-sourced from permitted current sources;
+- major authoritative Egypt source families are checked;
+- final source/evidence universe rebuilds reproducibly with green CI;
+- source-row counts are never labeled as unique institutions;
+- zero fuzzy auto-merge, unsupported eligibility, runtime DB mutation or public projection occurred;
+- `PROJECT-STATUS.md`, `PROJECT-DECISIONS.md`, `DATASET-LAYERS.md`, this file and Issue #8 agree;
+- an explicit closure decision hands the sole cursor to D2.2.
 
-Start with:
-
-`artifacts/international/overture-gap-review/higher-ed-scope-review.jsonl`
-
-Goal:
-
-1. classify obvious ordinary Egyptian universities/colleges as out of the active international higher-education scope;
-2. identify exact aliases/overlaps with the nine current SCU foreign branches and AUC evidence;
-3. isolate genuinely plausible missing foreign/international higher-education institutions;
-4. re-source plausible gaps from SCU, MOHESR, institution-primary or recognized accreditor evidence;
-5. check in explicit decisions by exact Overture ID;
-6. never grant international scope from Overture naming alone.
-
-### Next task B — continue the 238 outstanding high-signal school rows
-
-Work in small checked-in review batches. For each row, prefer this outcome hierarchy:
-
-1. exact/current authoritative source family coverage;
-2. explicit existing source alias;
-3. explicit provider/campus/division relation requiring D2.2 review;
-4. genuinely new candidate with current primary/recognized-source evidence;
-5. unresolved supporting-only lead.
-
-Do not introduce fuzzy auto-merge logic merely to reduce the queue faster.
-
-### Next task C — execute the V7 read-only comparison
-
-When the owned V7 filesystem is available, run the existing matcher against all 24,916 rows. Use V7 only to discover missing names/aliases. Re-source every useful unmatched lead from current permitted evidence before adding anything to the accepted universe.
-
-### Next task D — controlled Edarabia reference-only gap discovery
-
-Edarabia may identify a possible missing institution or field, but do not bulk scrape/store its content. Re-source every useful lead from primary/regulatory/accreditor evidence.
-
-### Next task E — institution/operator primary-site exhaustion pass
-
-Use primary school/operator websites and recognized source families to close remaining high-signal gaps and provider/campus/division ambiguity.
-
-## 9. D2.1 exit criteria
-
-D2.1 may be marked complete only when all of the following are true:
-
-- Overture high-signal pre-university review is substantially exhausted and residual unresolved rows are explicitly documented;
-- Overture higher-education review is completed;
-- OSM limitation is documented and not misrepresented as coverage;
-- V7 owned archive matching has been executed or explicitly blocked with a durable reason;
-- controlled Edarabia reference-only gap discovery is complete;
-- useful directory/archive leads have current permitted re-sourcing;
-- current major authoritative source families have been checked for Egypt coverage;
-- current source/lead universe is reproducibly rebuilt by green CI;
-- source-row counts are not mislabeled as unique institutions;
-- zero fuzzy auto-merge, zero unsupported eligibility, zero database mutation and zero public projection occurred;
-- `PROJECT-STATUS.md`, `PROJECT-DECISIONS.md`, `DATASET-LAYERS.md`, this continuation file and GitHub Issue #8 agree;
-- an explicit decision records D2.1 closure and hands the cursor to D2.2.
-
-## 10. Non-negotiable safety/data rules
+## 9. Non-negotiable rules
 
 - source/discovery rows never automatically become canonical institutions;
-- accreditation/source membership does not automatically equal Edu Hub eligibility unless the source-specific scope rule says so;
-- no identity merge from fuzzy similarity;
+- no international eligibility from branding alone;
+- no fuzzy identity merge;
 - no campus inference from one address;
 - no institution-wide assertion from division-scoped evidence;
-- historical/lifecycle evidence must not be silently presented as current;
-- British Council Partner status, Cognia presence, Overture/OSM, V7 and commercial directories do not independently establish international eligibility;
+- preserve lifecycle/historical status explicitly;
+- British Council Partner status, Cognia, Overture/OSM, V7 and commercial directories do not independently establish eligibility;
 - no Edarabia bulk storage/reproduction without permission;
 - no raw/staging publication;
-- no runtime database/public-page work before the D2 database-completion gate;
-- preserve EN/AR, provenance, portability, review state and rights boundaries.
+- no frontend/runtime work before the database completion gate;
+- preserve EN/AR, provenance, portability, rights and review state.
 
-## 11. Files a continuation agent should inspect first
+## 10. Startup files for every continuation agent
 
 1. `AGENTS.md`
 2. `docs/PROJECT-STATUS.md`
 3. `docs/PROJECT-DECISIONS.md`
-4. **this file** — `docs/EDU-DATA-2-CONTINUATION.md`
-5. GitHub Issue **#8**
+4. `docs/EDU-DATA-2-CONTINUATION.md`
+5. GitHub Issue #8
 6. `tools/data-acquisition/international/DATASET-LAYERS.md`
 7. `.github/workflows/edu-data-2-universe-checkpoint.yml`
-8. `tools/data-acquisition/international/build_d2_1_universe_checkpoint.py`
-9. `tools/data-acquisition/international/build_overture_gap_review.py`
-10. `tools/data-acquisition/international/apply_overture_gap_resolutions.py`
-11. the checked-in source/review seeds referenced by those builders.
+8. relevant builders/seeds for the current task
 
-Inspect current branch implementation before assuming a count from historical conversation text.
+Inspect actual branch state and latest green CI before trusting historical conversation counts.
 
-## 12. Handoff discipline for every future agent
+## 11. Handoff discipline
 
-After material progress:
+After every material accepted checkpoint:
 
-1. update code/seeds/builders and CI;
-2. obtain a green accepted workflow run;
-3. update `tools/data-acquisition/international/DATASET-LAYERS.md` when layer counts change;
-4. update `docs/PROJECT-STATUS.md` and `docs/PROJECT-DECISIONS.md` when status/architecture/count contracts change;
-5. update **this continuation file** with the new accepted run, counts, completed batches and exact next cursor;
-6. update GitHub Issue **#8** with the same accepted checkpoint and checklist progress;
-7. never leave a future agent dependent on chat history to know what happens next.
+1. commit deterministic code/evidence/review decisions;
+2. obtain green CI;
+3. update `DATASET-LAYERS.md` if counts changed;
+4. update `PROJECT-STATUS.md` and `PROJECT-DECISIONS.md` when status/contracts changed;
+5. update this continuation file with the accepted run and exact next cursor;
+6. update GitHub Issue #8;
+7. never leave the next agent dependent on chat history.
 
-The continuation file and Issue #8 should always describe the **last verified state**, not work that was merely planned or started.
+This file and Issue #8 must describe the **last verified accepted state**, never merely planned or in-progress work.
