@@ -83,14 +83,15 @@
     {
       "source_id": "cognia_accredited_egypt",
       "name": "Cognia Accredited Institutions - Egypt",
-      "url": "https://www.cognia.org/accreditation/",
+      "url": "https://home.cognia.org/registry",
       "publisher": "Cognia",
       "authority_class": "recognized_accreditor",
-      "role": ["eligibility_support", "accreditation", "identity"],
+      "role": ["eligibility_support", "accreditation", "identity", "candidate_discovery"],
       "auto_eligibility": false,
-      "scope_condition": "must_also_show_international_school_model",
-      "acquisition_mode": "directory_search",
-      "active": true
+      "scope_condition": "must_also_show_international_school_model_and_private_or_independent_scope",
+      "acquisition_mode": "javascript_registry_search_browser_or_export",
+      "active": true,
+      "notes": "Cognia's public accreditation page directs users to the Cognia Accreditation Registry, which supports country and institution-type search. The registry is a JavaScript application; deterministic Egypt extraction requires browser/export capture rather than assuming the generic accreditation page is the directory. Accreditation alone does not establish Edu Hub eligibility."
     },
     {
       "source_id": "cognia_member_milestones_egypt_2026_2027",
@@ -125,11 +126,12 @@
       "url": "https://dportal.mohesr.gov.eg/?id=172&option=com_sppagebuilder&view=page",
       "publisher": "Ministry of Higher Education and Scientific Research",
       "authority_class": "egyptian_regulator",
-      "role": ["identity", "eligibility", "regulatory_status", "reconciliation"],
-      "auto_eligibility": true,
-      "scope_condition": "recognized_foreign_branches_only",
-      "acquisition_mode": "official_html",
-      "active": true
+      "role": ["identity", "eligibility_support", "regulatory_status", "reconciliation"],
+      "auto_eligibility": false,
+      "scope_condition": "must_reconcile_current_branch_status_with_scu_and_institution_primary_evidence",
+      "acquisition_mode": "official_html_snapshot_plus_regulator_reconciliation",
+      "active": true,
+      "notes": "The 2026-09-15 MOHESR page lists ten foreign-branch entries while SCU's current branch category reports nine. The MOHESR-only Ryerson listing is retained as a lifecycle conflict, not auto-promoted."
     },
     {
       "source_id": "msche_auc",
