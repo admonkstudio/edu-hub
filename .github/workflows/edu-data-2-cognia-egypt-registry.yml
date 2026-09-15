@@ -6,6 +6,8 @@ on:
       - edu-data-2-international-registry
     paths:
       - 'tools/data-acquisition/international/extract_cognia_egypt_registry.py'
+      - 'tools/data-acquisition/international/match_cognia_registry_verification_queue.py'
+      - 'tools/data-acquisition/international/seeds/cognia-registry-verification-queue-2026-09-15.json'
       - '.github/workflows/edu-data-2-cognia-egypt-registry.yml'
   workflow_dispatch:
 
@@ -14,7 +16,7 @@ permissions:
 
 jobs:
   extract:
-    name: Extract all official Cognia Egypt registry rows
+    name: Extract and reconcile official Cognia Egypt registry rows
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -26,17 +28,24 @@ jobs:
         run: |
           pip install playwright
           python -m playwright install --with-deps chromium
-      - name: Compile extractor
-        run: python -m py_compile tools/data-acquisition/international/extract_cognia_egypt_registry.py
+      - name: Compile Cognia tools
+        run: |
+          python -m py_compile tools/data-acquisition/international/extract_cognia_egypt_registry.py
+          python -m py_compile tools/data-acquisition/international/match_cognia_registry_verification_queue.py
       - name: Extract all Egypt registry pages
         run: python tools/data-acquisition/international/extract_cognia_egypt_registry.py
-      - name: Assert official extraction and safety boundary
+      - name: Match the first-party verification queue
+        run: python tools/data-acquisition/international/match_cognia_registry_verification_queue.py
+      - name: Assert official extraction, reconciliation and safety boundaries
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          path = Path('artifacts/international/cognia-egypt-registry/cognia-egypt-registry.json')
-          data = json.loads(path.read_text(encoding='utf-8'))
+
+          root = Path('artifacts/international/cognia-egypt-registry')
+          data = json.loads((root/'cognia-egypt-registry.json').read_text(encoding='utf-8'))
+          matched = json.loads((root/'cognia-verification-queue-match.json').read_text(encoding='utf-8'))
+
           assert data['work_package'] == 'D2.1_cognia_egypt_registry_full_extraction'
           assert data['country_filter'] == 'Egypt'
           assert data['initial_response_status'] == 200
@@ -51,10 +60,25 @@ jobs:
           assert data['automatic_merges_performed'] == 0
           assert data['database_mutation_performed'] is False
           assert data['public_projection_rows_created'] == 0
+
+          assert matched['work_package'] == 'D2.1_cognia_registry_verification_queue_match'
+          assert matched['registry_source_result_count'] == data['source_result_count']
+          assert matched['queue_record_count'] == 24
+          assert matched['deterministic_exact_match_count'] + matched['requires_identity_scope_review_count'] == 24
+          assert matched['rules']['fuzzy_proposals_auto_confirm_accreditation'] is False
+          assert matched['rules']['cognia_registry_presence_auto_grants_international_eligibility'] is False
+          assert matched['international_eligibility_granted'] == 0
+          assert matched['canonical_institutions_created'] == 0
+          assert matched['automatic_merges_performed'] == 0
+          assert matched['database_mutation_performed'] is False
+          assert matched['public_projection_rows_created'] == 0
+
           print(json.dumps({
               'source_result_count': data['source_result_count'],
               'page_count': data['page_count'],
               'duplicate_normalized_name_group_count': data['duplicate_normalized_name_group_count'],
+              'queue_exact_matches': matched['deterministic_exact_match_count'],
+              'queue_review_required': matched['requires_identity_scope_review_count'],
           }, indent=2))
           PY
       - uses: actions/upload-artifact@v4
