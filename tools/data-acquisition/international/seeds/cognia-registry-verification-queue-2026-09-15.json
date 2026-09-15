@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "work_package": "D2.1_cognia_registry_verification_queue",
+  "snapshot_date": "2026-09-15",
+  "registry_url": "https://home.cognia.org/registry",
+  "registry_publisher": "Cognia",
+  "registry_access_note": "The official Cognia Accreditation Registry is a JavaScript application. These leads come from institution-primary pages and must be verified against the official registry before accreditor evidence is treated as confirmed.",
+  "records": [
+    {"query_name":"Renaissance International School of Egypt","primary_url":"https://rise-egypt.com/accreditation/","primary_claim_state":"claims_cognia_accredited","location_hint":"El Shorouk City, Cairo","identity_note":null},
+    {"query_name":"Salahaldin International School Cairo","primary_url":"https://sis.edu.eg/cairo/portfolio-items/accreditation/","primary_claim_state":"claims_cognia_accredited","location_hint":"New Cairo","identity_note":"Provider/campus relationship with SIS Alexandria requires D2.2 review."},
+    {"query_name":"Salahaldin International School Alexandria","primary_url":"https://sis.edu.eg/alex/about/","primary_claim_state":"claims_cognia_accredited","location_hint":"Alexandria","identity_note":"Provider/campus relationship with SIS Cairo requires D2.2 review."},
+    {"query_name":"Gateway International Montessori School","primary_url":"https://www.gateway.education/AboutUs/accreditation","primary_claim_state":"claims_cognia_accredited","location_hint":"New Cairo","identity_note":"Also an IB World School; reconcile to existing IB evidence if present."},
+    {"query_name":"ACIC American School","primary_url":"https://www.acic.edu.eg/accreditation","primary_claim_state":"claims_cognia_accredited","location_hint":"New Cairo","identity_note":null},
+    {"query_name":"Stanford International School American Division","primary_url":"https://stanfordschool-eg.com/about-us/","primary_claim_state":"claims_cognia_accredited","location_hint":"New Cairo","identity_note":"Accreditation is division-scoped; do not promote to British division."},
+    {"query_name":"Green Heights International School","primary_url":"https://greenheights.edu.eg/international/our-mission/","primary_claim_state":"claims_cognia_accredited","location_hint":"New Cairo","identity_note":null},
+    {"query_name":"Mansoura College 2 International American School","primary_url":"https://admission.mc.edu.eg/admission","primary_claim_state":"claims_cognia_accredited","location_hint":"Mansoura, Dakahlia","identity_note":"Division/provider relationship with Mansoura College British School requires D2.2 review."},
+    {"query_name":"Royal International American School","primary_url":"https://royal.edu.eg/home_v1/","primary_claim_state":"claims_cognia_accredited","location_hint":"6th of October City, Giza","identity_note":"School/site also describes American and French provision; accreditation scope needs registry confirmation."},
+    {"query_name":"International Modern School Sayed Galal American Division","primary_url":"https://i.imssg.net/","primary_claim_state":"claims_cognia_accredited","location_hint":"El Shorouk City, Cairo","identity_note":"Accreditation is American-division scoped; British division is separately evidenced."},
+    {"query_name":"Metropolitan School","primary_url":"https://metropolitanschool.edu.eg/admissions/","primary_claim_state":"claims_cognia_accredited","location_hint":"Cairo","identity_note":"Also claims CIS membership; accreditation/membership distinction must remain explicit."},
+    {"query_name":"Modern American School of Egypt","primary_url":"https://mase.edu.eg/academics-middle-school/","primary_claim_state":"claims_cognia_accredited","location_hint":"New Cairo","identity_note":null},
+    {"query_name":"Misr American College","primary_url":"https://mac-eg.org/accreditation/","primary_claim_state":"claims_cognia_accredited","location_hint":"New Maadi, Cairo","identity_note":"American division of Orouba Language Schools; provider/division relationship requires D2.2 review."},
+    {"query_name":"The International School of Egypt","primary_url":"https://isegypt.org/","primary_claim_state":"claims_cognia_accredited","location_hint":"Egypt","identity_note":"Also an IB World School; reconcile to existing IB evidence if present."},
+    {"query_name":"New Vision International School","primary_url":"https://nviseg.com/accreditation","primary_claim_state":"claims_cognia_accredited","location_hint":"Sheikh Zayed, Giza","identity_note":"Also an IB World School; reconcile to existing IB evidence if present."},
+    {"query_name":"Forsan American School","primary_url":"https://forsan.edu.eg/home-american","primary_claim_state":"claims_cognia_accredited","location_hint":"Smouha, Alexandria","identity_note":"Provider/division relationship with Forsan International Schools requires D2.2 review."},
+    {"query_name":"Alexandria House of English American Division","primary_url":"https://houseofenglish.edu.eg/american-division/about-us/","primary_claim_state":"claims_cognia_accredited","location_hint":"Alexandria","identity_note":"Accreditation is explicitly American-division scoped."},
+    {"query_name":"Silicon Valley International School American Program","primary_url":"https://siliconvalley-school.com/Educations/american/","primary_claim_state":"claims_cognia_accredited","location_hint":"New Administrative Capital","identity_note":"Accreditation claim is program/division scoped; school currently states higher grades are still expanding."},
+    {"query_name":"Egyptian American International School","primary_url":"https://els-egypt.net/wp-content/uploads/2025/09/Student-and-Parent-Handbook-25-26.pdf","primary_claim_state":"claims_cognia_accredited","location_hint":"Egypt","identity_note":"The Egyptian Schools operate multiple campuses/divisions. Registry verification must retain campus/division scope and avoid one-row group collapse."},
+    {"query_name":"Narmer International College","primary_url":"https://nic.edu.eg/faqs","primary_claim_state":"claims_cognia_accredited","location_hint":"New Cairo","identity_note":"Potential relationship/alias conflict with Cognia milestone row Narmer American College; requires D2.2 review."},
+    {"query_name":"Port Said International School American School","primary_url":"https://pis.edu.eg/accreditation-american/","primary_claim_state":"claims_cognia_accredited","location_hint":"Port Said","identity_note":"Potential match to Cognia milestone row Port Said American School; do not double count."},
+    {"query_name":"Modern Education American School","primary_url":"https://www.mes.edu.eg/about-us/","primary_claim_state":"claims_cognia_accredited","location_hint":"Cairo","identity_note":"Potential division/alias relationship with Cognia milestone row Modern Education Schools; do not double count."},
+    {"query_name":"The American School of Egypt","primary_url":"https://ase-edu.org/news/","primary_claim_state":"cognia_engagement_review_observed","location_hint":"Sheikh Zayed, Giza","identity_note":"Engagement review evidence does not by itself prove current accreditation. Official registry verification is required."},
+    {"query_name":"Future Pioneers International School","primary_url":"https://fpis.edu.eg/","primary_claim_state":"cognia_engagement_review_observed","location_hint":"Egypt","identity_note":"Engagement review event does not by itself prove current accreditation. Official registry verification is required."}
+  ],
+  "records_count": 24,
+  "rules": {
+    "official_registry_verification_required": true,
+    "primary_claim_auto_accreditation": false,
+    "cognia_auto_international_eligibility": false,
+    "automatic_identity_merge": false,
+    "database_mutation": false,
+    "public_projection": false
+  }
+}
