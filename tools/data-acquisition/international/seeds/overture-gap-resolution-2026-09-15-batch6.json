@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "batch_id": "overture-gap-resolution-2026-09-15-batch6",
+  "snapshot_date": "2026-09-15",
+  "records_count": 9,
+  "records": [
+    {
+      "overture_id": "175361fe-80ce-4a99-a941-8ecd1da00caf",
+      "overture_name": "AlMaaly International School",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-008",
+      "target_name_en": "Al Maaly International School",
+      "evidence_urls": [
+        "https://almaaly.edu.eg/",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "The current AlMaaly school domain and branding align with the accepted current Cognia Cairo source identity; the difference is spacing/capitalization only. This is source-resolution evidence only. Cognia presence does not independently establish international eligibility and no canonical merge is performed."
+    },
+    {
+      "overture_id": "c31746e4-1dc1-4d5f-8f3e-1ef3f635ca37",
+      "overture_name": "Sun of Knowledge British International School",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:sun-of-knowledge-british-international-school",
+      "target_name_en": "Sun of Knowledge British International School - SBIS",
+      "evidence_urls": [
+        "http://www.sbis.edu.eg/",
+        "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf"
+      ],
+      "review_note": "The Overture school name and sbis.edu.eg identity align with the accepted current British Council source row for Sun of Knowledge British International School - SBIS in Cairo. The acronym suffix is non-substantive. British Council Partner status itself grants no eligibility and no canonical merge is performed."
+    },
+    {
+      "overture_id": "bdedb8a4-2a35-42b6-bed2-cb7e7e36f25b",
+      "overture_name": "British Modern School - BMS",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:british-modern-school-badr",
+      "target_name_en": "British Modern School",
+      "evidence_urls": [
+        "https://bms-modernschool.com/",
+        "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf"
+      ],
+      "review_note": "Current British Modern School primary branding and its Badr/Suez Road location align with the accepted British Council Badr City source row. BMS is an acronym suffix. British Council Partner status itself grants no eligibility and no canonical merge is performed."
+    },
+    {
+      "overture_id": "4d7e4fc6-7413-4b74-a296-c31cc812bf8e",
+      "overture_name": "Lycée International Balzac",
+      "decision": "covered_by_current_authoritative_source_family",
+      "target_source_id": "french_homologation_2026_2027",
+      "target_source_record_id": "3010006W",
+      "target_name_en": "Lycée international Honoré-de-Balzac",
+      "evidence_urls": [
+        "https://lyceebalzac.com/",
+        "https://aefe.gouv.fr/en/etablissements"
+      ],
+      "review_note": "Current Lycée International Balzac primary evidence identifies a fully French-accredited Cairo school, and the current AEFE directory lists Lycée international Balzac in Cairo among homologated French schools. This is covered by the accepted French homologation source row UAI 3010006W; the shorter Overture brand is an explicit source alias, not a new institution."
+    },
+    {
+      "overture_id": "5f626cfa-ab4b-43f3-8bc1-5b5594ecd5be",
+      "overture_name": "International Schools of Kenana",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-242",
+      "target_name_en": "The International Schools of Kenana",
+      "evidence_urls": [
+        "https://alkenana-schools.org/",
+        "https://american.alkenana-schools.org/",
+        "https://british.alkenana-schools.org/",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "Current first-party Kenana evidence describes one educational institution/provider with National, American and British divisions at the 30th KM Cairo-Ismailia Road campus. The accepted Cognia row covers the current Kenana source identity, but the Overture umbrella label must remain provider/division topology work for D2.2 rather than being flattened into one institution-wide curriculum identity. Cognia alone grants no eligibility."
+    },
+    {
+      "overture_id": "5bd9814b-caa5-4f9c-879c-c33630a5a2da",
+      "overture_name": "Norwich International College - HR",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-176",
+      "target_name_en": "Norwich International College",
+      "evidence_urls": [
+        "https://norwichinternationalcollege.com/",
+        "https://norwichinternationalcollege.com/contact/",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "Current Norwich International College primary contact evidence places the school in Sheikh Zayed and gives phone +201112743326, aligning with the Overture row and accepted current Cognia source identity. The '- HR' suffix is not treated as a separate institution. Cognia alone grants no eligibility and no canonical merge is performed."
+    },
+    {
+      "overture_id": "5f91e9b4-2e5b-4055-901a-0c64b5f9f05b",
+      "overture_name": "Future International Schools Sadat City Branch",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-165",
+      "target_name_en": "New Future International School Sadat City",
+      "evidence_urls": [
+        "https://future.edu.eg/",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "Current Future primary evidence places Future International & Language Schools / New Future Schools in Sadat City at the second central axis next to the new stadium and exposes multiple school/system labels under the provider. The Overture Sadat City Branch row aligns with the accepted New Future current source evidence but requires D2.2 provider/branch/name topology rather than a flat alias. Cognia alone grants no eligibility."
+    },
+    {
+      "overture_id": "2a4995f3-4189-4c30-9b8d-d784867cb83c",
+      "overture_name": "Nordic international school in Cairo",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:nordick-international-school",
+      "target_name_en": "Nordick International school",
+      "evidence_urls": [
+        "https://www.nordic-school.com/",
+        "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf"
+      ],
+      "review_note": "The Overture Nordic spelling and current nordic-school.com identity align by current Sheikh Zayed/Waslet Dahshur contact evidence with the accepted British Council 'Nordick International school' source row. The spelling variation does not create a new institution. British Council Partner status itself grants no eligibility and no canonical merge is performed."
+    },
+    {
+      "overture_id": "304f2fdc-e4cc-47f8-9024-a116a62f26c4",
+      "overture_name": "British City College - IGCSE",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:british-city-college",
+      "target_name_en": "British City College",
+      "evidence_urls": [
+        "https://cisegypt.edu.eg/british/",
+        "https://cisegypt.edu.eg/contact/",
+        "https://cisegypt.edu.eg/policies/",
+        "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf"
+      ],
+      "review_note": "Current City International Schools primary evidence presents a British/IGCSE school alongside the provider's American offering, and its British policies use British City College naming. The Overture British City College - IGCSE row therefore maps to the accepted British City College source evidence as division/provider topology requiring D2.2, not as an institution-wide automatic merge. British Council Partner status grants no eligibility."
+    }
+  ],
+  "rules": {
+    "resolution_is_discovery_triage_not_canonical_identity_merge": true,
+    "fuzzy_matching_authorizes_nothing": true,
+    "division_provider_relationships_require_d2_2_review": true,
+    "location_mismatch_blocks_automatic_aliasing": true,
+    "overture_grants_no_international_eligibility": true,
+    "canonical_institutions_created": 0,
+    "automatic_identity_merges_performed": 0,
+    "database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
