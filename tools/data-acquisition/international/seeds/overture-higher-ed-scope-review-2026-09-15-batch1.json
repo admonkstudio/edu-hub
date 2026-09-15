@@ -92,8 +92,11 @@
     },
     {
       "decision": "rerouted_preuniversity_unresolved",
-      "evidence_urls": [],
-      "review_note": "Name/site pattern indicates a pre-university school lead, not a higher-ed institution. Preserve for school review rather than discard or promote.",
+      "evidence_urls": [
+        "https://admission.mc.edu.eg/admission",
+        "https://mc2.mc.edu.eg/"
+      ],
+      "review_note": "Current first-party Mansoura College admissions and school sites establish a pre-university group with National, British IG and American school divisions. Preserve this Overture row for explicit provider/division school review rather than discard it as higher education or promote it automatically.",
       "overture_ids": ["9e34fa47-a93e-4c90-a902-9a8181834ec2"]
     },
     {
