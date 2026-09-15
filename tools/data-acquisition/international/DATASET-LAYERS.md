@@ -4,57 +4,102 @@ The international registry deliberately maintains separate evidence layers until
 
 ## Foundational authoritative seed
 
-`build_authoritative_seed.py` rebuilds a deterministic source-shaped evidence set from the checked-in IB, UK DfE BSO, French homologation, German KMK, SCU foreign-branch and AUC/MSCHE snapshots. At the 2026-09-15 checkpoint this layer contains **96 source rows**.
-
-The 96 rows are evidence/source records. They are not a claim of 96 unique institutions.
+`build_authoritative_seed.py` rebuilds the deterministic source-shaped base from checked-in IB, UK DfE BSO, French homologation, German KMK, SCU foreign-branch and AUC/MSCHE evidence. The foundational layer remains **96 source rows** and is preserved as historical provenance.
 
 ## Historical classified strong-source layer
 
-Scope-reviewed CIS/Cognia milestone evidence and later reviewed source packages expand the reproducible strong/authoritative research universe without rewriting the foundational seed. The historical classified strong-source universe contains **106 source rows**.
-
-This 106-row layer remains independently reproducible for provenance and regression checks. Its four Cognia milestone rows are retained as historical source evidence even though the complete current Cognia registry now supersedes that four-row subset for the current D2.1 universe count.
+Reviewed CIS/Cognia milestone evidence expands the reproducible historical strong-source research layer to **106 source rows**. This layer remains independently reproducible. Its four Cognia milestone rows are preserved as historical evidence but are superseded by the complete current Cognia registry for current-universe counting only.
 
 ## British Council supporting discovery layer
 
-The September 2026 British Council Partner Schools source is supporting discovery/contact evidence only. Seven checked-in browser-reviewed batches now contain **226 source rows**.
+Seven checked-in September 2026 browser-review batches contain **226 British Council Partner School source rows**.
 
-Separate primary/recognized-source review currently qualifies 12 of those rows; 214 remain supporting candidates. Partner School status itself grants no international eligibility and creates no canonical identity.
+- 12 have separate qualifying primary/recognized evidence;
+- 214 remain supporting candidates;
+- Partner School status itself grants no international eligibility;
+- no source row creates a canonical identity or authorizes an automatic merge.
 
 ## Complete Cognia Egypt registry layer
 
-The official Cognia Accreditation Registry was queried through its public registry UI and completely extracted for country `Egypt` in accepted run `34977754806`:
+Accepted Cognia run `34977754806` completely extracted the official Egypt registry:
 
 - **256 official Egypt registry rows**;
 - 11 result pages;
-- 2 duplicate normalized-name groups retained as source rows;
-- zero automatic identity merges or eligibility decisions.
+- 2 duplicate normalized-name groups retained as source evidence;
+- four earlier Cognia milestone rows deterministically superseded for current-universe counting;
+- **252 additional current Cognia source rows** beyond the milestone subset;
+- zero automatic identity merges or eligibility decisions for those 252 rows.
 
-The four earlier Cognia milestone institutions occur as exact normalized-name matches in the complete registry. For the **current universe count only**, those four milestone rows are superseded by their registry rows while the already-reviewed scope decisions are carried forward through explicit same-publisher/exact-name source-family supersession. The other **252 Cognia registry rows remain supporting candidates** until separately qualified.
+## Canadian offshore-school authorization layer
 
-The historical milestone evidence is not deleted and remains provenance.
+The current Canadian offshore-school source family contains **6 authorized Egypt rows** across British Columbia, Manitoba, New Brunswick, Ontario and Prince Edward Island. These rows are supported by current CICIC/provincial authorization evidence and retain private/independent scope evidence.
+
+The six rows are source evidence, not six newly claimed unique institutions. Known cross-source overlap, including Royal Canadian School Cairo, and BCCIS East/West topology remain D2.2 review work.
+
+## German Schools Abroad layer
+
+The current ZfA German Schools Abroad directory contains **7 Egypt DAS source rows**. Current DAS membership is treated as recognized German foreign-national/international-model evidence, but it is distinct from current examination/credential authorization.
+
+The Hurghada row therefore preserves its KMK lifecycle explicitly: the Sek-I exam was last conducted in **2024/2025**, and no post-2024/2025 current Sek-I authorization is asserted. Cross-source overlap for the other DAS rows remains D2.2 identity review work.
 
 ## Current expanded D2.1 source/lead universe
 
-Accepted `EDU-DATA-2 D2.1 Universe Checkpoint` run `34995646409` rebuilds the current research universe from source and proves the following checkpoint:
+Accepted `EDU-DATA-2 D2.1 Universe Checkpoint` run **`35001371492`** proves the current checkpoint:
 
-- **584 total source/lead rows**;
-- **115 eligible source/lead rows**;
+- **597 total source/lead rows**;
+- **128 eligible source/evidence rows**;
 - **466 supporting candidates**;
 - **3 excluded source rows**;
 - **226 British Council rows**;
 - **256 current Cognia registry rows**;
-- 4 Cognia milestone rows superseded for current counting, yielding 252 net new Cognia source rows beyond the earlier subset.
+- **6 Canadian authorized offshore-school rows**;
+- **7 current ZfA German Schools Abroad rows**.
 
-`584` is not a unique-institution count. A source row may later resolve to an institution, campus, division, provider/group, an overlap with another source, or an out-of-scope entity.
+`597` is not a unique-institution count. A source row may resolve to an institution, campus, division, provider/group, overlap with another source, lifecycle evidence, or an out-of-scope entity.
 
-## Supporting gap-check sources
+## Overture supporting discovery and gap-resolution layer
 
-Overture/OSM, controlled Edarabia reference-only discovery, the owned V7 archive and institution/operator sites are supporting D2.1 gap-discovery inputs. They may discover candidate identities, aliases, campuses or geography, but they do not independently establish eligibility unless a separate permitted source-specific review does so.
+The official Overture Places `2026-08-19.0` release is supporting discovery/geography evidence only. The accepted Egypt-filtered acquisition contains:
 
-D2.1 remains open while those gap checks are completed.
+- 1,121 rectangular-bbox candidates;
+- 79 non-Egypt rows rejected using Overture's own address-country data;
+- **1,042 Egypt-only supporting rows**;
+- 42 duplicate normalized-name groups retained.
+
+Against the current 597-row universe, deterministic exact-name comparison currently yields:
+
+- **136 exact normalized-name overlap rows**;
+- **906 unmatched supporting rows** / 869 unmatched normalized names;
+- **266 high-signal pre-university rows**;
+- **75 higher-education review rows**;
+- **565 lower-priority supporting rows**.
+
+Two explicit checked-in Overture review batches have reviewed **30 high-signal rows**:
+
+- 28 are resolved from the unknown-gap queue as already-covered authoritative evidence, existing-source aliases, or existing provider/division cases requiring D2.2 topology review;
+- 2 remain reviewed-but-unresolved supporting leads;
+- 236 high-signal rows remain unreviewed;
+- **238 high-signal rows remain outstanding in total**.
+
+These review decisions are discovery triage only. They perform zero fuzzy merges, zero automatic universe additions, zero canonical identity creation and zero public projection.
+
+## OSM diagnostic layer
+
+OpenStreetMap remains a permitted supporting geography/identity source, but all public Overpass mirrors were inaccessible from the hosted GitHub Actions environment across the 12-tile Egypt diagnostic. The workflow records this as `environment_blocked_all_tiles` rather than treating failed access as zero OSM candidates.
+
+OSM unavailability in CI is therefore **diagnostic state, never negative evidence**.
+
+## V7, Edarabia and primary-source gap checks
+
+D2.1 remains open for:
+
+- read-only comparison against the owned 24,916-row V7 raw archive; unmatched legacy leads require current re-sourcing before use;
+- controlled Edarabia reference-only discovery under the project source-use policy;
+- continued institution/operator primary-source confirmation;
+- remaining Overture high-signal and higher-education triage.
 
 ## Canonical boundary
 
-No layer may silently collapse source rows into canonical institutions. Institution, provider, campus, division and parent/branch relationships are created only by explicit reviewed identity/topology decisions. Counts for source rows, reviewed identities, memberships and campuses therefore remain separate CI contracts.
+No layer may silently collapse source rows into canonical institutions. Institution, provider, campus, division and parent/branch relationships are created only through explicit reviewed D2.2 decisions. Counts for source rows, reviewed identities, memberships, campuses and divisions remain separate CI contracts.
 
-The canonical project status and decision log are the source of truth for the current checkpoint and accepted CI run IDs.
+The canonical project status and decision log are the source of truth for accepted checkpoint run IDs and durable project rules.
