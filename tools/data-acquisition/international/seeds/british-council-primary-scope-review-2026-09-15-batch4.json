@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.1_british_council_primary_scope_review",
+  "batch_id": "batch4-current-reviewed-bso-identity-overlaps",
+  "review_method": "british_council_discovery_then_primary_or_recognized_evidence_review",
+  "records_count": 2,
+  "records": [
+    {
+      "source_record_id": "bcps2026:british-school-of-alexandria",
+      "source_name": "The British School of Alexandria",
+      "decision": "eligible",
+      "decision_confidence": "high",
+      "scope_class": "international_school",
+      "ownership_scope": "independent_not_for_profit",
+      "curriculum_codes": ["british"],
+      "website": "https://bsalex.net",
+      "evidence_urls": [
+        "https://www.get-information-schools.service.gov.uk/Establishments/Establishment/Details/132609",
+        "https://www.gov.uk/government/publications/british-schools-overseas-inspection-reports/british-schools-overseas-accredited-schools-inspection-reports",
+        "https://bsalex.net"
+      ],
+      "eligibility_basis": [
+        "current_open_dfe_british_school_overseas",
+        "current_bso_accreditation",
+        "existing_reviewed_independent_not_for_profit_ownership_scope"
+      ],
+      "review_note": "British Council Partner School status is not the eligibility basis. Current DfE/GIAS lists The British School of Alexandria as an open British School Overseas and the current DfE accredited-schools list includes its October 2024 inspection. The existing BSO ownership review classifies the school as independent/not-for-profit. D2.2 must attach this discovery row to the already reviewed british-school-alexandria identity and create no duplicate institution."
+    },
+    {
+      "source_record_id": "bcps2026:uppingham-cairo",
+      "source_name": "Uppingham Cairo",
+      "decision": "eligible",
+      "decision_confidence": "high",
+      "scope_class": "international_school",
+      "ownership_scope": "private_independent_partnership",
+      "curriculum_codes": ["british", "ib"],
+      "website": "https://uppinghamcairo.com/",
+      "evidence_urls": [
+        "https://www.gov.uk/government/publications/british-schools-overseas-inspection-reports/british-schools-overseas-accredited-schools-inspection-reports",
+        "https://uppinghamcairo.com/about/",
+        "https://uppinghamcairo.com/"
+      ],
+      "eligibility_basis": [
+        "current_bso_accreditation",
+        "current_first_party_british_international_school_identity",
+        "existing_reviewed_private_independent_partnership_ownership_scope"
+      ],
+      "review_note": "British Council Partner School status is not the eligibility basis. Current DfE BSO evidence lists Uppingham Cairo among accredited Egypt schools, and current first-party evidence identifies it as a British international school opened in September 2024 and part of Uppingham School. Existing BSO scope review identifies the private/independent New Era Education partnership. D2.2 must attach this row to the already reviewed uppingham-cairo identity rather than create another institution."
+    }
+  ],
+  "safety": {
+    "partner_status_treated_as_international_eligibility": false,
+    "unreviewed_british_council_leads_promoted": false,
+    "automatic_identity_creation_performed": false,
+    "automatic_merges_performed": 0,
+    "canonical_database_rows_written": 0,
+    "public_projection_rows_created": 0
+  }
+}
