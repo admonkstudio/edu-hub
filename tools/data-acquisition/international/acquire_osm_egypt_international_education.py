@@ -2,16 +2,15 @@
 """Acquire supporting Egypt international-education candidates from OSM.
 
 OpenStreetMap is a supporting discovery/geography source only. This adapter uses
-the read-only Overpass API and intentionally narrows the Egypt query to school,
-college and university features whose names carry likely international-system
-signals. Results may reveal missing institutions, alternate names, campuses and
-coordinates, but they never establish Edu Hub eligibility or canonical identity.
+read-only public Overpass instances and narrows the Egypt query to education
+features whose names carry likely international-system signals. Results may
+reveal missing institutions, alternate names, campuses and coordinates, but
+they never establish Edu Hub eligibility or canonical identity.
 """
 from __future__ import annotations
 
 import argparse
 import json
-import re
 import time
 import unicodedata
 from datetime import datetime, timezone
@@ -19,16 +18,20 @@ from pathlib import Path
 
 import requests
 
+# The OSM public-instance list currently documents all three as global mirrors.
+# Start with VK Maps and Private.coffee because the primary FOSSGIS instance has
+# recently reported overload/timeouts from cloud-hosted traffic.
 OVERPASS_ENDPOINTS = [
+    "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
     "https://overpass-api.de/api/interpreter",
-    "https://overpass.kumi.systems/api/interpreter",
 ]
 NAME_PATTERN = (
     "international|american|british|english|french|francais|français|german|deutsch|"
-    "canadian|pakistan|indian|japanese|korean|italian|spanish|swiss|ib |baccalaureate|"
+    "canadian|pakistan|indian|japanese|korean|italian|spanish|swiss|baccalaureate|"
     "choueifat|sabis|montessori"
 )
-QUERY = f'''[out:json][timeout:90];
+QUERY = f'''[out:json][timeout:60][maxsize:268435456];
 area["ISO3166-1"="EG"]["boundary"="administrative"]->.egypt;
 (
   nwr(area.egypt)["amenity"~"^(school|college|university)$"]["name"~"{NAME_PATTERN}",i];
@@ -57,13 +60,14 @@ def fetch(timeout_s: int) -> tuple[dict, str, list[str]]:
         "User-Agent": "EduHub-D2.1-supporting-discovery/1.0",
         "Accept": "application/json",
     }
+    per_endpoint_timeout = min(max(timeout_s, 30), 70)
     for endpoint in OVERPASS_ENDPOINTS:
         try:
             response = requests.post(
                 endpoint,
                 data={"data": QUERY},
                 headers=headers,
-                timeout=timeout_s,
+                timeout=per_endpoint_timeout,
             )
             if response.status_code == 200:
                 return response.json(), endpoint, errors
@@ -124,7 +128,7 @@ def build(output: Path, timeout_s: int) -> dict:
     }
 
     result = {
-        "schema_version": 1,
+        "schema_version": 2,
         "built_at": datetime.now(timezone.utc).isoformat(),
         "work_package": "D2.1_osm_egypt_international_education_supporting_discovery",
         "source": "OpenStreetMap via Overpass API",
@@ -167,7 +171,7 @@ def main() -> int:
         type=Path,
         default=Path("artifacts/international/osm-egypt-international-education/osm-egypt-international-education.json"),
     )
-    parser.add_argument("--timeout-s", type=int, default=120)
+    parser.add_argument("--timeout-s", type=int, default=60)
     args = parser.parse_args()
     build(args.output, args.timeout_s)
     return 0
