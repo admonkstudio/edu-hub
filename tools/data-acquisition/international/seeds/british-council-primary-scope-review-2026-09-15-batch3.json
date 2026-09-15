@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.1_british_council_primary_scope_review",
+  "batch_id": "batch3-current-reviewed-identity-overlaps",
+  "review_method": "british_council_discovery_then_primary_or_recognized_evidence_review",
+  "records_count": 3,
+  "records": [
+    {
+      "source_record_id": "bcps2026:alsson-international-school-haraniya",
+      "source_name": "Alsson International School Haraniya",
+      "decision": "eligible",
+      "decision_confidence": "high",
+      "scope_class": "international_school",
+      "ownership_scope": "private_independent",
+      "curriculum_codes": ["ib", "british", "american"],
+      "website": "https://www.alsson.com/",
+      "evidence_urls": [
+        "https://ibo.org/programmes/find-an-ib-school/ibaem2/e/el-alsson-american-international-school/",
+        "https://www.alsson.com/",
+        "https://www.alsson.com/about/accreditations"
+      ],
+      "eligibility_basis": [
+        "current_ib_world_school_private_type",
+        "current_first_party_british_american_international_school_identity",
+        "current_first_party_ib_authorization_and_bso_evidence"
+      ],
+      "review_note": "The British Council row is supporting discovery evidence only. Current IB evidence identifies El Alsson American International School as PRIVATE and authorized, while the current first-party El Alsson site identifies one British and American international-school identity and records IB/BSO status. The Haraniya wording is retained as source provenance; D2.2 must attach this row only to the already reviewed El Alsson identity and must not recreate a historical/current campus claim from the discovery label."
+    },
+    {
+      "source_record_id": "bcps2026:misr-language-schools",
+      "source_name": "Misr Language Schools",
+      "decision": "eligible",
+      "decision_confidence": "high",
+      "scope_class": "international_school",
+      "ownership_scope": "private_independent",
+      "curriculum_codes": ["ib", "british", "american", "french", "egyptian_national"],
+      "website": "https://mls-egypt.org/",
+      "evidence_urls": [
+        "https://ibo.org/en/school/051897",
+        "https://mls-egypt.org/",
+        "https://frenchdivision.mls-egypt.org/"
+      ],
+      "eligibility_basis": [
+        "current_ib_world_school_private_type",
+        "current_first_party_multi_division_school_identity",
+        "existing_recognized_french_and_international_programme_evidence"
+      ],
+      "review_note": "The current IB profile identifies Misr Language Schools as PRIVATE and an IB World School. Current first-party evidence presents the same institutional identity with multiple curriculum divisions, including French and other international pathways. British Council status is not the eligibility basis. D2.2 must attach this discovery record to the already reviewed Misr Language Schools identity while retaining division-scoped evidence boundaries."
+    },
+    {
+      "source_record_id": "bcps2026:new-giza-international-school-evolution",
+      "source_name": "New Giza International School-Evolution",
+      "decision": "eligible",
+      "decision_confidence": "high",
+      "scope_class": "international_school",
+      "ownership_scope": "private_independent",
+      "curriculum_codes": ["ib"],
+      "website": "https://eisng.lvng.net/",
+      "evidence_urls": [
+        "https://www-prod.ibo.org/school/061134/",
+        "https://eisng.lvng.net/",
+        "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/re-accredited-evolution-international-school-egypt"
+      ],
+      "eligibility_basis": [
+        "current_ib_world_school_private_type",
+        "current_ib_authorized_programmes",
+        "existing_cis_and_first_party_identity_evidence"
+      ],
+      "review_note": "Current IB evidence identifies Evolution International School - NewGiza as PRIVATE and authorized, while current first-party/CIS evidence resolves the NewGiza/Evolution naming to the already reviewed institution identity. British Council status is only discovery provenance. This source row should become another membership of the existing Evolution identity rather than a new institution."
+    }
+  ],
+  "safety": {
+    "partner_status_treated_as_international_eligibility": false,
+    "unreviewed_british_council_leads_promoted": false,
+    "automatic_identity_creation_performed": false,
+    "automatic_merges_performed": 0,
+    "canonical_database_rows_written": 0,
+    "public_projection_rows_created": 0
+  }
+}
