@@ -28,7 +28,7 @@ jobs:
         run: python -m py_compile tools/data-acquisition/international/acquire_overture_egypt_international_education.py
       - name: Query official Overture Places release
         run: python tools/data-acquisition/international/acquire_overture_egypt_international_education.py
-      - name: Assert supporting-only safety boundary
+      - name: Assert Egypt filter and supporting-only safety boundary
         run: |
           python - <<'PY'
           import json
@@ -38,8 +38,12 @@ jobs:
           assert data['work_package'] == 'D2.1_overture_egypt_international_education_supporting_discovery'
           assert data['source'] == 'Overture Maps Places'
           assert data['release'] == '2026-08-19.0'
+          assert data['country_filter'] == 'EG'
+          assert data['bbox_candidate_rows'] == data['record_count'] + data['non_egypt_rows_rejected']
+          assert data['non_egypt_rows_rejected'] >= 0
           assert data['record_count'] == len(data['records'])
           assert data['record_count'] > 0
+          assert all('EG' in r['address_countries'] for r in data['records'])
           assert all(r['international_eligibility_granted'] is False for r in data['records'])
           assert data['rules']['overture_auto_international_eligibility'] is False
           assert data['rules']['overture_auto_identity_merge'] is False
@@ -49,6 +53,8 @@ jobs:
           assert data['public_projection_rows_created'] == 0
           print(json.dumps({
               'release': data['release'],
+              'bbox_candidate_rows': data['bbox_candidate_rows'],
+              'non_egypt_rows_rejected': data['non_egypt_rows_rejected'],
               'record_count': data['record_count'],
               'duplicate_normalized_name_group_count': data['duplicate_normalized_name_group_count'],
           }, indent=2))
