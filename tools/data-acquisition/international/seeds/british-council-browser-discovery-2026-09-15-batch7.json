@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "source_id": "british_council_partner_schools_egypt_2026_09",
+  "source_url": "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf",
+  "landing_url": "https://www.britishcouncil.org.eg/en/exam/igcse-school/choosing/find-british-council-attached-centre",
+  "capture_mode": "browser_pdf_text_extraction",
+  "source_role": "supporting_discovery_contact_evidence",
+  "international_eligibility_granted": false,
+  "batch_id": "batch7",
+  "records_count": 16,
+  "records": [
+    ["gulf-english-school-cairo","Gulf English School Cairo",6,"New Cairo","https://www.gescairo.com"],
+    ["kayan-international-college","Kayan International college",6,"New Cairo","https://kayan-college.com"],
+    ["manor-house-school-new-cairo","Manor House School",6,"New Cairo","https://www.mhis.edu.eg"],
+    ["manchester-international-school","Manchester International School",6,"New Cairo","https://www.manchester-international-school.com"],
+    ["manarat-al-farouk-islamic-language-school","Manarat Al Farouk Islamic Language School",6,"New Cairo","https://mfis-igcse.com"],
+    ["merryland-international-school","Merryland International School",6,"New Cairo","https://www.merryland-school.com"],
+    ["modern-education-schools","Modern Education Schools",6,"New Cairo","https://www.mes.edu.eg"],
+    ["modern-school-of-egypt-2000","Modern School of Egypt 2000",6,"New Cairo","https://mbse-eg.com"],
+    ["new-cairo-british-international-school","New Cairo British International School",6,"New Cairo",null],
+    ["narmer-american-college","Narmer American College",6,"New Cairo","https://www.nacegypt.com"],
+    ["leaders-international-college","Leaders International College",6,"New Cairo","https://www.leadersintcollege.com"],
+    ["royal-british-international-school","Royal British International School",6,"New Cairo","https://theroyalschool.online"],
+    ["repton-cairo-school","Repton Cairo School",6,"New Cairo","https://reptoncairo.org"],
+    ["egypt-integrated-school","Egypt Integrated School",7,"New Cairo",null],
+    ["cairo-british-college-victoria","Cairo British College Victoria",11,"6th of October - Cairo Alexandria Road",null],
+    ["the-egyptian-language-school-october","The Egyptian Language School",11,"6th of October",null]
+  ],
+  "safety": {
+    "partner_status_treated_as_international_eligibility": false,
+    "records_claimed_as_unique_institutions": false,
+    "automatic_identity_creation_performed": false,
+    "automatic_merges_performed": 0,
+    "canonical_database_rows_written": 0,
+    "public_projection_rows_created": 0
+  }
+}
