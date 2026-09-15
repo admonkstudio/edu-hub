@@ -2,11 +2,11 @@
 
 Last updated: 2026-09-15
 
-This file is the **continuation cursor for active Edu Hub work**. A new agent must be able to resume correctly from this file even if all prior chat context is unavailable.
+This file is the **durable continuation cursor for active Edu Hub work**. A new agent must be able to resume correctly from this file even if prior chat context is unavailable.
 
 Read it after `AGENTS.md`, `docs/PROJECT-STATUS.md`, and `docs/PROJECT-DECISIONS.md` before changing code or data.
 
-Visible GitHub tracker: **Issue #8 — `EDU-DATA-2 Continuation Roadmap — D2.1 → D2.7`**.
+Visible tracker: **GitHub Issue #8 — `EDU-DATA-2 Continuation Roadmap — D2.1 → D2.7`**.
 
 ## 1. Active scope
 
@@ -28,19 +28,19 @@ Do not skip ahead to website implementation.
 Current accepted D2.1 checkpoint:
 
 - Workflow: `EDU-DATA-2 D2.1 Universe Checkpoint`
-- Accepted run: **35009564541**
-- Accepted head: **`6ffb7cbb3d4e07e66bfc8317451a9829328c22c8`**
+- Accepted run: **35010912245**
+- Accepted head: **`020b223368fc0fd4dcc1b148bfa61461c92e493a`**
 - Conclusion: **green**
-- General `EDU-DATA-2 International Registry` run for the same head: **35009564572 — green**
+- General `EDU-DATA-2 International Registry` Mansoura implementation run immediately preceding the integration commit: **35010762392 — green**
 
 Accepted source/evidence universe:
 
-- **602 total source/evidence rows**
-- **133 eligible**
+- **604 total source/evidence rows**
+- **135 eligible**
 - **466 supporting candidates**
 - **3 excluded**
 
-`602` is **not** a unique-institution count.
+`604` is **not** a unique-institution count.
 
 Current construction:
 
@@ -48,11 +48,12 @@ Current construction:
 - complete 256-row Cognia registry replaces the four historical milestone rows for current counting → 584;
 - +6 current Canadian offshore-school authorization rows → 590;
 - +7 current ZfA German Schools Abroad Egypt rows → 597;
-- +5 reviewed substantive-international higher-education rows → **602**.
+- +5 reviewed substantive-international higher-education rows → 602;
+- +2 reviewed eligible Mansoura College international-school evidence rows → **604**.
 
 Historical source snapshots remain preserved.
 
-## 3. Completed/frozen major source families
+## 3. Completed/frozen major source and review families
 
 - 96-row foundational deterministic seed;
 - 106-row historical classified strong-source layer;
@@ -62,21 +63,33 @@ Historical source snapshots remain preserved.
 - 7 current ZfA DAS Egypt rows;
 - 9 current SCU foreign-university branches with Ryerson/TMU kept as lifecycle conflict only;
 - AUC substantive international/accreditation evidence;
-- 5-row reviewed substantive-international HE package: GIU, GUC, UFE, BUE and AASTMT.
+- 5-row reviewed substantive-international HE package: GIU, GUC, UFE, BUE and AASTMT;
+- Mansoura College provider/school topology review.
 
-### Higher-education scope rule adopted
+### Higher-education scope rule
 
-Egyptian incorporation, private-university classification or national legal form does not automatically exclude an institution when separate current evidence establishes **substantive binational, intergovernmental, transnational or international-organizational status**.
-
-However, a foreign name, partnership, validated programme or dual degree alone remains insufficient.
+Egyptian incorporation, private-university classification or national legal form does not automatically exclude an institution when separate current evidence establishes substantive **binational, intergovernmental, transnational or international-organizational status**. A foreign name, partnership, validated programme or dual degree alone remains insufficient.
 
 Checked-in review package:
 
 `tools/data-acquisition/international/seeds/substantive-international-higher-ed-review-2026-09-15.json`
 
-Overlay builder:
+### Mansoura College topology — COMPLETE
 
-`tools/data-acquisition/international/apply_substantive_international_he_review.py`
+Checked-in review package:
+
+`tools/data-acquisition/international/seeds/mansoura-college-topology-review-2026-09-15.json`
+
+Current first-party provider/admissions evidence establishes one Mansoura College educational campus/group with four school units. The accepted review does **not** materialize the umbrella as a canonical institution.
+
+- Mansoura College Language School — national, provider context only.
+- Modern Mansoura College Language School — national, provider context only; British Council Partner row preserved as separate supporting provenance.
+- Mansoura College British School — eligible reviewed evidence row; current primary evidence plus Pearson centre `92720` lifecycle evidence.
+- Mansoura College 2 International American School — eligible reviewed evidence row; current primary evidence plus recognized Cognia/ACT evidence; original Cognia row preserved separately.
+
+The Overture row `Mansoura College International Schools` (`9e34fa47-a93e-4c90-a902-9a8181834ec2`) is reviewed as a provider-umbrella alias, not a separate school institution.
+
+No automatic source-row merge, canonical institution creation, runtime DB mutation or public projection occurred.
 
 ## 4. Current Overture state
 
@@ -87,16 +100,28 @@ Current Egypt-only acquisition:
 - 1,121 bbox candidates;
 - 79 non-Egypt rows rejected by Overture address country;
 - **1,042 Egypt-only rows**;
-- **141 exact normalized-name overlaps** with the 602-row universe;
+- **141 exact normalized-name overlaps** with the 604-row universe;
 - **901 unmatched rows**;
 - **865 unmatched normalized names**;
 - **266 high-signal pre-university rows**;
 - **70 post-overlay higher-ed review rows**;
 - **565 lower-priority supporting rows**.
 
-Overture remains supporting discovery only and grants zero eligibility.
+The two Mansoura additions do not alter these Overture comparison counts. Overture remains supporting discovery only and grants zero eligibility.
 
-### School high-signal review
+### Higher-education Overture review — COMPLETE
+
+The complete 70-row HE queue has **0 outstanding rows**:
+
+- 14 existing eligible HE aliases/departments/subunits;
+- 21 out-of-scope Egyptian HE rows/subunits without sufficient substantive-international status;
+- 33 supporting-only academy/training/institute leads with no qualifying current HE evidence;
+- 1 school category error resolving to existing Egypt British International School BSO evidence;
+- 1 school/provider category error (`Mansoura College International Schools`) now closed by the explicit topology review above.
+
+Do not restart this review.
+
+### High-signal school review — ACTIVE NEXT CURSOR
 
 Builder:
 
@@ -114,70 +139,30 @@ Current school artifact:
 - 28 resolved/explained;
 - 2 reviewed-but-unresolved;
 - 236 not yet reviewed;
-- **238 outstanding in the current school artifact**.
+- **238 outstanding**.
 
 Reviewed unresolved rows:
 
 - `Kada Modern British School`
 - `M.S.G International British School`
 
-### Higher-education Overture review — COMPLETE
-
-Decision seed:
-
-`tools/data-acquisition/international/seeds/overture-higher-ed-scope-review-2026-09-15-batch1.json`
-
-Builder:
-
-`tools/data-acquisition/international/apply_overture_higher_ed_resolutions.py`
-
-The complete 70-row post-overlay HE queue now has **0 outstanding rows**:
-
-- 14 existing eligible HE aliases/departments/subunits;
-- 21 out-of-scope Egyptian HE rows/subunits without sufficient substantive-international status;
-- 33 supporting-only academy/training/institute leads with no current qualifying HE evidence;
-- 1 misclassified pre-university row resolved to existing Egypt British International School evidence;
-- 1 misclassified pre-university row (`Mansoura College International Schools`) rerouted to school/provider/division review.
-
-No fuzzy matching, automatic universe promotion or identity creation occurred.
+The separately rerouted Mansoura provider case is now complete and is not an extra outstanding row beyond this artifact.
 
 ## 5. Exact resume cursor — START HERE
 
-**Do not repeat the completed higher-education review.**
+### Task A — continue the 238 outstanding high-signal school rows
 
-### Task A — resolve Mansoura College provider/division topology
-
-The Overture row `Mansoura College International Schools` (`9e34fa47-a93e-4c90-a902-9a8181834ec2`) was incorrectly categorized as higher education.
-
-Current first-party evidence:
-
-- `https://admission.mc.edu.eg/admission`
-- `https://mc2.mc.edu.eg/`
-
-The current admissions system shows a pre-university Mansoura College group with multiple school/division offerings, including National, British IG and American tracks/schools.
-
-Existing current-universe evidence includes Mansoura-related Cognia/British Council rows. The next agent must:
-
-1. inspect all exact Mansoura source rows in the current 602-row universe and existing D2.2 review artifacts;
-2. distinguish provider/group, physical campus and curriculum/school division identities;
-3. create an explicit checked-in review decision linking only what current evidence actually proves;
-4. do **not** auto-merge by shared branding/name/domain;
-5. preserve division-scoped curriculum/accreditation evidence;
-6. validate with green CI.
-
-### Task B — continue the 238 outstanding high-signal school rows
-
-Work in small deterministic batches. Preferred outcome order:
+Work in small deterministic checked-in batches. Preferred outcome order:
 
 1. exact/current authoritative family coverage;
 2. explicit source alias;
-3. provider/campus/division topology requiring D2.2 review;
+3. provider/campus/division topology requiring later D2.2 review;
 4. genuinely new candidate with current permitted primary/recognized-source evidence;
 5. unresolved supporting-only lead.
 
-No fuzzy auto-merge logic may be introduced merely to reduce the queue.
+Current research already isolated several strong next-batch candidates, including American City International Schools, Cairo West International School, British International School Madinaty, Cairo British School, International Liberty School, Nefertari October/Cairo variants, and other exact/near-exact current source-family aliases. Every row still requires explicit evidence-backed review by exact Overture ID. Do not convert fuzzy similarity into an automatic merge.
 
-### Task C — execute V7 read-only comparison
+### Task B — execute V7 read-only comparison
 
 Matcher:
 
@@ -191,13 +176,13 @@ Owned V7 contract:
 - unmatched international-signal leads only;
 - zero eligibility and zero canonical identities from V7 itself.
 
-The matcher is ready but has not yet been run against the live owned V7 filesystem in this pass. Any useful V7 unmatched lead must be re-sourced from current permitted evidence.
+The matcher is ready but has not yet been run against the live owned V7 filesystem in this D2.1 pass. Any useful V7 unmatched lead must be re-sourced from current permitted evidence.
 
-### Task D — Edarabia reference-only gap pass
+### Task C — Edarabia reference-only gap pass
 
 Use Edarabia only as a discovery/reference index. Do not bulk scrape, systematically store or reproduce Edarabia content. Re-source every useful lead from institution-primary/regulatory/accreditor evidence.
 
-### Task E — primary-source exhaustion pass
+### Task D — primary-source exhaustion pass
 
 Use institution/operator primary sites and recognized source families to close remaining likely gaps and provider/campus/division ambiguity.
 
@@ -220,13 +205,14 @@ Current accepted review artifacts contain:
 - 17 reviewed current campuses across 15 institutions;
 - two reviewed institutions with multiple current campuses.
 
-D2.2 remains secondary until D2.1 is explicitly closed. New Cognia, Canadian, ZfA, substantive-HE, Overture and V7 evidence may not auto-materialize into canonical identities.
+D2.2 remains secondary until D2.1 is explicitly closed. New Cognia, Canadian, ZfA, substantive-HE, Mansoura, Overture and V7 evidence may not auto-materialize into canonical identities.
 
 ## 8. D2.1 exit criteria
 
 D2.1 may close only when:
 
 - Overture HE queue is complete — **DONE**;
+- Mansoura provider/school topology follow-up is complete — **DONE**;
 - high-signal school review is substantially exhausted and residual unresolved rows are explicitly documented;
 - OSM limitation remains documented without a false zero-coverage claim — **DONE**;
 - V7 comparison is executed or explicitly blocked with durable evidence;
@@ -242,6 +228,7 @@ D2.1 may close only when:
 ## 9. Non-negotiable rules
 
 - source/discovery rows never automatically become canonical institutions;
+- source-row counts are not unique-institution counts;
 - no international eligibility from branding alone;
 - no fuzzy identity merge;
 - no campus inference from one address;
