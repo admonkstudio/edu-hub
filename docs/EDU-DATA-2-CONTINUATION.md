@@ -2,9 +2,7 @@
 
 Last updated: 2026-09-15
 
-This file is the **durable continuation cursor for active Edu Hub work**. A new agent must be able to resume correctly from this file even if prior chat context is unavailable.
-
-Read it after `AGENTS.md`, `docs/PROJECT-STATUS.md`, and `docs/PROJECT-DECISIONS.md` before changing code or data.
+This file is the **durable continuation cursor for active Edu Hub work**. Read it after `AGENTS.md`, `docs/PROJECT-STATUS.md`, and `docs/PROJECT-DECISIONS.md` before changing code or data.
 
 Visible tracker: **GitHub Issue #8 — `EDU-DATA-2 Continuation Roadmap — D2.1 → D2.7`**.
 
@@ -21,19 +19,14 @@ Canonical sequence:
 
 `D2.1 universe → D2.2 identities → D2.3 EN/AR → D2.4 enrichment → D2.5 media → D2.6 audit → D2.7 portable freeze → Astro/Instatic decision → public product build`
 
-Do not skip ahead to website implementation.
-
 ## 2. Last accepted checkpoint
 
-Current accepted D2.1 checkpoint:
-
 - Workflow: `EDU-DATA-2 D2.1 Universe Checkpoint`
-- Accepted run: **35010912245**
-- Accepted head: **`020b223368fc0fd4dcc1b148bfa61461c92e493a`**
+- Accepted run: **35021093103**
+- Accepted head: **`637a5f0bcb8bc6c801eb74ec724914dc3f62a670`**
 - Conclusion: **green**
-- General `EDU-DATA-2 International Registry` Mansoura implementation run immediately preceding the integration commit: **35010762392 — green**
 
-Accepted source/evidence universe:
+Accepted source/evidence universe remains:
 
 - **604 total source/evidence rows**
 - **135 eligible**
@@ -42,14 +35,7 @@ Accepted source/evidence universe:
 
 `604` is **not** a unique-institution count.
 
-Current construction:
-
-- 332 pre-Cognia-current reviewed source/lead rows after British Council expansion;
-- complete 256-row Cognia registry replaces the four historical milestone rows for current counting → 584;
-- +6 current Canadian offshore-school authorization rows → 590;
-- +7 current ZfA German Schools Abroad Egypt rows → 597;
-- +5 reviewed substantive-international higher-education rows → 602;
-- +2 reviewed eligible Mansoura College international-school evidence rows → **604**.
+Construction remains 332 pre-Cognia-current rows → 584 after complete Cognia supersession → 590 after Canadian authorization → 597 after ZfA DAS → 602 after substantive-international HE review → **604 after two reviewed eligible Mansoura College international-school evidence rows**.
 
 Historical source snapshots remain preserved.
 
@@ -61,7 +47,7 @@ Historical source snapshots remain preserved.
 - 256-row complete Cognia Egypt registry;
 - 6 current Canadian offshore-school authorization rows;
 - 7 current ZfA DAS Egypt rows;
-- 9 current SCU foreign-university branches with Ryerson/TMU kept as lifecycle conflict only;
+- 9 current SCU foreign-university branches with Ryerson/TMU lifecycle conflict preserved;
 - AUC substantive international/accreditation evidence;
 - 5-row reviewed substantive-international HE package: GIU, GUC, UFE, BUE and AASTMT;
 - Mansoura College provider/school topology review.
@@ -70,87 +56,82 @@ Historical source snapshots remain preserved.
 
 Egyptian incorporation, private-university classification or national legal form does not automatically exclude an institution when separate current evidence establishes substantive **binational, intergovernmental, transnational or international-organizational status**. A foreign name, partnership, validated programme or dual degree alone remains insufficient.
 
-Checked-in review package:
-
-`tools/data-acquisition/international/seeds/substantive-international-higher-ed-review-2026-09-15.json`
-
 ### Mansoura College topology — COMPLETE
 
-Checked-in review package:
+Review package: `tools/data-acquisition/international/seeds/mansoura-college-topology-review-2026-09-15.json`.
 
-`tools/data-acquisition/international/seeds/mansoura-college-topology-review-2026-09-15.json`
+Mansoura College Language School and Modern Mansoura College Language School remain national/provider context. Mansoura College British School and Mansoura College 2 International American School are the two eligible reviewed evidence additions. The provider umbrella is non-canonical; old Cognia/British Council rows remain separate provenance; the Overture umbrella row is a provider alias only.
 
-Current first-party provider/admissions evidence establishes one Mansoura College educational campus/group with four school units. The accepted review does **not** materialize the umbrella as a canonical institution.
-
-- Mansoura College Language School — national, provider context only.
-- Modern Mansoura College Language School — national, provider context only; British Council Partner row preserved as separate supporting provenance.
-- Mansoura College British School — eligible reviewed evidence row; current primary evidence plus Pearson centre `92720` lifecycle evidence.
-- Mansoura College 2 International American School — eligible reviewed evidence row; current primary evidence plus recognized Cognia/ACT evidence; original Cognia row preserved separately.
-
-The Overture row `Mansoura College International Schools` (`9e34fa47-a93e-4c90-a902-9a8181834ec2`) is reviewed as a provider-umbrella alias, not a separate school institution.
-
-No automatic source-row merge, canonical institution creation, runtime DB mutation or public projection occurred.
+Do not restart this review unless current evidence changes or a regression is detected.
 
 ## 4. Current Overture state
 
 Overture Places release: `2026-08-19.0`.
 
-Current Egypt-only acquisition:
+Current Egypt-only acquisition remains:
 
 - 1,121 bbox candidates;
-- 79 non-Egypt rows rejected by Overture address country;
+- 79 non-Egypt rows rejected;
 - **1,042 Egypt-only rows**;
 - **141 exact normalized-name overlaps** with the 604-row universe;
-- **901 unmatched rows**;
-- **865 unmatched normalized names**;
+- **901 unmatched rows / 865 unmatched normalized names**;
 - **266 high-signal pre-university rows**;
 - **70 post-overlay higher-ed review rows**;
 - **565 lower-priority supporting rows**.
 
-The two Mansoura additions do not alter these Overture comparison counts. Overture remains supporting discovery only and grants zero eligibility.
+Overture remains supporting discovery only and grants zero eligibility.
 
 ### Higher-education Overture review — COMPLETE
 
-The complete 70-row HE queue has **0 outstanding rows**:
-
-- 14 existing eligible HE aliases/departments/subunits;
-- 21 out-of-scope Egyptian HE rows/subunits without sufficient substantive-international status;
-- 33 supporting-only academy/training/institute leads with no qualifying current HE evidence;
-- 1 school category error resolving to existing Egypt British International School BSO evidence;
-- 1 school/provider category error (`Mansoura College International Schools`) now closed by the explicit topology review above.
-
-Do not restart this review.
+The complete 70-row HE queue has **0 outstanding rows**. Do not restart it.
 
 ### High-signal school review — ACTIVE NEXT CURSOR
 
-Builder:
+Builder: `tools/data-acquisition/international/apply_overture_gap_resolutions.py`.
 
-`tools/data-acquisition/international/apply_overture_gap_resolutions.py`
-
-Accepted school decision batches:
+Accepted decision batches:
 
 - `overture-gap-resolution-2026-09-15-batch1.json`
 - `overture-gap-resolution-2026-09-15-batch2.json`
+- `overture-gap-resolution-2026-09-15-batch3.json`
 
-Current school artifact:
+Accepted run `35021093103` proves:
 
-- 266 input rows;
-- 30 explicitly reviewed;
-- 28 resolved/explained;
-- 2 reviewed-but-unresolved;
-- 236 not yet reviewed;
-- **238 outstanding**.
+- **266 input rows**;
+- **41 explicitly reviewed**;
+- **39 resolved/explained**;
+- **2 reviewed-but-unresolved**;
+- **225 unreviewed**;
+- **227 outstanding**.
 
 Reviewed unresolved rows:
 
 - `Kada Modern British School`
 - `M.S.G International British School`
 
-The separately rerouted Mansoura provider case is now complete and is not an extra outstanding row beyond this artifact.
+Batch 3 explicitly resolved/reconciled:
+
+- American City International Schools → current Cognia Cairo source identity;
+- Cairo West International School → current British Council source identity, while divisions remain scoped;
+- Cairo British School → current British Council source identity;
+- International Liberty School - IGCSE → British division/provider topology requiring D2.2;
+- The British International School Madinaty → accepted CIS source identity/current GEMS BISM branding;
+- Nefertari British International School → Nefertari British division topology requiring D2.2;
+- Nefertari International School - October → current October branch source identity;
+- Nefertari International Schools in Cairo → provider/branch topology requiring D2.2;
+- Royal Canadian School → current Canadian authorization family;
+- Lycée Français du Caire - Officiel → current French homologation identity;
+- Deutsche Evangelische Oberschule - unofficial → current ZfA DAS identity.
+
+All are source-resolution/topology decisions only. No canonical institution was created and no eligibility was granted by Overture.
+
+### Deliberately not collapsed
+
+`AIA International School` remains unreviewed because its Overture row is located in New Cairo, while the current authoritative AIA/Alexandria International Academy evidence is in Alexandria. Do not map it to the Alexandria source identity without separate current evidence for the New Cairo row.
 
 ## 5. Exact resume cursor — START HERE
 
-### Task A — continue the 238 outstanding high-signal school rows
+### Task A — continue the 227 outstanding high-signal school rows
 
 Work in small deterministic checked-in batches. Preferred outcome order:
 
@@ -160,23 +141,15 @@ Work in small deterministic checked-in batches. Preferred outcome order:
 4. genuinely new candidate with current permitted primary/recognized-source evidence;
 5. unresolved supporting-only lead.
 
-Current research already isolated several strong next-batch candidates, including American City International Schools, Cairo West International School, British International School Madinaty, Cairo British School, International Liberty School, Nefertari October/Cairo variants, and other exact/near-exact current source-family aliases. Every row still requires explicit evidence-backed review by exact Overture ID. Do not convert fuzzy similarity into an automatic merge.
+Strong next-batch research already identified several evidence-rich candidates: El Alsson International School, El Rowad American Division, Forsan International Schools, Manhattan Elite International School, The Royal British International School, both International School of Choueifat Cairo/6 October Overture rows, Deutsche Schule der Borromäerinnen Kairo, and other current source-family overlaps. Each still requires exact Overture-ID review and primary/recognized evidence before checking in a decision.
 
 ### Task B — execute V7 read-only comparison
 
-Matcher:
+Matcher: `tools/data-acquisition/international/build_v7_international_gap_review.py`.
 
-`tools/data-acquisition/international/build_v7_international_gap_review.py`
+Owned V7 contract: **24,916 raw rows**, read-only, exact normalized-name overlap only, unmatched international-signal leads only, zero eligibility and zero canonical identities from V7 itself.
 
-Owned V7 contract:
-
-- **24,916 raw rows**;
-- read-only;
-- exact normalized-name overlap only;
-- unmatched international-signal leads only;
-- zero eligibility and zero canonical identities from V7 itself.
-
-The matcher is ready but has not yet been run against the live owned V7 filesystem in this D2.1 pass. Any useful V7 unmatched lead must be re-sourced from current permitted evidence.
+Any useful V7 unmatched lead must be re-sourced from current permitted evidence.
 
 ### Task C — Edarabia reference-only gap pass
 
@@ -188,24 +161,11 @@ Use institution/operator primary sites and recognized source families to close r
 
 ## 6. OSM status
 
-Accepted OSM diagnostic run: **34997269459 — green diagnostic**.
-
-All 12 tiled public-Overpass attempts were blocked from GitHub-hosted CI. The pipeline records `environment_blocked_all_tiles`. Failed source access must never be interpreted as zero OSM candidates.
-
-Do not repeatedly retry the same public Overpass approach unless the runtime/network method changes materially.
+Accepted OSM diagnostic run: **34997269459 — green diagnostic**. All 12 tiled public-Overpass attempts were blocked from GitHub-hosted CI. `environment_blocked_all_tiles` is diagnostic state and must never be interpreted as zero OSM candidates.
 
 ## 7. Current D2.2 state — not the primary cursor yet
 
-Current accepted review artifacts contain:
-
-- 30 reviewed institution drafts;
-- 10 reviewed division drafts;
-- 51 reviewed source/lead memberships;
-- 67 original strong-source rows still queued;
-- 17 reviewed current campuses across 15 institutions;
-- two reviewed institutions with multiple current campuses.
-
-D2.2 remains secondary until D2.1 is explicitly closed. New Cognia, Canadian, ZfA, substantive-HE, Mansoura, Overture and V7 evidence may not auto-materialize into canonical identities.
+Current accepted review artifacts remain 30 reviewed institution drafts, 10 reviewed division drafts, 51 reviewed source/lead memberships, 67 original strong-source rows queued, and 17 reviewed current campuses across 15 institutions. New D2.1 evidence may not auto-materialize into canonical identities.
 
 ## 8. D2.1 exit criteria
 
@@ -222,7 +182,7 @@ D2.1 may close only when:
 - final source/evidence universe rebuilds reproducibly with green CI;
 - source-row counts are never labeled as unique institutions;
 - zero fuzzy auto-merge, unsupported eligibility, runtime DB mutation or public projection occurred;
-- `PROJECT-STATUS.md`, `PROJECT-DECISIONS.md`, `DATASET-LAYERS.md`, this file and Issue #8 agree;
+- canonical docs and Issue #8 agree;
 - an explicit closure decision hands the sole cursor to D2.2.
 
 ## 9. Non-negotiable rules
@@ -261,8 +221,8 @@ After every material accepted checkpoint:
 2. obtain green CI;
 3. update `DATASET-LAYERS.md` if counts changed;
 4. update `PROJECT-STATUS.md` and `PROJECT-DECISIONS.md` when status/contracts changed;
-5. update this continuation file with the accepted run and exact next cursor;
+5. update this continuation file with accepted run/counts and exact next cursor;
 6. update GitHub Issue #8;
 7. never leave the next agent dependent on chat history.
 
-This file and Issue #8 must describe the **last verified accepted state**, never merely planned or in-progress work.
+This file and Issue #8 describe the **last verified accepted state**, never merely planned or in-progress work.
