@@ -45,7 +45,7 @@ Review contract: `tools/data-acquisition/international/seeds/mansoura-college-to
 
 ## Current expanded D2.1 source/evidence universe
 
-Accepted `EDU-DATA-2 D2.1 Universe Checkpoint` run **`35021835175`** at head `1f4f5d369c2950f1291cb0794df2d93e8126f023` proves:
+Accepted `EDU-DATA-2 D2.1 Universe Checkpoint` run **`35022596202`** at head `a843e4d5545d5fca3f9d863c4d7104aca37be92d` proves:
 
 - **604 total source/evidence rows**;
 - **135 eligible source/evidence rows**;
@@ -84,16 +84,16 @@ Against the **604-row** universe, deterministic exact normalized-name comparison
 
 ### High-signal school review
 
-Four checked-in school-review batches now cover **50 of the 266** high-signal pre-university rows:
+Five checked-in school-review batches now cover **55 of the 266** high-signal pre-university rows:
 
-- **48 resolved/explained** as existing authoritative coverage, explicit source aliases, or provider/division cases requiring D2.2 topology review;
+- **53 resolved/explained** as existing authoritative coverage, explicit source aliases, or provider/division cases requiring D2.2 topology review;
 - **2 reviewed-but-unresolved** supporting leads;
-- **216 high-signal rows remain unreviewed**;
-- **218 rows remain outstanding** in the school-review artifact.
+- **211 high-signal rows remain unreviewed**;
+- **213 rows remain outstanding** in the school-review artifact.
 
 The two reviewed unresolved rows remain `Kada Modern British School` and `M.S.G International British School`.
 
-Batch 4 explicitly reviewed El Alsson International School, El Rowad American Division, Forsan International Schools, two Manhattan Elite International School Overture place rows, The Royal British International School, the New Cairo and 6 October International School of Choueifat rows, and Deutsche Schule der Borromäerinnen Kairo. Provider/division cases remain topology work; duplicate Overture places were not auto-deduplicated.
+Batch 5 explicitly reviewed American International School in Egypt West Campus, Royal British Schools New Damietta, Solaimaneyah International School SIS, Creatives International Schools in 10th of Ramadan and Al Karma/Katameya. AIS West resolves to current IB code `049504` and remains distinct from the East Campus identity. Royal British and Al Karma remain provider/division/name-topology work rather than flattened curriculum identities. The Creatives 10th of Ramadan row is kept distinct from the separate Giza Creative International School lead.
 
 ### Higher-education review — complete
 
@@ -109,7 +109,7 @@ OpenStreetMap remains a permitted supporting source, but all public Overpass mir
 
 D2.1 remains open for:
 
-- continued explicit review of the **218 outstanding high-signal school rows** in small deterministic batches;
+- continued explicit review of the **213 outstanding high-signal school rows** in small deterministic batches;
 - read-only comparison against the owned **24,916-row V7** archive, with useful unmatched leads re-sourced from current permitted evidence before use;
 - controlled Edarabia reference-only discovery under `docs/SOURCE-USAGE-POLICY.md`;
 - institution/operator primary-source exhaustion for remaining likely gaps and topology ambiguity.
