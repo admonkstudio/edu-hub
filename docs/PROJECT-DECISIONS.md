@@ -304,6 +304,24 @@ Historical national-registry decisions remain preserved on branch `edu-data-1-na
 
 **Accepted validation:** `EDU-DATA-2 Incremental Campus Review` run `34920248466`.
 
+## 2026-09-15 — Dataset layers and checkpoint counts are intentionally separate
+
+**Decision:** The deterministic 96-row foundational seed is a reproducible evidence layer built from the checked-in IB, UK DfE BSO, French homologation, German KMK, SCU foreign-branch and AUC/MSCHE snapshots. It must not be relabeled as the complete discovery universe or as a unique-institution count.
+
+**Decision:** The classified strong/authoritative research universe is a separate 106-row layer after reviewed CIS/Cognia expansion. Supporting discovery then expands research coverage without rewriting either historical layer.
+
+**Decision:** At the verified 2026-09-15 checkpoint, the expanded D2.1 universe contains **316 source/lead rows**, including **210 British Council discovery rows**. Twelve British Council rows have separate high-confidence primary/recognized qualification and **198 remain supporting candidates**. These are source/discovery counts, not a claim of 316 unique institutions.
+
+**Decision:** D2.2 remains an explicit reviewed-identity layer. At the same checkpoint it contains **30 reviewed institution drafts**, **10 reviewed division drafts**, **51 reviewed source-or-lead memberships**, **67 original strong-source rows still queued for identity review**, and **198 unqualified discovery rows** outside identity review.
+
+**Decision:** The current reviewed campus layer contains **17 current-campus drafts across 15 reviewed institutions**. Two institutions currently have multiple reviewed campuses. Every reviewed campus topology remains non-exhaustive unless future affirmative evidence establishes completeness.
+
+**Decision:** CI contracts must preserve these layer boundaries. Aggregate campus CI rebuilds the same current identity/campus pipeline as the incremental review, while source-specific discovery and identity workflows derive totals from checked-in decision/discovery seeds instead of treating historical magic numbers as canonical identities.
+
+**Reference:** `tools/data-acquisition/international/DATASET-LAYERS.md`.
+
+**Accepted validations at this checkpoint:** `EDU-DATA-2 British Council Discovery` run `34923095404`; `EDU-DATA-2 Discovery Identity Review` run `34923122094`; aggregate `EDU-DATA-2 Campus Review` run `34972560009`; `EDU-DATA-2 International Registry` run `34972805842`.
+
 ## Deferred decisions until database completion
 
 - Astro-first vs Instatic-first final implementation choice;
