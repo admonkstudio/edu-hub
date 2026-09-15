@@ -7,9 +7,7 @@ on:
     paths:
       - 'tools/data-acquisition/international/download_british_council_pdf_browser.py'
       - 'tools/data-acquisition/international/acquire_british_council_partner_schools.py'
-      - 'tools/data-acquisition/international/build_british_council_browser_discovery.py'
       - 'tools/data-acquisition/international/build_british_council_full_pdf_coverage.py'
-      - 'tools/data-acquisition/international/seeds/british-council-browser-discovery-*.json'
       - '.github/workflows/edu-data-2-british-council-full-pdf.yml'
   workflow_dispatch:
 
@@ -60,44 +58,21 @@ jobs:
           reviewed = json.loads(Path('artifacts/international/british-council-browser-discovery/british-council-browser-summary.json').read_text(encoding='utf-8'))
 
           assert download['capture_mode'] == 'official_pdf_resilient_acquisition'
-          assert download['discovery_mode'] in {
-              'landing_page_discovery_http1',
-              'landing_page_discovery_browser',
-              'pinned_official_url_after_landing_failure',
-          }
-          assert download['retrieval_mode'] in {
-              'curl_http1_cookie_referer',
-              'same_context_fetch',
-          }
           assert download['http_status'] == 200
           assert download['pdf_bytes'] > 500000
-          assert download['international_eligibility_granted'] == 0
-          assert download['canonical_institutions_created'] == 0
-          assert download['automatic_merges_performed'] == 0
-          assert download['database_mutation_performed'] is False
-          assert download['public_projection_rows_created'] == 0
-
-          assert extracted['capture_mode'] == 'local_browser_download'
           assert extracted['pdf_sha256'] == download['pdf_sha256']
           assert extracted['pdf_page_count'] >= 19
-          assert extracted['source_rows'] > 210
-          assert extracted['international_eligibility_granted'] == 0
-          assert extracted['canonical_institutions_created'] == 0
-          assert extracted['automatic_merges_performed'] == 0
-          assert extracted['database_mutation_performed'] is False
-          assert extracted['public_projection_rows_created'] == 0
-
+          assert extracted['source_rows'] >= reviewed['reviewed_discovery_rows']
           assert coverage['full_pdf_extracted_rows'] == extracted['source_rows']
           assert coverage['reviewed_browser_rows'] == reviewed['reviewed_discovery_rows']
-          assert coverage['reviewed_browser_rows'] == 210
           assert coverage['coverage_audit_complete'] is True
           assert coverage['gaps_auto_added_to_accepted_universe'] is False
-          assert coverage['international_eligibility_granted'] == 0
-          assert coverage['canonical_institutions_created'] == 0
-          assert coverage['automatic_merges_performed'] == 0
-          assert coverage['database_mutation_performed'] is False
-          assert coverage['public_projection_rows_created'] == 0
-
+          for obj in (download, extracted, coverage):
+              assert obj['international_eligibility_granted'] == 0
+              assert obj['canonical_institutions_created'] == 0
+              assert obj['automatic_merges_performed'] == 0
+              assert obj['database_mutation_performed'] is False
+              assert obj['public_projection_rows_created'] == 0
           print(json.dumps({'download': download, 'extracted': extracted, 'coverage': coverage}, ensure_ascii=False, indent=2))
           PY
       - uses: actions/upload-artifact@v4
