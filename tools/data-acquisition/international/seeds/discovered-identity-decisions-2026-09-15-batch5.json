@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.2_explicit_discovered_identity_review",
+  "batch_id": "batch5-qualified-discovery-membership-on-reviewed-bso-identity",
+  "review_method": "explicit_additive_source_membership_after_separate_d2_1_eligibility_and_existing_d2_2_identity_review",
+  "records_count": 1,
+  "records": [
+    {
+      "review_identity_key": "egypt-british-international-school",
+      "source_id": "british_council_partner_schools_egypt_2026_09",
+      "source_record_id": "bcps2026:egypt-british-international-school-new-cairo",
+      "source_name": "Egypt British International School",
+      "provisional_canonical_name_en": "Egypt British International School",
+      "decision": "confirmed_discovery_membership_of_existing_reviewed_identity",
+      "decision_confidence": "high",
+      "evidence_urls": [
+        "https://www.get-information-schools.service.gov.uk/Establishments/Establishment/Details/150804",
+        "https://www.gov.uk/government/publications/british-schools-overseas-inspection-reports/british-schools-overseas-accredited-schools-inspection-reports",
+        "http://www.isc.edu.eg/ebis/"
+      ],
+      "review_note": "The British Council New Cairo row resolves exactly to the already reviewed Egypt British International School identity through the current DfE/GIAS BSO record and the same school website/address context. This is an additive discovery membership only; it creates no second institution and does not imply campus-topology completeness."
+    }
+  ],
+  "safety": {
+    "absence_of_match_treated_as_uniqueness_proof": false,
+    "unqualified_discovery_rows_entered_identity_review": false,
+    "automatic_identity_creation_performed": false,
+    "automatic_merges_performed": 0,
+    "canonical_database_rows_written": 0,
+    "runtime_database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
