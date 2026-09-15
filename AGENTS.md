@@ -37,9 +37,15 @@ Use the Admonk Project Lifecycle:
 → 10 Handoff + Learn
 ```
 
-Read `docs/PROJECT-STATUS.md` before continuing substantial work.
+Before continuing substantial work, read these files in order:
 
-Update `docs/PROJECT-STATUS.md` and `docs/PROJECT-DECISIONS.md` after material progress or architecture changes.
+1. `docs/PROJECT-STATUS.md`
+2. `docs/PROJECT-DECISIONS.md`
+3. `docs/EDU-DATA-2-CONTINUATION.md` when EDU-DATA-2 is active
+
+`docs/EDU-DATA-2-CONTINUATION.md` is the durable continuation cursor for the current data milestone. It records the last accepted CI checkpoint, exact counts, completed source/review batches, known blockers and the next task. If chat history conflicts with a newer verified continuation file, use the repository state and current explicit user instruction.
+
+Update `docs/PROJECT-STATUS.md` and `docs/PROJECT-DECISIONS.md` after material progress or architecture changes. While EDU-DATA-2 remains active, also update `docs/EDU-DATA-2-CONTINUATION.md` after every material accepted checkpoint so a new agent can resume without prior chat history.
 
 ## 3. Reusable Admonk intelligence
 
