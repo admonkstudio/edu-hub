@@ -78,6 +78,10 @@ jobs:
           import json
           from pathlib import Path
 
+          discovery_seeds = sorted(Path('tools/data-acquisition/international/seeds').glob('british-council-browser-discovery-2026-09-15*.json'))
+          expected_discovery_rows = sum(json.loads(path.read_text(encoding='utf-8'))['records_count'] for path in discovery_seeds)
+          assert expected_discovery_rows >= 175
+
           root = Path('artifacts/international/discovery-identity-review')
           summary = json.loads((root/'discovery-identity-summary.json').read_text(encoding='utf-8'))
           institutions = [json.loads(line) for line in (root/'reviewed-institution-drafts.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
@@ -99,7 +103,7 @@ jobs:
           assert summary['reviewed_discovery_source_rows'] == len(discovery_memberships) == 11
           assert summary['reviewed_source_or_lead_rows'] == 50
           assert summary['original_unreviewed_source_rows'] == len(original_queue) == 67
-          assert summary['unqualified_discovery_rows'] == len(discovery_queue) == 129
+          assert summary['unqualified_discovery_rows'] == len(discovery_queue) == expected_discovery_rows - 11
           assert summary['qualified_discovery_rows_pending_identity_review'] == len(qualified_queue) == 0
           assert summary['full_universe_unique_institution_count_claimed'] is None
           assert summary['absence_of_match_treated_as_uniqueness_proof'] is False
@@ -146,7 +150,7 @@ jobs:
               assert batch_id in by_key[key]['discovery_membership_review_batches']
           assert len({row['draft_institution_id'] for row in institutions}) == len(institutions)
 
-          print(json.dumps(summary, indent=2))
+          print(json.dumps({'expected_discovery_rows': expected_discovery_rows, **summary}, indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
