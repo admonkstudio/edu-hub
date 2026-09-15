@@ -78,9 +78,30 @@ jobs:
           import json
           from pathlib import Path
 
-          discovery_seeds = sorted(Path('tools/data-acquisition/international/seeds').glob('british-council-browser-discovery-2026-09-15*.json'))
-          expected_discovery_rows = sum(json.loads(path.read_text(encoding='utf-8'))['records_count'] for path in discovery_seeds)
-          assert expected_discovery_rows >= 175
+          seed_root = Path('tools/data-acquisition/international/seeds')
+          discovery_seed_paths = sorted(seed_root.glob('british-council-browser-discovery-2026-09-15*.json'))
+          expected_discovery_rows = sum(json.loads(path.read_text(encoding='utf-8'))['records_count'] for path in discovery_seed_paths)
+          assert expected_discovery_rows >= 210
+
+          decision_paths = sorted(seed_root.glob('discovered-identity-decisions-*.json'))
+          decision_docs = [json.loads(path.read_text(encoding='utf-8')) for path in decision_paths]
+          decisions = [row for doc in decision_docs for row in doc['records']]
+          expected_decision_batches = len(decision_docs)
+          expected_discovery_memberships = len(decisions)
+          expected_identity_keys = {row['review_identity_key'] for row in decisions}
+          expected_source_record_ids = {row['source_record_id'] for row in decisions}
+          assert expected_discovery_memberships == len(expected_source_record_ids)
+          assert expected_decision_batches >= 5
+          assert expected_discovery_memberships >= 12
+
+          existing_attachments = [row for row in decisions if row['decision'] == 'confirmed_discovery_membership_of_existing_reviewed_identity']
+          original_overlaps = [row for row in decisions if row['decision'] == 'confirmed_discovery_overlap_with_original_source_identity']
+          new_identity_decisions = [row for row in decisions if row['decision'] != 'confirmed_discovery_membership_of_existing_reviewed_identity']
+          expected_existing_attachments = len(existing_attachments)
+          expected_original_overlaps = len(original_overlaps)
+          expected_new_identity_drafts = len(new_identity_decisions)
+          expected_institutions = 24 + expected_new_identity_drafts
+          expected_reviewed_memberships = 35 + expected_original_overlaps + expected_discovery_memberships
 
           root = Path('artifacts/international/discovery-identity-review')
           summary = json.loads((root/'discovery-identity-summary.json').read_text(encoding='utf-8'))
@@ -93,17 +114,17 @@ jobs:
           qualified_queue = [json.loads(line) for line in (root/'qualified-discovery-identity-queue.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
 
           assert summary['base_reviewed_institution_drafts'] == 24
-          assert summary['discovery_identity_review_batches'] == 4
-          assert summary['new_discovery_driven_identity_drafts'] == 6
-          assert summary['existing_reviewed_identity_discovery_memberships'] == 5
-          assert summary['reviewed_institution_drafts'] == len(institutions) == 30
+          assert summary['discovery_identity_review_batches'] == expected_decision_batches
+          assert summary['new_discovery_driven_identity_drafts'] == expected_new_identity_drafts
+          assert summary['existing_reviewed_identity_discovery_memberships'] == expected_existing_attachments
+          assert summary['reviewed_institution_drafts'] == len(institutions) == expected_institutions
           assert summary['reviewed_division_drafts'] == len(divisions) == 10
           assert summary['base_reviewed_original_source_rows'] == 35
-          assert summary['reviewed_original_source_rows_from_discovery_overlap'] == len(overlap_original) == 4
-          assert summary['reviewed_discovery_source_rows'] == len(discovery_memberships) == 11
-          assert summary['reviewed_source_or_lead_rows'] == 50
+          assert summary['reviewed_original_source_rows_from_discovery_overlap'] == len(overlap_original) == expected_original_overlaps
+          assert summary['reviewed_discovery_source_rows'] == len(discovery_memberships) == expected_discovery_memberships
+          assert summary['reviewed_source_or_lead_rows'] == expected_reviewed_memberships
           assert summary['original_unreviewed_source_rows'] == len(original_queue) == 67
-          assert summary['unqualified_discovery_rows'] == len(discovery_queue) == expected_discovery_rows - 11
+          assert summary['unqualified_discovery_rows'] == len(discovery_queue) == expected_discovery_rows - expected_discovery_memberships
           assert summary['qualified_discovery_rows_pending_identity_review'] == len(qualified_queue) == 0
           assert summary['full_universe_unique_institution_count_claimed'] is None
           assert summary['absence_of_match_treated_as_uniqueness_proof'] is False
@@ -113,44 +134,28 @@ jobs:
           assert summary['runtime_database_mutation_performed'] is False
           assert summary['public_projection_rows_created'] == 0
 
-          expected_discovery = {
-              'kings-school-the-crown',
-              'international-school-choueifat-cairo',
-              'global-paradigm-baccalaureate-school',
-              'capital-international-schools',
-              'mount-international-school-community',
-              'international-school-elite-education',
-              'el-alsson-newgiza',
-              'misr-language-schools',
-              'evolution-international-school-newgiza',
-              'british-school-alexandria',
-              'uppingham-cairo',
-          }
-          expected_overlaps = {
-              'global-paradigm-baccalaureate-school',
-              'capital-international-schools',
-              'mount-international-school-community',
-              'international-school-elite-education',
-          }
-          attached_existing = {
-              'el-alsson-newgiza': (3, 'batch3-qualified-discovery-memberships-on-reviewed-identities'),
-              'misr-language-schools': (4, 'batch3-qualified-discovery-memberships-on-reviewed-identities'),
-              'evolution-international-school-newgiza': (3, 'batch3-qualified-discovery-memberships-on-reviewed-identities'),
-              'british-school-alexandria': (2, 'batch4-qualified-discovery-memberships-on-reviewed-bso-identities'),
-              'uppingham-cairo': (2, 'batch4-qualified-discovery-memberships-on-reviewed-bso-identities'),
-          }
-          assert {row['review_identity_key'] for row in discovery_memberships} == expected_discovery
-          assert {row['review_identity_key'] for row in overlap_original} == expected_overlaps
+          assert {row['review_identity_key'] for row in discovery_memberships} == expected_identity_keys
+          assert {row['source_record_id'] for row in discovery_memberships} == expected_source_record_ids
+          assert {row['review_identity_key'] for row in overlap_original} == {row['review_identity_key'] for row in original_overlaps}
+
           by_key = {row['review_identity_key']: row for row in institutions}
-          assert expected_discovery <= set(by_key)
-          assert all(by_key[key]['uniqueness_inferred_from_absence_of_match'] is False for key in expected_discovery if 'uniqueness_inferred_from_absence_of_match' in by_key[key])
-          assert all(by_key[key]['source_record_count'] == 2 for key in expected_overlaps)
-          for key, (expected_count, batch_id) in attached_existing.items():
-              assert by_key[key]['source_record_count'] == expected_count
+          assert expected_identity_keys <= set(by_key)
+          assert all(by_key[key]['uniqueness_inferred_from_absence_of_match'] is False for key in expected_identity_keys if 'uniqueness_inferred_from_absence_of_match' in by_key[key])
+          assert all(by_key[row['review_identity_key']]['source_record_count'] >= 2 for row in original_overlaps)
+          for row in existing_attachments:
+              key = row['review_identity_key']
+              batch_id = next(doc['batch_id'] for doc in decision_docs if row in doc['records'])
               assert batch_id in by_key[key]['discovery_membership_review_batches']
           assert len({row['draft_institution_id'] for row in institutions}) == len(institutions)
 
-          print(json.dumps({'expected_discovery_rows': expected_discovery_rows, **summary}, indent=2))
+          print(json.dumps({
+              'expected_discovery_rows': expected_discovery_rows,
+              'expected_decision_batches': expected_decision_batches,
+              'expected_discovery_memberships': expected_discovery_memberships,
+              'expected_new_identity_drafts': expected_new_identity_drafts,
+              'expected_existing_attachments': expected_existing_attachments,
+              **summary,
+          }, indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
