@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "source_id": "cicic_canadian_offshore_schools_egypt_2026_09_15",
+  "snapshot_date": "2026-09-15",
+  "source_name": "Canadian Information Centre for International Credentials — current offshore schools in Egypt",
+  "source_url": "https://www.cicic.ca/982/perform_an_advanced_search_in_the_directory_of_offshore_schools_and_international_education_resources.canada?t=5",
+  "records_count": 6,
+  "coverage_note": "Current Egypt offshore-school authorizations identified across British Columbia, Manitoba, New Brunswick, Ontario and Prince Edward Island. CICIC states that its directory contains only currently recognized, authorized, registered and/or licensed educational institutions. Provincial primary pages are retained where separately available.",
+  "records": [
+    {
+      "cicic_id": "4154",
+      "name": "British Columbia Canadian International School East (BCCIS East)",
+      "city": "Cairo",
+      "province_system": "British Columbia",
+      "official_profile_url": "https://www.cicic.ca/986/british_columbia_canadian_international_school_east_%28bccis_east%29.canada?id=4154",
+      "province_authority_url": "https://bcforhighschool.gov.bc.ca/offshore/students-parents/find-a-bc-offshore-school/",
+      "institution_site": "https://bccis.ca/",
+      "legal_status": "authorized",
+      "ownership_scope": "private_for_profit",
+      "scope_state": "eligible",
+      "scope_class": "international_school",
+      "strong_evidence": "current_canadian_offshore_school_authorization"
+    },
+    {
+      "cicic_id": "9104",
+      "name": "British Columbia Canadian International School West (BCCIS West)",
+      "city": "Cairo",
+      "province_system": "British Columbia",
+      "official_profile_url": "https://www.cicic.ca/986/british_columbia_canadian_international_school_west_%28bccis_west%29.canada?id=9104",
+      "province_authority_url": "https://bcforhighschool.gov.bc.ca/offshore/students-parents/find-a-bc-offshore-school/",
+      "institution_site": "https://bccis.ca/",
+      "legal_status": "authorized",
+      "ownership_scope": "private_for_profit",
+      "scope_state": "eligible",
+      "scope_class": "international_school",
+      "strong_evidence": "current_canadian_offshore_school_authorization"
+    },
+    {
+      "cicic_id": "4163",
+      "name": "Heritage International School",
+      "city": "Giza",
+      "province_system": "Manitoba",
+      "official_profile_url": "https://www.cicic.ca/873/educational_institution_s_profile.canada?id=4163",
+      "province_authority_url": "https://www.edu.gov.mb.ca/k12/masop/index.html",
+      "institution_site": "https://www.heritageinternationalschool.com/",
+      "legal_status": "authorized",
+      "ownership_scope": "private_for_profit",
+      "scope_state": "eligible",
+      "scope_class": "international_school",
+      "strong_evidence": "current_canadian_offshore_school_authorization"
+    },
+    {
+      "cicic_id": "9586",
+      "name": "Al Farouk International School",
+      "city": "Cairo Governorate",
+      "province_system": "New Brunswick",
+      "official_profile_url": "https://www.cicic.ca/986/al_farouk_international_school.canada?id=9586",
+      "province_authority_url": null,
+      "institution_site": "https://alfaroukinternational.com/",
+      "legal_status": "authorized",
+      "ownership_scope": "private_for_profit",
+      "scope_state": "eligible",
+      "scope_class": "international_school",
+      "strong_evidence": "current_canadian_offshore_school_authorization"
+    },
+    {
+      "cicic_id": "4175",
+      "name": "Canadian International School of Egypt",
+      "city": "Cairo",
+      "province_system": "Ontario",
+      "official_profile_url": "https://www.cicic.ca/986/canadian_international_school_of_egypt_.canada?id=4175",
+      "province_authority_url": null,
+      "institution_site": "https://cise-egypt.com/",
+      "legal_status": "authorized",
+      "ownership_scope": "private_for_profit",
+      "scope_state": "eligible",
+      "scope_class": "international_school",
+      "strong_evidence": "current_canadian_offshore_school_authorization"
+    },
+    {
+      "cicic_id": "9014",
+      "name": "Royal Canadian School - Cairo",
+      "city": "New Cairo",
+      "province_system": "Prince Edward Island",
+      "official_profile_url": "https://www.cicic.ca/986/royal_canadian_school_cairo.canada?id=9014",
+      "province_authority_url": null,
+      "institution_site": "https://royalcanadianschool.com/",
+      "legal_status": "authorized",
+      "ownership_scope": "private_for_profit",
+      "scope_state": "eligible",
+      "scope_class": "international_school",
+      "strong_evidence": "current_canadian_offshore_school_authorization",
+      "known_existing_source_identity_hint": {
+        "source_id": "ib_world_schools_egypt",
+        "name_en": "Royal Canadian School Cairo",
+        "relationship": "same_institution_review_hint_only",
+        "automatic_merge_performed": false
+      }
+    }
+  ],
+  "rules": {
+    "authorization_supports_international_scope": true,
+    "private_for_profit_supports_private_independent_scope": true,
+    "source_rows_are_not_unique_institution_claims": true,
+    "east_west_bccis_identity_structure_requires_d2_2_review": true,
+    "exact_or_fuzzy_cross_source_names_do_not_auto_merge": true,
+    "canonical_institutions_created": 0,
+    "automatic_identity_merges_performed": 0,
+    "database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
