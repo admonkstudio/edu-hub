@@ -16,7 +16,7 @@ jobs:
   discover:
     name: Discover supporting international-education candidates from OSM
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -26,9 +26,9 @@ jobs:
         run: pip install requests
       - name: Compile acquisition tool
         run: python -m py_compile tools/data-acquisition/international/acquire_osm_egypt_international_education.py
-      - name: Query read-only OpenStreetMap via Overpass
-        run: python tools/data-acquisition/international/acquire_osm_egypt_international_education.py --timeout-s 90
-      - name: Assert supporting-only safety boundary
+      - name: Query read-only OpenStreetMap via tiled Overpass requests
+        run: python tools/data-acquisition/international/acquire_osm_egypt_international_education.py --timeout-s 20
+      - name: Assert complete tiled supporting-only safety boundary
         run: |
           python - <<'PY'
           import json
@@ -36,7 +36,10 @@ jobs:
           p = Path('artifacts/international/osm-egypt-international-education/osm-egypt-international-education.json')
           data = json.loads(p.read_text(encoding='utf-8'))
           assert data['work_package'] == 'D2.1_osm_egypt_international_education_supporting_discovery'
-          assert data['source'] == 'OpenStreetMap via Overpass API'
+          assert data['source'] == 'OpenStreetMap via public Overpass API'
+          assert data['tile_count'] == 12
+          assert data['successful_tile_count'] == 12
+          assert data['failed_tile_count'] == 0
           assert data['record_count'] == len(data['records'])
           assert data['record_count'] > 0
           assert all(r['international_eligibility_granted'] is False for r in data['records'])
@@ -47,7 +50,8 @@ jobs:
           assert data['database_mutation_performed'] is False
           assert data['public_projection_rows_created'] == 0
           print(json.dumps({
-              'endpoint': data['source_endpoint'],
+              'tiles': data['tile_count'],
+              'endpoint_tile_counts': data['endpoint_tile_counts'],
               'record_count': data['record_count'],
               'duplicate_normalized_name_group_count': data['duplicate_normalized_name_group_count'],
           }, indent=2))
