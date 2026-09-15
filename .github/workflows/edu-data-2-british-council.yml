@@ -78,13 +78,26 @@ jobs:
           import json
           from pathlib import Path
 
-          seeds = sorted(Path('tools/data-acquisition/international/seeds').glob('british-council-browser-discovery-2026-09-15*.json'))
-          seed_docs = [json.loads(path.read_text(encoding='utf-8')) for path in seeds]
-          expected_batches = len(seed_docs)
-          expected_discovery_rows = sum(doc['records_count'] for doc in seed_docs)
-          expected_website_rows = sum(1 for doc in seed_docs for row in doc['records'] if row[4])
-          assert expected_batches >= 5
-          assert expected_discovery_rows >= 175
+          seed_root = Path('tools/data-acquisition/international/seeds')
+          discovery_seed_paths = sorted(seed_root.glob('british-council-browser-discovery-2026-09-15*.json'))
+          discovery_docs = [json.loads(path.read_text(encoding='utf-8')) for path in discovery_seed_paths]
+          expected_batches = len(discovery_docs)
+          expected_discovery_rows = sum(doc['records_count'] for doc in discovery_docs)
+          expected_website_rows = sum(1 for doc in discovery_docs for row in doc['records'] if row[4])
+          assert expected_batches >= 6
+          assert expected_discovery_rows >= 210
+
+          review_seed_paths = sorted(seed_root.glob('british-council-primary-scope-review-*.json'))
+          review_docs = [json.loads(path.read_text(encoding='utf-8')) for path in review_seed_paths]
+          expected_review_batches = len(review_docs)
+          expected_review_records = [row for doc in review_docs for row in doc['records']]
+          expected_review_ids = {row['source_record_id'] for row in expected_review_records}
+          expected_reviewed_rows = len(expected_review_records)
+          assert expected_reviewed_rows == len(expected_review_ids)
+          assert expected_review_batches >= 5
+          assert expected_reviewed_rows >= 12
+          assert all(row['decision'] == 'eligible' for row in expected_review_records)
+          assert all(row['decision_confidence'] == 'high' for row in expected_review_records)
 
           bc_root = Path('artifacts/international/british-council-browser-discovery')
           bc = json.loads((bc_root/'british-council-browser-summary.json').read_text(encoding='utf-8'))
@@ -110,10 +123,10 @@ jobs:
           review_root = Path('artifacts/international/british-council-primary-scope-review')
           review = json.loads((review_root/'british-council-primary-scope-summary.json').read_text(encoding='utf-8'))
           assert review['source_rows'] == expected_discovery_rows
-          assert review['review_batches'] == 4
-          assert review['reviewed_rows'] == 11
-          assert review['eligible_rows'] == 11
-          assert review['remaining_supporting_candidates'] == expected_discovery_rows - 11
+          assert review['review_batches'] == expected_review_batches
+          assert review['reviewed_rows'] == expected_reviewed_rows
+          assert review['eligible_rows'] == expected_reviewed_rows
+          assert review['remaining_supporting_candidates'] == expected_discovery_rows - expected_reviewed_rows
           assert review['partner_status_treated_as_international_eligibility'] is False
           assert review['automatic_identity_creation_performed'] is False
           assert review['automatic_merges_performed'] == 0
@@ -124,9 +137,9 @@ jobs:
           summary = json.loads((root/'candidate-universe-summary.json').read_text(encoding='utf-8'))
           assert summary['source_record_count'] == 106 + expected_discovery_rows
           assert summary['source_counts']['british_council_partner_schools_egypt_2026_09'] == expected_discovery_rows
-          assert summary['scope_or_lead_state_counts']['eligible'] == 114
+          assert summary['scope_or_lead_state_counts']['eligible'] == 103 + expected_reviewed_rows
           assert summary['scope_or_lead_state_counts']['excluded'] == 3
-          assert summary['scope_or_lead_state_counts']['supporting_candidate'] == expected_discovery_rows - 11
+          assert summary['scope_or_lead_state_counts']['supporting_candidate'] == expected_discovery_rows - expected_reviewed_rows
           assert summary['english_name_present'] == 106 + expected_discovery_rows
           assert summary['bilingual_name_gap_count'] == 97
           assert summary['unique_institutions_claimed'] is None
@@ -136,22 +149,12 @@ jobs:
           assert summary['public_projection_rows_created'] == 0
 
           evidence = [json.loads(line) for line in (review_root/'primary-scope-review-evidence.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
-          assert {row['source_record_id'] for row in evidence} == {
-              'bcps2026:kings-school-the-crown',
-              'bcps2026:international-school-choueifat-cairo',
-              'bcps2026:global-paradigm-baccalaureate-school',
-              'bcps2026:capital-international-schools',
-              'bcps2026:mount-international-school-community',
-              'bcps2026:international-school-elite-education',
-              'bcps2026:alsson-international-school-haraniya',
-              'bcps2026:misr-language-schools',
-              'bcps2026:new-giza-international-school-evolution',
-              'bcps2026:british-school-of-alexandria',
-              'bcps2026:uppingham-cairo',
-          }
+          assert {row['source_record_id'] for row in evidence} == expected_review_ids
           print(json.dumps({
               'expected_discovery_batches': expected_batches,
               'expected_discovery_rows': expected_discovery_rows,
+              'expected_review_batches': expected_review_batches,
+              'expected_reviewed_rows': expected_reviewed_rows,
               'browser_discovery': bc,
               'primary_review': review,
               'reviewed_candidate_universe': summary,
