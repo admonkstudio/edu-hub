@@ -1,0 +1,72 @@
+name: EDU-DATA-2 Higher Ed Branch Reconciliation
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'tools/data-acquisition/international/build_higher_ed_branch_reconciliation.py'
+      - 'tools/data-acquisition/international/seeds/scu-foreign-university-branches-*.json'
+      - 'tools/data-acquisition/international/seeds/mohesr-foreign-university-branches-*.json'
+      - '.github/workflows/edu-data-2-higher-ed-branch-reconciliation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile builder
+        run: python -m py_compile tools/data-acquisition/international/build_higher_ed_branch_reconciliation.py
+      - name: Build regulator reconciliation
+        run: python tools/data-acquisition/international/build_higher_ed_branch_reconciliation.py
+      - name: Assert regulator and lifecycle boundaries
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('artifacts/international/higher-ed-branch-reconciliation')
+          summary = json.loads((root/'higher-ed-branch-reconciliation-summary.json').read_text(encoding='utf-8'))
+          rows = [json.loads(line) for line in (root/'scu-mohesr-branch-reconciliation.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+          source_rows = [json.loads(line) for line in (root/'mohesr-branch-source-candidates.jsonl').read_text(encoding='utf-8').splitlines() if line.strip()]
+
+          assert len(rows) == summary['mohesr_listing_rows'] == len(source_rows)
+          assert summary['matched_current_branch_rows'] == summary['scu_current_branch_rows']
+          assert summary['scu_rows_missing_from_mohesr'] == 0
+          assert summary['mohesr_only_rows'] == summary['mohesr_listing_rows'] - summary['scu_current_branch_rows']
+          assert summary['mohesr_only_keys'] == ['ryerson_tmu']
+          assert summary['lifecycle_conflict_rows'] == 1
+          assert summary['current_active_branches_added_by_mohesr_only'] == 0
+          assert summary['mohesr_listing_auto_eligibility'] is False
+          assert summary['canonical_institutions_created'] == 0
+          assert summary['automatic_merges_performed'] == 0
+          assert summary['database_mutation_performed'] is False
+          assert summary['public_projection_rows_created'] == 0
+
+          conflict = next(row for row in rows if row['reconciliation_key'] == 'ryerson_tmu')
+          assert conflict['relationship'] == 'mohesr_only_lifecycle_conflict'
+          assert conflict['current_branch_confirmed'] is False
+          assert conflict['lifecycle_review_required'] is True
+          assert conflict['conflict_sources']
+
+          for row in source_rows:
+              assert row['mohesr_listing_auto_eligibility'] is False
+              assert row['canonical_identity_created'] is False
+              assert row['automatic_merge_performed'] is False
+              assert row['database_mutation_performed'] is False
+              assert row['public_promotion_performed'] is False
+
+          print(json.dumps(summary, ensure_ascii=False, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-higher-ed-branch-reconciliation
+          path: artifacts/international/higher-ed-branch-reconciliation/
+          if-no-files-found: error
