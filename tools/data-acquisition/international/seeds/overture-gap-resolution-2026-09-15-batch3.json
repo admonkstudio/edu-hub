@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "batch_id": "overture-gap-resolution-2026-09-15-batch3",
+  "snapshot_date": "2026-09-15",
+  "records_count": 11,
+  "records": [
+    {
+      "overture_id": "f98ba041-a9c0-45a1-8dd1-cb1cd8c287d7",
+      "overture_name": "American City International Schools",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "cognia_accreditation_registry_egypt_2026_09_15",
+      "target_source_record_id": "registry-row-020",
+      "target_name_en": "American City International School",
+      "evidence_urls": [
+        "https://cisegypt.edu.eg/american/contact/",
+        "https://cisegypt.edu.eg/",
+        "https://home.cognia.org/registry"
+      ],
+      "review_note": "Current City International Schools primary pages identify the American Zamalek school and give the Zamalek contact location corresponding to the Overture row. The accepted Cognia Cairo row is the same American City source identity; this is an explicit source mapping only, not a canonical merge."
+    },
+    {
+      "overture_id": "15d55afd-2059-45b9-b0df-e4a454e25e81",
+      "overture_name": "Cairo West International School",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:cairo-west-international-schools",
+      "target_name_en": "Cairo West International Schools",
+      "evidence_urls": [
+        "https://cairowestschool.com/",
+        "https://cairowestschool.com/contact-us/",
+        "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf"
+      ],
+      "review_note": "Current primary branding is Cairo West International Schools at the same 6th of October address represented by Overture. Singular/plural variation is non-substantive. Current primary evidence also shows British and American divisions, which remain division-scoped for later topology review."
+    },
+    {
+      "overture_id": "2b5b79bb-7433-47d5-b40b-a5cf8cd67919",
+      "overture_name": "Cairo British School",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:cairo-british-school",
+      "target_name_en": "CBS (Cairo British School)",
+      "evidence_urls": [
+        "https://cairobritishschool.com/",
+        "https://cairobritishschool.com/contactus.html",
+        "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf"
+      ],
+      "review_note": "The current primary site identifies Cairo British School at Km 27 Cairo-Ismailia Desert Road, matching the Overture row and the British Council CBS source identity. British Council Partner status remains supporting evidence only."
+    },
+    {
+      "overture_id": "7f9a7851-32c5-45cc-a685-b11af5bdbdf9",
+      "overture_name": "International Liberty School - IGCSE",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:international-liberty-school",
+      "target_name_en": "International Liberty School",
+      "evidence_urls": [
+        "https://www.ils.school/",
+        "https://www.ils.school/british/glance",
+        "https://www.ils.school/british/Curriculum",
+        "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf"
+      ],
+      "review_note": "The institution-primary site explicitly presents International Liberty School - British Division and its IGCSE curriculum under the wider school. The Overture IGCSE row is therefore division-scoped evidence requiring D2.2 topology review rather than a separate institution assertion."
+    },
+    {
+      "overture_id": "e44a18f8-fd16-48d3-9c05-01182b745b35",
+      "overture_name": "The British International School Madinaty",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "cis_international_accreditation_egypt",
+      "target_source_record_id": "cis_international_accreditation_egypt:20245064fbea7b096b0e",
+      "target_name_en": "The British School Madinaty",
+      "evidence_urls": [
+        "https://www.bism-cairo.com/",
+        "https://www.bism-cairo.com/About-Us",
+        "https://www.cois.org/about-cis/news/post/~board/reaccredited/post/newly-accredited-the-british-school-madinaty-egypt"
+      ],
+      "review_note": "Current primary branding is GEMS British International School Madinaty, Cairo at Talaat Mostafa Road, Madinaty, corresponding to the Overture row and the accepted CIS source identity. This review maps source aliases only and does not create a new canonical institution."
+    },
+    {
+      "overture_id": "99f70cf6-febb-4633-8467-d9b040b862ca",
+      "overture_name": "Nefertari British International School",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "ib_world_schools_egypt",
+      "target_source_record_id": "ib_world_schools_egypt:da08494c7053c0824c89",
+      "target_name_en": "Nefertari International School",
+      "evidence_urls": [
+        "https://niscl.net/",
+        "https://niscl.net/about-us/our-story-el/",
+        "https://nbis.niscl.net/",
+        "https://ibo.org/school/050772/"
+      ],
+      "review_note": "Current Nefertari primary evidence explicitly models the Cairo British school as the British Division within the Nefertari International Schools provider/branch structure. The Overture British row therefore requires D2.2 provider/division reconciliation rather than separate-institution materialization."
+    },
+    {
+      "overture_id": "2452e2eb-ff24-4bd4-9245-a9fee6d79287",
+      "overture_name": "Nefertari International School - October",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "british_council_partner_schools_egypt_2026_09",
+      "target_source_record_id": "bcps2026:nefertari-international-school-6-october",
+      "target_name_en": "Nefertari International School (6 of October City)",
+      "evidence_urls": [
+        "https://niscl.net/",
+        "https://naisoct.niscl.net/",
+        "https://naisoct.niscl.net/admission/how-to-apply/",
+        "https://www.britishcouncil.org.eg/sites/default/files/british_council_partner_schools_list_-_sep_2026_0.pdf"
+      ],
+      "review_note": "Current primary evidence identifies the October branch and gives its 6 October address/contact. The Overture row and British Council source row refer to that same branch-level school identity; curriculum divisions remain separate topology work."
+    },
+    {
+      "overture_id": "b638b966-0e81-43c6-bf68-5813ad8b08d0",
+      "overture_name": "Nefertari International Schools in Cairo",
+      "decision": "existing_provider_division_requires_d2_2_review",
+      "target_source_id": "ib_world_schools_egypt",
+      "target_source_record_id": "ib_world_schools_egypt:da08494c7053c0824c89",
+      "target_name_en": "Nefertari International School",
+      "evidence_urls": [
+        "https://niscl.net/",
+        "https://niscl.net/about-us/our-story-el/",
+        "https://ibo.org/school/050772/"
+      ],
+      "review_note": "The current Nefertari primary site explicitly distinguishes Cairo and October branches and multiple curriculum divisions. The Overture plural Cairo label is provider/branch-level evidence, not authority to flatten the provider, campus and division structure into one canonical identity."
+    },
+    {
+      "overture_id": "cc3ab0b3-49d2-4032-8f00-ae179a929aa8",
+      "overture_name": "Royal Canadian School",
+      "decision": "covered_by_current_authoritative_source_family",
+      "target_source_id": "cicic_canadian_offshore_schools_egypt_2026_09_15",
+      "target_source_record_id": "cicic-9014",
+      "target_name_en": "Royal Canadian School - Cairo",
+      "evidence_urls": [
+        "https://www.rcs.edu.eg/",
+        "https://www.cicic.ca/986/royal_canadian_school_cairo.canada?id=9014"
+      ],
+      "review_note": "The current school site gives the New Administrative Capital/New Cairo campus contact matching Overture, while the accepted current Canadian authorization family already contains Royal Canadian School - Cairo. No new universe row or identity merge is required."
+    },
+    {
+      "overture_id": "e2b8be31-35d8-4522-bba3-0b85097165f0",
+      "overture_name": "Lycée Français du Caire - Officiel",
+      "decision": "existing_source_identity_alias",
+      "target_source_id": "french_homologation_2026_2027",
+      "target_source_record_id": "3010002S",
+      "target_name_en": "Lycée français du Caire",
+      "evidence_urls": [
+        "https://www.lfcaire.org/",
+        "https://www.lfcaire.org/contact/",
+        "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054341397"
+      ],
+      "review_note": "Current primary contact evidence identifies the Lycée français du Caire and its Mearag site at Division cité El Merag / 2ème Megawra, matching the Overture row. The accepted French homologation row UAI 3010002S already covers the school."
+    },
+    {
+      "overture_id": "ea527ffb-49fb-4085-9983-c4d98e950d57",
+      "overture_name": "Deutsche Evangelische Oberschule - unofficial",
+      "decision": "covered_by_current_authoritative_source_family",
+      "target_source_id": "zfa_german_schools_abroad_egypt_2026_09_15",
+      "target_source_record_id": "zfa-das-egypt-deo-kairo",
+      "target_name_en": "Deutsche Evangelische Oberschule Kairo",
+      "evidence_urls": [
+        "https://deokairo.com/",
+        "https://www.auslandsschulwesen.de/DE/Schulnetz/DAS/Weltkarte/weltkarte_node.html"
+      ],
+      "review_note": "Current school materials identify Deutsche Evangelische Oberschule Kairo at 6 El Dokki Street, matching the Overture location. The accepted current ZfA German Schools Abroad family already covers this school; the Overture 'unofficial' suffix is not an eligibility signal."
+    }
+  ],
+  "rules": {
+    "resolution_is_discovery_triage_not_canonical_identity_merge": true,
+    "fuzzy_matching_authorizes_nothing": true,
+    "division_provider_relationships_require_d2_2_review": true,
+    "overture_grants_no_international_eligibility": true,
+    "canonical_institutions_created": 0,
+    "automatic_identity_merges_performed": 0,
+    "database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
