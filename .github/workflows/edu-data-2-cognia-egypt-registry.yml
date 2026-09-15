@@ -1,0 +1,64 @@
+name: EDU-DATA-2 Cognia Egypt Registry
+
+on:
+  push:
+    branches:
+      - edu-data-2-international-registry
+    paths:
+      - 'tools/data-acquisition/international/extract_cognia_egypt_registry.py'
+      - '.github/workflows/edu-data-2-cognia-egypt-registry.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  extract:
+    name: Extract all official Cognia Egypt registry rows
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser dependency
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Compile extractor
+        run: python -m py_compile tools/data-acquisition/international/extract_cognia_egypt_registry.py
+      - name: Extract all Egypt registry pages
+        run: python tools/data-acquisition/international/extract_cognia_egypt_registry.py
+      - name: Assert official extraction and safety boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('artifacts/international/cognia-egypt-registry/cognia-egypt-registry.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+          assert data['work_package'] == 'D2.1_cognia_egypt_registry_full_extraction'
+          assert data['country_filter'] == 'Egypt'
+          assert data['initial_response_status'] == 200
+          assert data['official_registry_extraction_complete'] is True
+          assert data['source_result_count'] == data['extracted_record_count']
+          assert data['source_result_count'] >= 256
+          assert data['page_count'] >= 11
+          assert all(row['country'] == 'Egypt' for row in data['records'])
+          assert len({row['source_row_number'] for row in data['records']}) == data['extracted_record_count']
+          assert data['international_eligibility_granted'] == 0
+          assert data['canonical_institutions_created'] == 0
+          assert data['automatic_merges_performed'] == 0
+          assert data['database_mutation_performed'] is False
+          assert data['public_projection_rows_created'] == 0
+          print(json.dumps({
+              'source_result_count': data['source_result_count'],
+              'page_count': data['page_count'],
+              'duplicate_normalized_name_group_count': data['duplicate_normalized_name_group_count'],
+          }, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edu-data-2-cognia-egypt-registry
+          path: artifacts/international/cognia-egypt-registry/
+          if-no-files-found: error
