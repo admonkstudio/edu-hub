@@ -36,7 +36,7 @@ jobs:
           python -m py_compile tools/data-acquisition/international/build_british_council_browser_discovery.py
           python -m py_compile tools/data-acquisition/international/build_british_council_full_pdf_coverage.py
       - name: Download the official PDF through Chromium
-        run: python tools/data-acquisition/international/download_british_council_pdf_browser.py
+        run: python tools/data-acquisition/international/download_british_council_pdf_browser.py --timeout-ms 10000
       - name: Extract all ruled-table rows from the downloaded PDF
         run: |
           python tools/data-acquisition/international/acquire_british_council_partner_schools.py \
