@@ -44,13 +44,7 @@ Last consolidated: 2026-09-15.
 
 ## 4. Active international-education scope
 
-**Decision:** Active Phase 1 scope is international education in Egypt, including:
-
-- private/independent international schools;
-- private/independent IB World Schools;
-- recognized foreign-national/international school models;
-- recognized foreign university branch campuses;
-- internationally chartered/accredited/binational/transnational institutions whose international status is substantive.
+**Decision:** Active Phase 1 scope is international education in Egypt, including private/independent international schools, private/independent IB World Schools, recognized foreign-national/international school models, recognized foreign university branch campuses, and internationally chartered/accredited/binational/transnational institutions whose international status is substantive.
 
 **Decision:** Egyptian public schools and ordinary Egyptian public universities are not active Phase 1 targets.
 
@@ -78,15 +72,7 @@ Last consolidated: 2026-09-15.
 
 **Decision:** A foreign partnership, exchange, franchise, validation, dual-degree arrangement or international-sounding name alone remains insufficient. Those relationships may later be represented at programme level without making the whole institution internationally scoped.
 
-**Decision:** The 2026-09-15 reviewed substantive-international HE package qualifies the following source/evidence rows under this standard:
-
-- German International University (GIU) — current German-Egyptian/transnational evidence;
-- German University in Cairo (GUC) — current binational/transnational evidence;
-- French University in Egypt (UFE) — Franco-Egyptian intergovernmental/dual-ministry evidence;
-- The British University in Egypt (BUE) — Egypt–UK establishment basis plus substantive UK-validated institutional model;
-- Arab Academy for Science, Technology and Maritime Transport (AASTMT) — League of Arab States specialized-organization status and SCU international/framework classification.
-
-**Decision:** These five rows are source/evidence additions, not five automatically created unique canonical institutions.
+**Decision:** The 2026-09-15 reviewed substantive-international HE package qualifies GIU, GUC, UFE, BUE and AASTMT under this standard. These five rows are source/evidence additions, not five automatically created unique canonical institutions.
 
 **Reference:** `tools/data-acquisition/international/seeds/substantive-international-higher-ed-review-2026-09-15.json`.
 
@@ -94,17 +80,11 @@ Last consolidated: 2026-09-15.
 
 **Decision:** Overture category/name signals are triage inputs only. Every HE decision must be explicit and source-backed; no row is promoted because Overture labels it `college_university`.
 
-**Decision:** At the accepted 2026-09-15 checkpoint, the full 70-row post-overlay HE queue is explicitly reviewed with **0 HE rows outstanding**:
-
-- 14 existing eligible HE aliases/subunits;
-- 21 out-of-scope Egyptian HE rows/subunits without sufficient substantive-international status;
-- 33 supporting-only academy/training/institute leads with no qualifying current HE evidence;
-- 1 Overture category error resolving to existing Egypt British International School BSO evidence;
-- 1 Overture category error (`Mansoura College International Schools`) rerouted to pre-university provider/division review.
+**Decision:** The full 70-row post-overlay HE queue is explicitly reviewed with **0 HE rows outstanding**: 14 existing eligible HE aliases/subunits, 21 out-of-scope Egyptian HE rows/subunits, 33 supporting-only academy/training/institute leads, 1 school-category error resolving to existing EBIS evidence, and 1 Mansoura College school/provider category error now closed by explicit topology review.
 
 **Decision:** Rerouting a category error does not create or merge an identity.
 
-**References:** `overture-higher-ed-scope-review-2026-09-15-batch1.json` and `apply_overture_higher_ed_resolutions.py`.
+**References:** `overture-higher-ed-scope-review-2026-09-15-batch1.json`, `apply_overture_higher_ed_resolutions.py`, and the Mansoura topology review contract below.
 
 ## 8. Source-family and layer-count semantics
 
@@ -120,7 +100,7 @@ Last consolidated: 2026-09-15.
 
 **Decision:** Current ZfA DAS membership is distinct from current exam authorization. Deutsche Schule Hurghada retains current DAS evidence while the checked KMK Sek-I lifecycle records last conducted year `2024/2025`; no later Sek-I authorization is asserted.
 
-**Decision:** Accepted D2.1 run `35009564541` establishes the current **602 source/evidence row** checkpoint: **133 eligible / 466 supporting / 3 excluded**. `602` is not a unique-institution count.
+**Decision:** Accepted D2.1 run `35010912245` establishes the current **604 source/evidence row** checkpoint: **135 eligible / 466 supporting / 3 excluded**. `604` is not a unique-institution count.
 
 ## 9. Supporting discovery qualification is evidence-separated
 
@@ -147,6 +127,20 @@ Last consolidated: 2026-09-15.
 **Decision:** One known address never proves one-campus completeness. Historical locations are not current campuses unless current evidence supports them.
 
 **Decision:** Multi-campus review is explicit and additive; absence of another known campus is not proof that none exists.
+
+### Mansoura College topology decision
+
+**Decision:** Current first-party Mansoura College evidence establishes a provider/campus umbrella with four school units. The umbrella is not materialized as a separate canonical institution during D2.1.
+
+**Decision:** Mansoura College Language School and Modern Mansoura College Language School are national-school provider context and are not added to the active international source universe. The British Council `Mansoura College Modern` row remains separate supporting provenance and is not automatically merged.
+
+**Decision:** `Mansoura College British School` is added as an eligible reviewed source/evidence row based on current institution-primary British-school evidence plus Pearson centre `92720` lifecycle evidence.
+
+**Decision:** `Mansoura College 2 International American School` is added as an eligible reviewed source/evidence row based on current institution-primary American-school evidence plus recognized Cognia/ACT evidence. Its original Cognia registry row remains preserved as separate source provenance.
+
+**Decision:** Overture `Mansoura College International Schools` is a reviewed provider-umbrella alias, not a separate institution; Overture itself grants no eligibility.
+
+**Reference:** `tools/data-acquisition/international/seeds/mansoura-college-topology-review-2026-09-15.json`.
 
 ## 11. Review artifacts are not runtime database writes
 
@@ -244,6 +238,8 @@ Last consolidated: 2026-09-15.
 
 **Decision:** Overture higher-education review is complete and must not be restarted.
 
-**Decision:** The next D2.1 task is the explicit `Mansoura College International Schools` provider/division reconciliation using current first-party evidence, followed by the remaining high-signal school queue, V7 read-only gap comparison, Edarabia reference-only pass and final primary-source exhaustion.
+**Decision:** Mansoura College provider/school topology reconciliation is complete and must not be restarted unless current evidence changes or regression is detected.
+
+**Decision:** The next D2.1 task is the remaining **238 high-signal school rows**, processed in small deterministic evidence-backed batches, followed by V7 read-only gap comparison, Edarabia reference-only pass and final institution/operator primary-source exhaustion.
 
 **Decision:** D2.1 remains open until those gap-exhaustion criteria are satisfied and an explicit closure decision hands the sole active cursor to D2.2.
