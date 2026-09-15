@@ -102,10 +102,10 @@ jobs:
           review_root = Path('artifacts/international/british-council-primary-scope-review')
           review = json.loads((review_root/'british-council-primary-scope-summary.json').read_text(encoding='utf-8'))
           assert review['source_rows'] == 140
-          assert review['review_batches'] == 3
-          assert review['reviewed_rows'] == 9
-          assert review['eligible_rows'] == 9
-          assert review['remaining_supporting_candidates'] == 131
+          assert review['review_batches'] == 4
+          assert review['reviewed_rows'] == 11
+          assert review['eligible_rows'] == 11
+          assert review['remaining_supporting_candidates'] == 129
           assert review['partner_status_treated_as_international_eligibility'] is False
           assert review['automatic_identity_creation_performed'] is False
           assert review['automatic_merges_performed'] == 0
@@ -116,9 +116,9 @@ jobs:
           summary = json.loads((root/'candidate-universe-summary.json').read_text(encoding='utf-8'))
           assert summary['source_record_count'] == 246
           assert summary['source_counts']['british_council_partner_schools_egypt_2026_09'] == 140
-          assert summary['scope_or_lead_state_counts']['eligible'] == 112
+          assert summary['scope_or_lead_state_counts']['eligible'] == 114
           assert summary['scope_or_lead_state_counts']['excluded'] == 3
-          assert summary['scope_or_lead_state_counts']['supporting_candidate'] == 131
+          assert summary['scope_or_lead_state_counts']['supporting_candidate'] == 129
           assert summary['english_name_present'] == 246
           assert summary['bilingual_name_gap_count'] == 97
           assert summary['unique_institutions_claimed'] is None
@@ -138,6 +138,8 @@ jobs:
               'bcps2026:alsson-international-school-haraniya',
               'bcps2026:misr-language-schools',
               'bcps2026:new-giza-international-school-evolution',
+              'bcps2026:british-school-of-alexandria',
+              'bcps2026:uppingham-cairo',
           }
           print(json.dumps({'browser_discovery': bc, 'primary_review': review, 'reviewed_candidate_universe': summary}, indent=2))
           PY
