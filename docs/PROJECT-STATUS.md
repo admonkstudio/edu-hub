@@ -1,6 +1,6 @@
 # Edu Hub Project Status
 
-Last updated: 2026-09-15
+Last updated: 2026-09-16
 
 ## Current lifecycle
 
@@ -60,22 +60,22 @@ Reference: `tools/data-acquisition/international/DATASET-LAYERS.md`.
 
 ## D2.1 — Complete institution/source universe
 
-Status: **ACTIVE — 604-ROW UNIVERSE STABLE; 204 HIGH-SIGNAL SCHOOL ROWS REMAIN OUTSTANDING**
+Status: **ACTIVE — 604-ROW UNIVERSE STABLE; 199 HIGH-SIGNAL SCHOOL ROWS REMAIN OUTSTANDING**
 
 ### Accepted checkpoint
 
-`EDU-DATA-2 D2.1 Universe Checkpoint` run **35024492612** is green at head `e1c554e61c9f9fc0c8185182a37a33f13ab78ce4` and proves:
+`EDU-DATA-2 D2.1 Universe Checkpoint` run **35025256648** is green at head `7aa5f49ddf90cf5cf36f5fc55da80bf040f1ceda` and proves:
 
 - **604 source/evidence rows**;
 - **135 eligible**;
 - **466 supporting candidates**;
 - **3 excluded**;
 - 266 high-signal pre-university Overture rows;
-- **64 explicitly reviewed school rows**;
-- **62 resolved/explained**;
+- **69 explicitly reviewed school rows**;
+- **67 resolved/explained**;
 - **2 reviewed-but-unresolved**;
-- **202 unreviewed**;
-- **204 outstanding**;
+- **197 unreviewed**;
+- **199 outstanding**;
 - zero fuzzy automatic merges;
 - zero canonical identities created;
 - zero runtime database mutation;
@@ -84,8 +84,6 @@ Status: **ACTIVE — 604-ROW UNIVERSE STABLE; 204 HIGH-SIGNAL SCHOOL ROWS REMAIN
 ### Completed major source/review families
 
 The current D2.1 checkpoint includes the 226-row British Council layer, complete 256-row Cognia Egypt registry, 6-row Canadian offshore-school authorization family, 7-row ZfA DAS Egypt family, the 5-row substantive-international HE review package, and the explicit Mansoura College provider/school topology review.
-
-The five reviewed HE additions remain GIU, GUC, UFE, BUE and AASTMT under the evidence-based substantive-international rule. Egyptian incorporation or private/national legal form is not by itself exclusionary when separate current evidence establishes substantive binational, intergovernmental, transnational or international-organizational status. Foreign branding, partnership, validation or dual-degree arrangements alone remain insufficient.
 
 ### Mansoura College topology — COMPLETE
 
@@ -112,22 +110,20 @@ Overture never grants eligibility or creates/merges identities.
 
 #### Higher education — complete
 
-The entire 70-row post-overlay HE queue has explicit checked-in decisions and **0 outstanding HE rows**: 14 existing eligible HE aliases/subunits; 21 out-of-scope Egyptian HE rows/subunits; 33 supporting-only ambiguous academy/training/institute leads; 1 school category error resolving to existing EBIS evidence; and the Mansoura provider row closed through explicit topology review.
+The entire 70-row post-overlay HE queue has explicit checked-in decisions and **0 outstanding HE rows**.
 
 #### High-signal schools — active next cursor
 
-Six school-resolution batches now cover **64 of 266** rows:
+Seven school-resolution batches now cover **69 of 266** rows:
 
-- 62 resolved/explained;
+- 67 resolved/explained;
 - 2 reviewed but unresolved (`Kada Modern British School`, `M.S.G International British School`);
-- 202 unreviewed;
-- **204 outstanding**.
+- 197 unreviewed;
+- **199 outstanding**.
 
-Batch 6 explicitly reviewed AlMaaly International School, Sun of Knowledge British International School, British Modern School - BMS, Lycée International Balzac, International Schools of Kenana, Norwich International College - HR, Future International Schools Sadat City Branch, Nordic international school in Cairo, and British City College - IGCSE.
+Batch 7 explicitly reviewed City International Schools in Zamalek, St. Fatima International School Al Hegaz, Future British International School - Tanta, Producer of Life International School in Hurghada, and Summits International Schools. City International and Summits remain provider/division topology work; the Future British Overture coordinate defect is preserved and does not override the exact Tanta address/source evidence.
 
-Lycée International Balzac resolves through current French homologation evidence. Kenana, Future Sadat and British City remain provider/division/branch topology work for D2.2 rather than flattened identities. The remaining simple aliases use exact current-source identities only; Cognia and British Council Partner status do not grant eligibility.
-
-AIA International School remains deliberately **not** collapsed into the known Alexandria AIA source identity because the Overture row is located in New Cairo while the current authoritative AIA school is in Alexandria. Delta American School also remains held back pending stronger current evidence.
+Sunrise International School Hurghada remains held back because two separate Overture rows still require stronger first-party evidence connecting them to the accepted `New Sunrise International School` source identity. AIA International School and Delta American School also remain unforced pending stronger evidence.
 
 ### OSM diagnostic
 
@@ -135,13 +131,13 @@ Accepted OSM diagnostic run **34997269459** remains green as a diagnostic. All 1
 
 ### V7 archive
 
-`tools/data-acquisition/international/build_v7_international_gap_review.py` is ready for read-only matching against the owned **24,916-row V7** archive. It performs exact normalized-name overlap only and cannot grant eligibility or create identities. It has not yet been executed against the live owned V7 filesystem in this D2.1 pass.
+`tools/data-acquisition/international/build_v7_international_gap_review.py` remains ready for read-only matching against the owned **24,916-row V7** archive. It performs exact normalized-name overlap only and cannot grant eligibility or create identities. It has not yet been executed against the live owned V7 filesystem in this D2.1 pass.
 
 Any useful V7 unmatched lead must be re-sourced from current permitted evidence before altering the accepted universe.
 
 ### Remaining D2.1 work — exact order
 
-1. **Continue the 204 outstanding high-signal school rows** in small checked-in batches; prioritize authoritative coverage, explicit aliases, provider/campus/division topology, then genuinely new re-sourced candidates.
+1. **Continue the 199 outstanding high-signal school rows** in small checked-in batches; prioritize authoritative coverage, explicit aliases, provider/campus/division topology, then genuinely new re-sourced candidates.
 2. **Execute the V7 read-only comparison** against all 24,916 owned rows when filesystem access is available; re-source every useful unmatched lead.
 3. **Run controlled Edarabia reference-only discovery**; do not bulk store or reproduce Edarabia content.
 4. **Run the institution/operator primary-source exhaustion pass** for remaining likely gaps and topology ambiguity.
@@ -157,37 +153,38 @@ Accepted Discovery Identity Review run: **34994994433**. Accepted aggregate Camp
 
 ## D2.3 — Complete EN + AR architecture
 
-Status: **ARCHITECTURE IMPLEMENTED / CONTENT INCOMPLETE**. English and Arabic remain first-class localizations over one factual entity graph; official Arabic forms are preferred and transliteration/editorial Arabic must be labeled.
+Status: **ARCHITECTURE IMPLEMENTED / CONTENT INCOMPLETE**.
 
 ## D2.4 — Enrich every eligible institution
 
-Status: **STARTED / BROADER COVERAGE PENDING**. Enrichment attaches only after identity/campus/division scope is understood and retains source/lifecycle/academic-year provenance.
+Status: **STARTED / BROADER COVERAGE PENDING**.
 
 ## D2.5 — Media and rights
 
-Status: **STARTED**. Every final institution must reach a terminal media state; `placeholder_required` is valid when no publication-safe image exists.
+Status: **STARTED**.
 
 ## D2.6 — Completeness audit
 
-Status: **ARCHITECTURE IMPLEMENTED / FULL CANONICAL AUDIT PENDING**. Audit factual coverage, EN, AR, media, provenance/freshness and unresolved conflicts independently.
+Status: **ARCHITECTURE IMPLEMENTED / FULL CANONICAL AUDIT PENDING**.
 
 ## D2.7 — Portable master freeze
 
-Status: **NOT STARTED**. Freeze a deterministic presentation-neutral master export before choosing Astro-first vs Instatic-first or beginning public product implementation.
+Status: **NOT STARTED**.
 
 ## Current accepted CI
 
-- `EDU-DATA-2 D2.1 Universe Checkpoint` — **35024492612** — green — 604 rows / 135 eligible / 466 supporting / 3 excluded; 64 school rows reviewed; 204 outstanding.
+- `EDU-DATA-2 D2.1 Universe Checkpoint` — **35025256648** — green — 604 rows / 135 eligible / 466 supporting / 3 excluded; 69 school rows reviewed; 199 outstanding.
+- `EDU-DATA-2 D2.1 Universe Checkpoint` — **35024492612** — green — batch 6 baseline; 64 school rows reviewed; 204 outstanding.
 - `EDU-DATA-2 D2.1 Universe Checkpoint` — **35022596202** — green — batch 5 baseline; 55 school rows reviewed; 213 outstanding.
 - `EDU-DATA-2 D2.1 Universe Checkpoint` — **35021835175** — green — batch 4 baseline; 50 school rows reviewed; 218 outstanding.
 - `EDU-DATA-2 D2.1 Universe Checkpoint` — **35021093103** — green — batch 3 baseline; 41 school rows reviewed; 227 outstanding.
 - `EDU-DATA-2 D2.1 Universe Checkpoint` — **35010912245** — green — accepted Mansoura topology integration baseline.
-- `EDU-DATA-2 OSM Supporting Discovery` — **34997269459** — green diagnostic — hosted Overpass blocked, no false zero-coverage claim.
+- `EDU-DATA-2 OSM Supporting Discovery` — **34997269459** — green diagnostic.
 - `EDU-DATA-2 Cognia Egypt Registry` — **34977754806** — green — complete 256-row Egypt registry.
 - `EDU-DATA-2 British Council Discovery` — **34994994601** — green — 226 rows / 12 qualified / 214 supporting.
 - `EDU-DATA-2 Discovery Identity Review` — **34994994433** — green — 30 institutions / 10 divisions / 51 memberships.
-- `EDU-DATA-2 Higher-Ed Branch Reconciliation` — **34973583179** — green — 9 SCU current foreign branches plus Ryerson/TMU lifecycle conflict.
-- `EDU-DATA-2 Campus Review` — **34972560009** — green — 17 current campuses across 15 reviewed institutions.
+- `EDU-DATA-2 Higher-Ed Branch Reconciliation` — **34973583179** — green.
+- `EDU-DATA-2 Campus Review` — **34972560009** — green.
 
 ## Non-negotiable constraints
 
