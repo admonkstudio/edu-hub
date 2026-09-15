@@ -97,7 +97,8 @@ jobs:
               tools/data-acquisition/international/seeds/overture-gap-resolution-2026-09-15-batch1.json \
               tools/data-acquisition/international/seeds/overture-gap-resolution-2026-09-15-batch2.json \
               tools/data-acquisition/international/seeds/overture-gap-resolution-2026-09-15-batch3.json \
-              tools/data-acquisition/international/seeds/overture-gap-resolution-2026-09-15-batch4.json
+              tools/data-acquisition/international/seeds/overture-gap-resolution-2026-09-15-batch4.json \
+              tools/data-acquisition/international/seeds/overture-gap-resolution-2026-09-15-batch5.json
       - name: Apply complete Overture higher-ed review decisions
         run: python tools/data-acquisition/international/apply_overture_higher_ed_resolutions.py
       - name: Assert checkpoint counts, Mansoura topology, Overture gaps and safety boundaries
@@ -196,15 +197,15 @@ jobs:
           assert gaps['overture_rows_auto_added_to_universe'] == 0
 
           assert resolutions['input_high_signal_rows'] == 266
-          assert resolutions['reviewed_rows'] == 50
-          assert resolutions['resolved_existing_or_authoritative_rows'] == 48
+          assert resolutions['reviewed_rows'] == 55
+          assert resolutions['resolved_existing_or_authoritative_rows'] == 53
           assert resolutions['reviewed_still_unresolved_rows'] == 2
-          assert resolutions['unreviewed_high_signal_rows'] == 216
-          assert resolutions['outstanding_high_signal_rows'] == 218
+          assert resolutions['unreviewed_high_signal_rows'] == 211
+          assert resolutions['outstanding_high_signal_rows'] == 213
           assert resolutions['decision_counts'] == {
-              'covered_by_current_authoritative_source_family': 5,
-              'existing_provider_division_requires_d2_2_review': 10,
-              'existing_source_identity_alias': 33,
+              'covered_by_current_authoritative_source_family': 6,
+              'existing_provider_division_requires_d2_2_review': 12,
+              'existing_source_identity_alias': 35,
               'unresolved_supporting_only': 2,
           }
 
