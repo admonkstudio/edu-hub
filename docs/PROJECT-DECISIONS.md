@@ -2,7 +2,7 @@
 
 This file contains the **active durable decisions** for the current Edu Hub scope. Detailed historical decision text remains preserved in Git history and on the historical national-registry branch where applicable. If an older chat or document conflicts with this file, `AGENTS.md`, the latest verified `PROJECT-STATUS.md`, and `EDU-DATA-2-CONTINUATION.md`, use the newer verified repository state.
 
-Last consolidated: 2026-09-15.
+Last consolidated: 2026-09-16.
 
 ## 1. Ownership, audience and product model
 
@@ -72,7 +72,7 @@ Reference: `tools/data-acquisition/international/seeds/substantive-international
 
 **Decision:** Current ZfA DAS membership is distinct from current exam authorization. Deutsche Schule Hurghada retains current DAS evidence while the checked KMK Sek-I lifecycle records last conducted year `2024/2025`; no later Sek-I authorization is asserted.
 
-**Decision:** Accepted D2.1 run **`35024492612`** establishes the current **604 source/evidence row** checkpoint: **135 eligible / 466 supporting / 3 excluded**. `604` is not a unique-institution count.
+**Decision:** Accepted D2.1 run **`35025256648`** establishes the current **604 source/evidence row** checkpoint: **135 eligible / 466 supporting / 3 excluded**. `604` is not a unique-institution count.
 
 ## 9. Supporting discovery qualification is evidence-separated
 
@@ -118,6 +118,8 @@ Reference: `tools/data-acquisition/international/seeds/mansoura-college-topology
 
 **Decision:** Location mismatches block automatic aliasing. A similar or identical school name at a materially different location remains separate research work unless current evidence explicitly establishes the relationship.
 
+**Decision:** A demonstrable coordinate defect inside a discovery row does not override exact current address/name/contact evidence. The defect must be preserved in the review note rather than silently repaired or used as merge authority.
+
 ## 13. OSM and geospatial discovery
 
 **Decision:** OSM remains a permitted supporting source. Hosted CI Overpass failure is diagnostic state, not negative evidence. Accepted diagnostic run `34997269459` recorded all 12 Egypt tiles blocked as `environment_blocked_all_tiles`; this must never be reported as zero OSM candidates.
@@ -162,14 +164,14 @@ Reference: `docs/SOURCE-USAGE-POLICY.md`.
 
 **Decision:** Overture higher-education review and Mansoura College topology are complete and must not be restarted absent changed evidence/regression.
 
-**Decision:** Six high-signal school batches are accepted. Run **35024492612** proves **64 reviewed / 62 resolved-explained / 2 unresolved / 202 unreviewed / 204 outstanding** from the 266-row high-signal school queue.
+**Decision:** Seven high-signal school batches are accepted. Run **35025256648** proves **69 reviewed / 67 resolved-explained / 2 unresolved / 197 unreviewed / 199 outstanding** from the 266-row high-signal school queue.
 
-**Decision:** Batch 6 explicitly reconciles AlMaaly International School; Sun of Knowledge British International School; British Modern School - BMS; Lycée International Balzac; International Schools of Kenana; Norwich International College - HR; Future International Schools Sadat City Branch; Nordic international school in Cairo; and British City College - IGCSE. Kenana, Future Sadat and British City remain provider/division/branch topology work, while Lycée International Balzac resolves through the current French homologation family. None of these decisions grants eligibility from Overture, Cognia or British Council Partner status.
+**Decision:** Batch 7 reconciles City International Schools in Zamalek as provider/branch/division topology linked to current British City College evidence; St. Fatima International School to the Al Hegaz source identity; Future British International School to the current Tanta source identity while preserving its Overture coordinate defect; Producer of Life International American School to the current Hurghada Producer of Life source identity; and Summits International Schools as provider/division topology linked to the current American Division evidence.
 
-**Decision:** The exact next D2.1 task is the remaining **204 high-signal school rows**, processed in small deterministic evidence-backed batches, followed by V7 read-only gap comparison, Edarabia reference-only pass and institution/operator primary-source exhaustion.
+**Decision:** The exact next D2.1 task is the remaining **199 high-signal school rows**, processed in small deterministic evidence-backed batches, followed by V7 read-only gap comparison, Edarabia reference-only pass and institution/operator primary-source exhaustion.
 
-**Decision:** AIA International School is not currently mapped to the known Alexandria AIA source identity because the Overture row is located in New Cairo while current authoritative AIA evidence is in Alexandria. It remains separate research work unless current evidence resolves the discrepancy.
+**Decision:** AIA International School is not currently mapped to the known Alexandria AIA source identity because the Overture row is located in New Cairo while current authoritative AIA evidence is in Alexandria. Sunrise International School Hurghada also remains held back because two separate Overture place rows still lack sufficient first-party evidence connecting them to the accepted `New Sunrise International School` source row.
 
-**Decision:** Weak or incomplete evidence must remain unresolved rather than be forced into an existing alias. Delta American School is one such held-back lead pending stronger current evidence.
+**Decision:** Weak or incomplete evidence must remain unresolved rather than be forced into an existing alias. Delta American School remains held back pending stronger current evidence.
 
 **Decision:** D2.1 remains open until gap-exhaustion criteria are satisfied and an explicit closure decision hands the sole active cursor to D2.2.
