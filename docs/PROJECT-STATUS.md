@@ -60,22 +60,22 @@ Reference: `tools/data-acquisition/international/DATASET-LAYERS.md`.
 
 ## D2.1 — Complete institution/source universe
 
-Status: **ACTIVE — 604-ROW UNIVERSE STABLE; 227 HIGH-SIGNAL SCHOOL ROWS REMAIN OUTSTANDING**
+Status: **ACTIVE — 604-ROW UNIVERSE STABLE; 218 HIGH-SIGNAL SCHOOL ROWS REMAIN OUTSTANDING**
 
 ### Accepted checkpoint
 
-`EDU-DATA-2 D2.1 Universe Checkpoint` run **35021093103** is green at head `637a5f0bcb8bc6c801eb74ec724914dc3f62a670` and proves:
+`EDU-DATA-2 D2.1 Universe Checkpoint` run **35021835175** is green at head `1f4f5d369c2950f1291cb0794df2d93e8126f023` and proves:
 
 - **604 source/evidence rows**;
 - **135 eligible**;
 - **466 supporting candidates**;
 - **3 excluded**;
 - 266 high-signal pre-university Overture rows;
-- **41 explicitly reviewed school rows**;
-- **39 resolved/explained**;
+- **50 explicitly reviewed school rows**;
+- **48 resolved/explained**;
 - **2 reviewed-but-unresolved**;
-- **225 unreviewed**;
-- **227 outstanding**;
+- **216 unreviewed**;
+- **218 outstanding**;
 - zero fuzzy automatic merges;
 - zero canonical identities created;
 - zero runtime database mutation;
@@ -116,16 +116,18 @@ The entire 70-row post-overlay HE queue has explicit checked-in decisions and **
 
 #### High-signal schools — active next cursor
 
-Three school-resolution batches now cover **41 of 266** rows:
+Four school-resolution batches now cover **50 of 266** rows:
 
-- 39 resolved/explained;
+- 48 resolved/explained;
 - 2 reviewed but unresolved (`Kada Modern British School`, `M.S.G International British School`);
-- 225 unreviewed;
-- **227 outstanding**.
+- 216 unreviewed;
+- **218 outstanding**.
 
-Batch 3 explicitly reviewed American City International Schools, Cairo West International School, Cairo British School, International Liberty School - IGCSE, The British International School Madinaty, three Nefertari branch/division/provider rows, Royal Canadian School, Lycée Français du Caire - Officiel and Deutsche Evangelische Oberschule - unofficial.
+Batch 4 explicitly reviewed El Alsson International School, El Rowad American Division, Forsan International Schools, two Manhattan Elite International School Overture rows, The Royal British International School, the New Cairo and 6 October International School of Choueifat rows, and Deutsche Schule der Borromäerinnen Kairo.
 
-AIA International School was deliberately **not** collapsed into the known Alexandria AIA source identity because the Overture row is located in New Cairo while the current authoritative AIA school is in Alexandria. This remains a separate unresolved research candidate rather than an unsafe alias.
+Provider/school/division distinctions were preserved for El Alsson, Forsan and Manhattan; the duplicate Manhattan Overture place rows were reviewed separately rather than automatically deduplicated. Royal British and DSBK resolve to current government-authoritative source families. Choueifat New Cairo and 6 October remain distinct branch-level source aliases.
+
+AIA International School remains deliberately **not** collapsed into the known Alexandria AIA source identity because the Overture row is located in New Cairo while the current authoritative AIA school is in Alexandria. This remains separate research work rather than an unsafe alias.
 
 ### OSM diagnostic
 
@@ -139,7 +141,7 @@ Any useful V7 unmatched lead must be re-sourced from current permitted evidence 
 
 ### Remaining D2.1 work — exact order
 
-1. **Continue the 227 outstanding high-signal school rows** in small checked-in batches; prioritize authoritative coverage, explicit aliases, provider/campus/division topology, then genuinely new re-sourced candidates.
+1. **Continue the 218 outstanding high-signal school rows** in small checked-in batches; prioritize authoritative coverage, explicit aliases, provider/campus/division topology, then genuinely new re-sourced candidates.
 2. **Execute the V7 read-only comparison** against all 24,916 owned rows when filesystem access is available; re-source every useful unmatched lead.
 3. **Run controlled Edarabia reference-only discovery**; do not bulk store or reproduce Edarabia content.
 4. **Run the institution/operator primary-source exhaustion pass** for remaining likely gaps and topology ambiguity.
@@ -175,7 +177,8 @@ Status: **NOT STARTED**. Freeze a deterministic presentation-neutral master expo
 
 ## Current accepted CI
 
-- `EDU-DATA-2 D2.1 Universe Checkpoint` — **35021093103** — green — 604 rows / 135 eligible / 466 supporting / 3 excluded; 41 school rows reviewed; 227 outstanding.
+- `EDU-DATA-2 D2.1 Universe Checkpoint` — **35021835175** — green — 604 rows / 135 eligible / 466 supporting / 3 excluded; 50 school rows reviewed; 218 outstanding.
+- `EDU-DATA-2 D2.1 Universe Checkpoint` — **35021093103** — green — batch 3 baseline; 41 school rows reviewed; 227 outstanding.
 - `EDU-DATA-2 D2.1 Universe Checkpoint` — **35010912245** — green — accepted Mansoura topology integration baseline.
 - `EDU-DATA-2 OSM Supporting Discovery` — **34997269459** — green diagnostic — hosted Overpass blocked, no false zero-coverage claim.
 - `EDU-DATA-2 Cognia Egypt Registry` — **34977754806** — green — complete 256-row Egypt registry.
