@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Acquire supporting Egypt international-education candidates from OSM.
+"""Attempt supporting Egypt international-education discovery from OSM.
 
-OpenStreetMap is supporting identity/geography discovery only. To avoid
-country-wide Overpass overload, Egypt is covered by a fixed 3x4 bounding-box
-grid. Three bounded workers query independent tiles concurrently, avoiding the
-serial timeout amplification seen on public mirrors without creating high load.
-Results may identify gaps, alternate names, campuses and coordinates but never
-establish eligibility.
+OpenStreetMap is supporting identity/geography discovery only. Egypt is covered
+by a fixed 3x4 bounding-box grid and three bounded workers query public Overpass
+mirrors. Public Overpass access is not guaranteed from hosted CI environments,
+so failed tiles are recorded as an explicit coverage diagnostic rather than
+being mistaken for zero results or repeatedly failing the entire D2.1 pipeline.
+
+Any returned rows remain supporting-only and never establish eligibility.
 """
 from __future__ import annotations
 
@@ -59,7 +60,7 @@ def tiles() -> list[tuple[float, float, float, float]]:
 
 def query_for(bbox: tuple[float, float, float, float]) -> str:
     south, west, north, east = bbox
-    return f'''[out:json][timeout:15];
+    return f'''[out:json][timeout:10];
 (
   nwr["amenity"~"^(school|college|university)$"]["name"~"{NAME_PATTERN}",i]({south},{west},{north},{east});
 );
@@ -76,37 +77,34 @@ def fetch_tile(index: int, bbox: tuple[float, float, float, float], request_time
             if response.status_code == 200:
                 payload = response.json()
                 return {
-                    "tile": index,
-                    "bbox": bbox,
-                    "status": "success",
-                    "endpoint": endpoint,
-                    "errors": errors,
-                    "elements": payload.get("elements", []),
+                    "tile": index, "bbox": bbox, "status": "success", "endpoint": endpoint,
+                    "errors": errors, "elements": payload.get("elements", []),
                 }
             errors.append(f"{endpoint}: HTTP {response.status_code}")
         except Exception as exc:
             errors.append(f"{endpoint}: {type(exc).__name__}: {exc}")
-        time.sleep(0.35)
+        time.sleep(0.25)
     return {"tile": index, "bbox": bbox, "status": "failed", "endpoint": None, "errors": errors, "elements": []}
 
 
 def build(output: Path, timeout_s: int) -> dict:
-    request_timeout_s = min(max(timeout_s, 8), 15)
+    request_timeout_s = min(max(timeout_s, 5), 8)
     work = list(enumerate(tiles(), start=1))
     tile_results: list[dict] = []
-
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = {
-            executor.submit(fetch_tile, index, bbox, request_timeout_s): index
-            for index, bbox in work
-        }
+        futures = {executor.submit(fetch_tile, index, bbox, request_timeout_s): index for index, bbox in work}
         for future in as_completed(futures):
             tile_results.append(future.result())
-
     tile_results.sort(key=lambda item: item["tile"])
+
+    successful_tiles = [item for item in tile_results if item["status"] == "success"]
     failed_tiles = [item for item in tile_results if item["status"] != "success"]
-    if failed_tiles:
-        raise RuntimeError(f"OSM supporting discovery incomplete; failed tiles: {[item['tile'] for item in failed_tiles]}")
+    if not failed_tiles:
+        coverage_state = "complete"
+    elif not successful_tiles:
+        coverage_state = "environment_blocked_all_tiles"
+    else:
+        coverage_state = "partial_public_overpass_availability"
 
     elements: list[dict] = []
     endpoint_counts: dict[str, int] = {}
@@ -114,14 +112,11 @@ def build(output: Path, timeout_s: int) -> dict:
     for item in tile_results:
         elements.extend(item["elements"])
         endpoint = item["endpoint"]
-        endpoint_counts[endpoint] = endpoint_counts.get(endpoint, 0) + 1
+        if endpoint:
+            endpoint_counts[endpoint] = endpoint_counts.get(endpoint, 0) + 1
         tile_summaries.append({
-            "tile": item["tile"],
-            "bbox": item["bbox"],
-            "status": item["status"],
-            "endpoint": endpoint,
-            "errors": item["errors"],
-            "element_count": len(item["elements"]),
+            "tile": item["tile"], "bbox": item["bbox"], "status": item["status"],
+            "endpoint": endpoint, "errors": item["errors"], "element_count": len(item["elements"]),
         })
 
     records: list[dict] = []
@@ -137,42 +132,38 @@ def build(output: Path, timeout_s: int) -> dict:
         seen.add(key)
         center = element.get("center") or {}
         records.append({
-            "osm_type": element.get("type"),
-            "osm_id": element.get("id"),
-            "name": name,
-            "name_normalized": normalize_name(name),
-            "name_ar": normalize(tags.get("name:ar")),
-            "name_en": normalize(tags.get("name:en")),
-            "amenity": normalize(tags.get("amenity")),
+            "osm_type": element.get("type"), "osm_id": element.get("id"), "name": name,
+            "name_normalized": normalize_name(name), "name_ar": normalize(tags.get("name:ar")),
+            "name_en": normalize(tags.get("name:en")), "amenity": normalize(tags.get("amenity")),
             "operator": normalize(tags.get("operator")),
             "website": normalize(tags.get("website") or tags.get("contact:website")),
             "phone": normalize(tags.get("phone") or tags.get("contact:phone")),
             "email": normalize(tags.get("email") or tags.get("contact:email")),
-            "street": normalize(tags.get("addr:street")),
-            "city": normalize(tags.get("addr:city")),
+            "street": normalize(tags.get("addr:street")), "city": normalize(tags.get("addr:city")),
             "postcode": normalize(tags.get("addr:postcode")),
-            "latitude": element.get("lat", center.get("lat")),
-            "longitude": element.get("lon", center.get("lon")),
-            "raw_tags": tags,
-            "source_role": "supporting_identity_geography_discovery_only",
+            "latitude": element.get("lat", center.get("lat")), "longitude": element.get("lon", center.get("lon")),
+            "raw_tags": tags, "source_role": "supporting_identity_geography_discovery_only",
             "international_eligibility_granted": False,
         })
-
     records.sort(key=lambda row: (row["name_normalized"], row["osm_type"], row["osm_id"]))
+
     by_name: dict[str, list[int]] = {}
     for index, record in enumerate(records, start=1):
         by_name.setdefault(record["name_normalized"], []).append(index)
     duplicate_groups = {name: ids for name, ids in by_name.items() if len(ids) > 1}
 
     result = {
-        "schema_version": 4,
+        "schema_version": 5,
         "built_at": datetime.now(timezone.utc).isoformat(),
         "work_package": "D2.1_osm_egypt_international_education_supporting_discovery",
         "source": "OpenStreetMap via public Overpass API",
         "coverage_bbox": [22.0, 24.5, 31.9, 37.0],
+        "coverage_state": coverage_state,
+        "coverage_complete": coverage_state == "complete",
         "tile_count": len(tile_summaries),
-        "successful_tile_count": len(tile_summaries),
-        "failed_tile_count": 0,
+        "successful_tile_count": len(successful_tiles),
+        "failed_tile_count": len(failed_tiles),
+        "failed_tile_ids": [item["tile"] for item in failed_tiles],
         "max_concurrent_tile_requests": MAX_WORKERS,
         "tile_summaries": tile_summaries,
         "endpoint_tile_counts": endpoint_counts,
@@ -185,6 +176,7 @@ def build(output: Path, timeout_s: int) -> dict:
             "osm_auto_international_eligibility": False,
             "osm_auto_identity_merge": False,
             "osm_auto_canonical_creation": False,
+            "failed_coverage_never_interpreted_as_zero_candidates": True,
             "coordinates_require_identity_review_before_attachment": True,
             "database_mutation": False,
             "public_projection": False,
@@ -198,10 +190,8 @@ def build(output: Path, timeout_s: int) -> dict:
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({
-        "tile_count": result["tile_count"],
-        "record_count": len(records),
-        "endpoint_tile_counts": endpoint_counts,
-        "max_concurrent_tile_requests": MAX_WORKERS,
+        "coverage_state": coverage_state, "successful_tile_count": len(successful_tiles),
+        "failed_tile_count": len(failed_tiles), "record_count": len(records),
     }, ensure_ascii=False, indent=2))
     return result
 
@@ -209,7 +199,7 @@ def build(output: Path, timeout_s: int) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=Path("artifacts/international/osm-egypt-international-education/osm-egypt-international-education.json"))
-    parser.add_argument("--timeout-s", type=int, default=12)
+    parser.add_argument("--timeout-s", type=int, default=6)
     args = parser.parse_args()
     build(args.output, args.timeout_s)
     return 0
