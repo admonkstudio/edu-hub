@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "snapshot_date": "2026-09-15",
+  "work_package": "D2.2_explicit_multi_campus_evidence_review",
+  "batch_id": "batch3-reconciled-ib-bc-identities",
+  "review_method": "current_first_party_location_evidence_multiple_explicit_campuses_allowed_structure_not_assumed_exhaustive",
+  "records_count": 6,
+  "records": [
+    {
+      "review_identity_key": "global-paradigm-baccalaureate-school",
+      "review_mode": "initial_current_campus_review",
+      "campus_key": "mostakbal-city-current-campus",
+      "campus_type": "main",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": null,
+      "address_en": "ASR2 Mostakbal City, New Cairo, Cairo, 11477, Egypt",
+      "source_urls": [
+        "https://globalparadigmschools-baccalaureate.com/",
+        "https://globalparadigmschools-baccalaureate.com/contact/"
+      ],
+      "evidence_note": "Current first-party GPBS pages describe its campus and publish the operating address as ASR2 Mostakbal City, New Cairo. This establishes one current GPBS campus. The reviewed evidence does not prove that the institution has no other current or future campuses.",
+      "campus_structure_complete": false
+    },
+    {
+      "review_identity_key": "capital-international-schools",
+      "review_mode": "initial_explicit_current_campus_set",
+      "campus_key": "main-campus-el-nargess",
+      "campus_type": "main",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": "Main Campus",
+      "address_en": "Area 17, KH El-Nargess District, New Cairo, Cairo Governorate 11835, Egypt",
+      "source_urls": [
+        "https://www.capitalschools.edu.eg/",
+        "https://www.capitalschools.edu.eg/academics/academic-calendars/main"
+      ],
+      "evidence_note": "Current first-party Capital International School pages explicitly label Main Campus and publish its El-Nargess District address. This is one of two current campuses explicitly presented by the school in the reviewed evidence.",
+      "campus_structure_complete": false
+    },
+    {
+      "review_identity_key": "capital-international-schools",
+      "review_mode": "initial_explicit_current_campus_set",
+      "campus_key": "lotus-campus-golden-square",
+      "campus_type": "additional",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": "Lotus Campus",
+      "address_en": "Golden Square, Plot 114E, North Lotus, New Cairo 1, Cairo Governorate 11835, Egypt",
+      "source_urls": [
+        "https://www.capitalschools.edu.eg/",
+        "https://www.capitalschools.edu.eg/academics/academic-calendars/lotus"
+      ],
+      "evidence_note": "Current first-party Capital International School pages explicitly label Lotus Campus and publish a separate North Lotus address, distinct from Main Campus. The school also publishes campus-specific academic calendars for Lotus Campus.",
+      "campus_structure_complete": false
+    },
+    {
+      "review_identity_key": "mount-international-school-community",
+      "review_mode": "initial_explicit_current_campus_set",
+      "campus_key": "new-administrative-capital-campus",
+      "campus_type": "main",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": "New Capital",
+      "address_en": "New Administrative Capital, Second District R2, SC-D1-5, Cairo, Egypt",
+      "source_urls": [
+        "https://misc-edu.com/",
+        "https://misc-edu.com/contact-us/",
+        "https://misc-edu.com/admission-page/"
+      ],
+      "evidence_note": "Current first-party MISC pages identify a New Capital school location and publish the New Administrative Capital, Second District R2, SC-D1-5 address. This is one of two current MISC locations explicitly presented by the reviewed first-party site.",
+      "campus_structure_complete": false
+    },
+    {
+      "review_identity_key": "mount-international-school-community",
+      "review_mode": "initial_explicit_current_campus_set",
+      "campus_key": "al-shorouk-current-campus",
+      "campus_type": "additional",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": "Al-Shorouk",
+      "address_en": "Al-Shorouk City, Cairo, Egypt",
+      "source_urls": [
+        "https://misc-edu.com/",
+        "https://misc-edu.com/home-mount-al-shorouk/"
+      ],
+      "evidence_note": "Current first-party MISC pages expose a separate Al-Shorouk school experience, state that admissions are open in Al-Shorouk, describe a modern campus in the heart of Al-Shorouk City, and publish a distinct map location. This supports a second current campus without asserting the institution's complete topology.",
+      "campus_structure_complete": false
+    },
+    {
+      "review_identity_key": "international-school-elite-education",
+      "review_mode": "initial_current_campus_review",
+      "campus_key": "new-cairo-fifth-settlement-current-campus",
+      "campus_type": "main",
+      "lifecycle_status": "active",
+      "source_named_campus_name_en": null,
+      "address_en": "New Cairo, 5th Settlement, off Road 90, behind Masraweya Compound, Cairo, Egypt",
+      "source_urls": [
+        "https://isee-eg.com/",
+        "https://isee-eg.com/contact-us/"
+      ],
+      "evidence_note": "Current first-party ISEE pages present the school's campus and consistently publish the New Cairo, Fifth Settlement, off Road 90, behind Masraweya Compound address. This establishes one current campus; no additional campus is inferred from non-primary directory claims.",
+      "campus_structure_complete": false
+    }
+  ],
+  "safety": {
+    "reviewed_current_campus_evidence_records": 6,
+    "reviewed_institution_identities": 4,
+    "campus_structure_complete_records": 0,
+    "automatic_additional_campus_inference_performed": false,
+    "canonical_database_rows_written": 0,
+    "runtime_database_mutation_performed": false,
+    "public_projection_rows_created": 0
+  }
+}
