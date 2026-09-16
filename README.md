@@ -1,54 +1,32 @@
 # Edu Hub
 
-Edu Hub is an Admonk-owned, independent bilingual education discovery and knowledge platform.
+Edu Hub is an Admonk-owned bilingual education platform for Egypt.
 
-The first market is Egypt. Phase 1 combines a structured directory of education providers with an editorial knowledge platform designed for useful discovery, trustworthy research, strong organic search visibility, and AI-search discoverability.
+## Current project scope
 
-## Core product thesis
+This repository is intentionally limited to three things:
 
-```text
-Useful structured information
-→ search visibility
-→ authority
-→ audience
-→ intent
-→ monetization
-```
+1. the **Astro public-site foundation and deployment**;
+2. the **Instatic CMS deployment/integration**;
+3. **English/Arabic bilingual support**.
 
-Phase 1 is authority and traffic. Phase 2 may add claimed profiles, premium plans, advertising, leads, applications, consultants, and related commercial functions only after the core information product proves useful.
+The previous database-research project is no longer part of the repository. Do not rebuild, scrape, deduplicate, enrich, migrate, or maintain institution data here.
 
-## Primary audience
+The final institution/content tables will be supplied by the project owner when they are ready. Until then, the application must remain data-neutral.
 
-1. Parents
-2. Students
+## Languages
 
-Institutions, universities, advertisers, consultants, and other commercial participants are secondary audiences attracted by parent/student demand.
+- English (Egypt): `en-EG` at `/en-eg/`
+- Arabic (Egypt): `ar-EG` at `/ar-eg/`
 
-## Initial platform direction
+Arabic pages use RTL layout. English pages use LTR layout. Language alternatives and canonical URLs are handled in the Astro layout.
 
-- Astro + TypeScript
-- PostgreSQL as source of truth
-- Supabase as the initial database/auth/storage platform
-- Arabic and English from launch
-- country-aware locale routes (`ar-EG`, `en-EG`)
-- official-source-first research
-- source/evidence provenance for important facts
-- curated programmatic SEO, never unrestricted filter-index generation
+## Deployment
 
-## Project control
+- Astro is the public frontend foundation.
+- Instatic CMS is maintained as a separate CMS service and will receive the final approved tables later.
+- No Supabase dependency.
+- No local SQL schema.
+- No data-acquisition workflows.
 
-Read `AGENTS.md` before substantial work.
-
-Current project state: `docs/PROJECT-STATUS.md`
-
-Core definition:
-
-- `docs/PROJECT-BRIEF.md`
-- `docs/PRODUCT-ARCHITECTURE.md`
-- `docs/DATA-MODEL.md`
-- `docs/SEO-ARCHITECTURE.md`
-- `docs/CONTENT-STRATEGY.md`
-- `docs/PLATFORM.md`
-- `docs/PROJECT-DECISIONS.md`
-
-Reusable Admonk studio intelligence remains maintained in `admonkstudio/admonk`; do not copy the entire studio agent system into this repository.
+See `docs/DEPLOYMENT.md` and `docs/BILINGUAL.md`.

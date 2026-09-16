@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  SUPPORTED_LOCALES,
+  type SupportedLocale,
+} from '../../lib/i18n';
+
+export function getStaticPaths() {
+  return SUPPORTED_LOCALES.map((locale) => ({
+    params: { locale: locale.toLowerCase() },
+    props: { locale },
+  }));
+}
+
+interface Props {
+  locale: SupportedLocale;
+}
+
+const { locale } = Astro.props;
+const isArabic = locale === 'ar-EG';
+const title = isArabic ? 'إديو هَب' : 'Edu Hub';
+const description = isArabic
+  ? 'الواجهة الثنائية اللغة لمنصة إديو هَب.'
+  : 'The bilingual foundation for Edu Hub.';
+---
+
+<BaseLayout locale={locale} title={title} description={description}>
+  <header>
+    <nav class="shell" aria-label={isArabic ? 'التنقل الرئيسي' : 'Primary navigation'}>
+      <strong>Edu Hub</strong>
+      <ul>
+        <li><a href="/en-eg/" lang="en">English</a></li>
+        <li><a href="/ar-eg/" lang="ar">العربية</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main class="shell">
+    <p class="eyebrow">{isArabic ? 'واجهة التأسيس' : 'Foundation'}</p>
+    <h1>{isArabic ? 'إديو هَب جاهز للمحتوى النهائي.' : 'Edu Hub is ready for the final content.'}</h1>
+    <p>
+      {isArabic
+        ? 'تم فصل الموقع عن أعمال قاعدة البيانات السابقة. سيتم ربط الجداول النهائية بعد اعتمادها.'
+        : 'The site is now separated from the previous database work. Final approved tables will be connected later.'}
+    </p>
+    <aside class="notice">
+      {isArabic
+        ? 'التركيز الحالي: النشر، ربط Instatic CMS، وتجربة عربية/إنجليزية صحيحة.'
+        : 'Current focus: deployment, Instatic CMS integration, and correct English/Arabic behavior.'}
+    </aside>
+  </main>
+  <footer>
+    <div class="shell">{isArabic ? 'إديو هَب' : 'Edu Hub'}</div>
+  </footer>
+</BaseLayout>

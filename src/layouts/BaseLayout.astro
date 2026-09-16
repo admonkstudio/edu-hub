@@ -1,0 +1,41 @@
+---
+import { localeDirection, localePath, type SupportedLocale } from '../lib/i18n';
+import '../styles/global.css';
+
+interface Props {
+  locale: SupportedLocale;
+  title: string;
+  description: string;
+}
+
+const { locale, title, description } = Astro.props;
+const origin = import.meta.env.PUBLIC_WEB_ORIGIN ?? 'http://localhost:4321';
+const canonical = new URL(localePath(locale), origin).toString();
+const alternates = (['en-EG', 'ar-EG'] as const).map((alternateLocale) => ({
+  locale: alternateLocale,
+  href: new URL(localePath(alternateLocale), origin).toString(),
+}));
+---
+
+<!doctype html>
+<html lang={locale} dir={localeDirection(locale)}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="canonical" href={canonical} />
+    {
+      alternates.map(({ locale: alternateLocale, href }) => (
+        <link rel="alternate" hreflang={alternateLocale} href={href} />
+      ))
+    }
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={new URL('/en-eg/', origin).toString()}
+    />
+    <title>{title}</title>
+  </head>
+  <body><slot /></body>
+</html>
